@@ -10,7 +10,9 @@ class SrcBundler {
     compilerOptions() {
         try {
             const tsconfig = fs.readFileSync('tsconfig.json', { encoding: "utf-8" })
-            return JSON.parse(strip_json_comments(tsconfig)).compilerOptions
+            const options = JSON.parse(tsconfig).compilerOptions
+            options.types = []
+            return options
         } catch (error) {
             return {}
         }
@@ -75,9 +77,10 @@ class SrcBundler {
         else {
             console.log("🚥 Still failed. Compiler will try after 5 second.")
         }
-        setTimeout(function () {
-            this.watch(dest)
-        }.bind(this), 5000)
+        // clearTimeout(this.watchTimer)
+        // this.watchTimer = setTimeout(function () {
+        //     this.watch(dest)
+        // }.bind(this), 5000)
     }
 
     build(dest) {

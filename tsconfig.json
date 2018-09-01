@@ -1,16 +1,19 @@
 {
-    "compilerOptions": {
-      "target": "es5",
-      "module": "commonjs",
-      "lib": [
-        "esnext",
-        "es2015.promise",
-        "dom"
-      ],
-      "strict": true,
-      "noImplicitAny": true,
-      "strictNullChecks": true,
-      "noImplicitThis": true,
-      "alwaysStrict": true
-    }
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "lib": [
+      "esnext",
+      "es2015.promise",
+      "dom"
+    ],
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "types": [
+      "xtstudio"
+    ]
   }
+}
