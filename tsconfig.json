@@ -15,5 +15,8 @@
     "types": [
       "xtstudio"
     ]
-  }
+  },
+  "files": [
+    "source/**/*"
+  ]
 }
