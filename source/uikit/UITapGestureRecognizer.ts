@@ -9,7 +9,7 @@ export class UITapGestureRecognizer extends UIGestureRecognizer {
 
     numberOfTouchesRequired = 1
 
-    private beganPoints: Map<number, UIPoint> = new Map()
+    private beganPoints: { [key: number]: UIPoint } = {}
 
     private validPointsCount = 0
 
@@ -17,7 +17,7 @@ export class UITapGestureRecognizer extends UIGestureRecognizer {
         super.handleTouch(touches)
         touches.forEach(it => {
             if (it.phase == UITouchPhase.began) {
-                if (UIView.recognizedGesture != null) { this.beganPoints.clear(); return }
+                if (UIView.recognizedGesture != undefined) { this.beganPoints = {}; return }
                 if (it.windowPoint) {
                     this.beganPoints[it.identifier] = it.windowPoint
                 }
@@ -25,36 +25,36 @@ export class UITapGestureRecognizer extends UIGestureRecognizer {
             else if (it.phase == UITouchPhase.moved) {
                 if (it.windowPoint && this.beganPoints[it.identifier]) {
                     if (Math.abs(this.beganPoints[it.identifier].x - it.windowPoint.x) >= 22.0 || Math.abs(this.beganPoints[it.identifier].y - it.windowPoint.y) >= 22.0) {
-                        this.beganPoints.delete(it.identifier)
+                        delete this.beganPoints[it.identifier]
                     }
                 }
             }
             else if (it.phase == UITouchPhase.ended) {
-                if (UIView.recognizedGesture != null) {
-                    this.beganPoints.clear()
+                if (UIView.recognizedGesture != undefined) {
+                    this.beganPoints = {}
                     this.state = UIGestureRecognizerState.possible
                     this.validPointsCount = 0
                     return
                 }
-                if (it.tapCount >= this.numberOfTapsRequired && this.beganPoints[it.identifier] != null) {
+                if (it.tapCount >= this.numberOfTapsRequired && this.beganPoints[it.identifier] != undefined) {
                     this.validPointsCount++
                 }
-                this.beganPoints.delete(it.identifier)
+                delete this.beganPoints[it.identifier]
                 if (this.validPointsCount >= this.numberOfTouchesRequired) {
                     UIView.recognizedGesture = this
                     this.state = UIGestureRecognizerState.ended
                     this.handleEvent("touch")
-                    // val e = it.view ?.convertRectToWindow(null)
-                    // EDOJavaHelper.emit(this, "touch", this)
+                    this.emit("touch", this)
                     setTimeout(() => {
-                        UIView.recognizedGesture = null
+                        UIView.recognizedGesture = undefined
                     }, 0)
                 }
-                if (this.beganPoints.keys.length == 0 || this.state == UIGestureRecognizerState.ended) {
+                if (Object.keys(this.beganPoints).length == 0 || this.state == UIGestureRecognizerState.ended) {
                     this.state = UIGestureRecognizerState.possible
                     this.validPointsCount = 0
                 }
             }
         })
     }
+
 }

@@ -2,10 +2,12 @@ import { UIRect, UIRectZero } from "./UIRect";
 import { UIColor } from "./UIColor";
 import { CALayer } from "../coregraphics/CALayer";
 import { UIPoint, UIPointZero } from "./UIPoint";
-import { UIAffineTransform, UIAffineTransformIdentity } from "./UIAffineTransform";
+import { UIAffineTransform, UIAffineTransformIdentity, UIAffineTransformIsIdentity } from "./UIAffineTransform";
 import { UIViewContentMode } from "./UIEnums";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { EventEmitter } from "../kimi/EventEmitter";
+import { Matrix } from "./helpers/Matrix";
+import { UITouch, UITouchPhase } from "./UITouch";
 
 export class UIView extends EventEmitter {
 
@@ -367,10 +369,142 @@ export class UIView extends EventEmitter {
 
     static recognizedGesture: any
 
-    convertPointFromWindow(point: UIPoint): UIPoint {
-        return UIPointZero
+    convertPointFromView(point: UIPoint, fromView: UIView): UIPoint {
+        const fromPoint = fromView.convertPointToWindow(point)
+        if (!fromPoint) {
+            return point
+        }
+        return this.convertPointFromWindow(fromPoint) || point
     }
 
+    convertPointToWindow(point: UIPoint): UIPoint | undefined {
+        if (this.window === undefined) {
+            return undefined
+        }
+        var matrix = new Matrix()
+        var current: UIView | undefined = this
+        var routes: UIView[] = []
+        while (current != null) {
+            if (current instanceof UIWindow) { break }
+            routes.push(current)
+            current = current.superview
+        }
+        routes.forEach((it) => {
+            // (it.superview as? UIScrollWrapperView)?.let {
+            //     matrix.postTranslate(-it.scrollX / scale, -it.scrollY / scale)
+            // }
+            matrix.postTranslate(it.frame.x, it.frame.y)
+            if (!UIAffineTransformIsIdentity(it.transform)) {
+                const unmatrix = Matrix.unmatrix(it.transform as Matrix)
+                const matrix2 = new Matrix()
+                matrix2.postTranslate(-(it.frame.width / 2.0), -(it.frame.height / 2.0))
+                matrix2.postRotate(unmatrix.degree)
+                matrix2.postScale(unmatrix.scale.x, unmatrix.scale.y)
+                matrix2.postTranslate(unmatrix.translate.x, unmatrix.translate.y)
+                matrix2.postTranslate((it.frame.width / 2.0), (it.frame.height / 2.0))
+                matrix.concat(matrix2)
+            }
+        })
+        return { x: point.x * matrix.a + point.x * matrix.c + matrix.tx, y: point.y * matrix.b + point.y * matrix.d + matrix.ty }
+    }
+
+    convertPointFromWindow(point: UIPoint): UIPoint | undefined {
+        if (this.window == undefined) {
+            return undefined
+        }
+        var matrix = new Matrix()
+        var current: UIView | undefined = this
+        var routes: UIView[] = []
+        while (current != undefined) {
+            if (current instanceof UIWindow) { break }
+            routes.push(current)
+            current = current.superview
+        }
+        routes.forEach((it) => {
+            // (it.superview as ?UIScrollWrapperView) ?.let {
+            //     matrix.postTranslate(-it.scrollX / scale, -it.scrollY / scale)
+            // }
+            matrix.postTranslate(it.frame.x, it.frame.y)
+            if (!UIAffineTransformIsIdentity(it.transform)) {
+                const unmatrix = Matrix.unmatrix(it.transform as Matrix)
+                const matrix2 = new Matrix()
+                matrix2.postTranslate(-(it.frame.width / 2.0), -(it.frame.height / 2.0))
+                matrix2.postRotate(unmatrix.degree)
+                matrix2.postScale(unmatrix.scale.x, unmatrix.scale.y)
+                matrix2.postTranslate(unmatrix.translate.x, unmatrix.translate.y)
+                matrix2.postTranslate((it.frame.width / 2.0), (it.frame.height / 2.0))
+                matrix.preConcat(matrix2)
+            }
+        })
+        return {
+            x: (point.x - matrix.tx) / (matrix.a + matrix.b),
+            y: (point.y - matrix.ty) / (matrix.d + matrix.c),
+        }
+    }
+
+    // Touches
+
+    hitTest(point: UIPoint): UIView | undefined {
+        if (this.userInteractionEnabled && this.alpha > 0.0 && !this.hidden && this.pointInside(point)) {
+            const reversedSubviews = this.subviews.reverse()
+            for (let index = 0; index < reversedSubviews.length; index++) {
+                const it = reversedSubviews[index]
+                const convertedPoint = it.convertPointFromView(point, this)
+                const testedView = it.hitTest(convertedPoint)
+                if (testedView !== undefined) {
+                    return testedView
+                }
+            }
+            return this
+        }
+        return undefined
+    }
+
+    touchesBegan(touches: UITouch[]) {
+        this.gestureRecognizers.filter((it) => it.enabled).forEach((it) => {
+            it.handleTouch(touches)
+        })
+        if (this.superview) {
+            this.superview.touchesBegan(touches)
+        }
+    }
+
+    touchesMoved(touches: UITouch[]) {
+        this.gestureRecognizers.filter((it) => it.enabled).forEach((it) => {
+            it.handleTouch(touches)
+        })
+        if (this.superview) {
+            this.superview.touchesMoved(touches)
+        }
+    }
+
+    touchesEnded(touches: UITouch[]) {
+        this.gestureRecognizers.filter((it) => it.enabled).forEach((it) => {
+            it.handleTouch(touches)
+        })
+        if (this.superview) {
+            this.superview.touchesEnded(touches)
+        }
+    }
+
+    touchesCancelled(touches: UITouch[]) {
+        this.gestureRecognizers.filter((it) => it.enabled).forEach((it) => {
+            it.handleTouch(touches)
+        })
+        if (this.superview) {
+            this.superview.touchesCancelled(touches)
+        }
+    }
+
+    pointInside(point: UIPoint): boolean {
+        // touchAreaInsets?.let { touchAreaInsets ->
+        //     return point.x >= 0.0 - touchAreaInsets.left &&
+        //             point.y >= 0.0 - touchAreaInsets.top &&
+        //             point.x <= this.frame.width + touchAreaInsets.right &&
+        //             point.y <= this.frame.height + touchAreaInsets.bottom
+        // }
+        return point.x >= 0.0 && point.y >= 0.0 && point.x <= this.frame.width && point.y <= this.frame.height
+    }
 }
 
 export class UIWindow extends UIView {
@@ -380,23 +514,122 @@ export class UIWindow extends UIView {
         this.setupTouches()
     }
 
+    private currentTouchesID: number[] = []
+    private touches: { [key: number]: UITouch } = {}
+    private upCount: Map<UIPoint, number> = new Map()
+    private upTimestamp: Map<UIPoint, number> = new Map()
+
     setupTouches() {
         this.domElement.addEventListener("touchstart", (e) => {
-            console.log(e)
+            for (let index = 0; index < e.changedTouches.length; index++) {
+                const pointer = e.changedTouches[index];
+                this.currentTouchesID.push(pointer.identifier)
+                const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
+                const target = this.hitTest(point)
+                if (target) {
+                    if (target instanceof UINativeTouchView) {
+                        return false
+                    }
+                    const touch = new UITouch()
+                    this.touches[pointer.identifier] = touch
+                    touch.identifier = pointer.identifier
+                    touch.phase = UITouchPhase.began
+                    touch.tapCount = (() => {
+                        for (const [key, value] of this.upCount) {
+                            const timestamp = this.upTimestamp.get(key) || 0.0
+                            if (Date.now() / 1000.0 - timestamp < 1.0
+                                && Math.abs(key.x - point.x) < 44.0 && Math.abs(key.y - point.y) < 44.0) {
+                                return value + 1
+                            }
+                        }
+                        return 1
+                    })()
+                    touch.timestamp = Date.now() / 1000.0
+                    touch.window = this
+                    touch.windowPoint = point
+                    touch.view = target
+                    touch.view.touchesBegan([touch])
+                }
+            }
             e.preventDefault()
         })
         this.domElement.addEventListener("touchmove", (e) => {
-            console.log(e)
+            // sharedVelocityTracker.computeCurrentVelocity(1000)
+            for (let index = 0; index < e.changedTouches.length; index++) {
+                const pointer = e.changedTouches[index];
+                const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
+                const touch = this.touches[pointer.identifier]
+                if (touch === undefined) {
+                    return false
+                }
+                touch.phase = UITouchPhase.moved
+                touch.timestamp = Date.now() / 1000.0
+                touch.windowPoint = point
+                if (touch.view) {
+                    touch.view.touchesMoved([touch])
+                }
+            }
             e.preventDefault()
         })
         this.domElement.addEventListener("touchend", (e) => {
-            console.log(e)
+            for (let index = 0; index < e.changedTouches.length; index++) {
+                const pointer = e.changedTouches[index];
+                const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
+                const touch = this.touches[pointer.identifier]
+                if (touch !== undefined) {
+                    touch.phase = UITouchPhase.ended
+                    touch.timestamp = Date.now() / 1000.0
+                    touch.windowPoint = point
+                    if (touch.view) {
+                        touch.view.touchesEnded([touch])
+                    }
+                }
+                const idx = this.currentTouchesID.indexOf(pointer.identifier)
+                if (idx >= 0) {
+                    this.currentTouchesID.splice(idx, 1)
+                }
+            }
+            if (this.currentTouchesID.length == 0) {
+                this.upCount.clear()
+                this.upTimestamp.clear()
+                for (const key in this.touches) {
+                    if (this.touches.hasOwnProperty(key)) {
+                        const it = this.touches[key];
+                        if (it.windowPoint) {
+                            this.upCount.set(it.windowPoint, it.tapCount)
+                            this.upTimestamp.set(it.windowPoint, it.timestamp)
+                        }
+                    }
+                }
+                this.touches = {}
+                // sharedVelocityTracker.clear()
+                setTimeout(() => {
+                    UIView.recognizedGesture = undefined
+                }, 0)
+            }
             e.preventDefault()
         })
         this.domElement.addEventListener("touchcancel", (e) => {
-            console.log(e)
+            for (let index = 0; index < e.changedTouches.length; index++) {
+                const pointer = e.changedTouches[index];
+                const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
+                const touch = this.touches[pointer.identifier]
+                if (touch) {
+                    touch.phase = UITouchPhase.cancelled
+                    touch.timestamp = Date.now() / 1000.0
+                    touch.windowPoint = point
+                    if (touch.view) {
+                        touch.view.touchesCancelled([touch])
+                    }
+                }
+            }
+            this.upCount.clear()
+            this.upTimestamp.clear()
+            this.touches = {}
             e.preventDefault()
         })
     }
 
 }
+
+export class UINativeTouchView extends UIView { }

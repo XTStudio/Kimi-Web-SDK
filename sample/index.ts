@@ -4,6 +4,17 @@ const aView = new UIView
 aView.frame = { x: 44, y: 44, width: 88, height: 88 }
 aView.backgroundColor = UIColor.red
 aView.clipsToBounds = true
+const longPress = new UIPanGestureRecognizer()
+    .on("began", () => {
+        aView.backgroundColor = UIColor.yellow
+    })
+    .on("changed", () => {
+        aView.backgroundColor = UIColor.gray
+    })
+    .on("ended", () => {
+        aView.backgroundColor = UIColor.red
+    })
+aView.addGestureRecognizer(longPress)
 global.aView = aView
 
 const bView = new UIView
@@ -14,6 +25,9 @@ aView.addSubview(bView)
 const cView = new UIView
 cView.frame = { x: 11, y: 11, width: 22, height: 1000 }
 cView.backgroundColor = UIColor.gray
+cView.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
+    cView.backgroundColor = UIColor.yellow
+}))
 // cView.hidden = true
 
 aView.insertSubviewAboveSubview(cView, bView)

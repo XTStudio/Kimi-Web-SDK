@@ -1,6 +1,7 @@
 import { UIPoint, UIPointZero } from "./UIPoint";
 import { UITouch } from "./UITouch";
 import { UIView } from "./UIView";
+import { EventEmitter } from "../kimi/EventEmitter";
 
 export enum UIGestureRecognizerState {
     possible,
@@ -11,7 +12,7 @@ export enum UIGestureRecognizerState {
     failed,
 }
 
-export class UIGestureRecognizer {
+export class UIGestureRecognizer extends EventEmitter {
 
     protected state: UIGestureRecognizerState = UIGestureRecognizerState.possible
 

@@ -31,6 +31,15 @@ import { UIGestureRecognizerState, UIGestureRecognizer } from "./uikit/UIGesture
 global.UIGestureRecognizerState = UIGestureRecognizerState
 global.UIGestureRecognizer = UIGestureRecognizer
 
+import { UITapGestureRecognizer } from "./uikit/UITapGestureRecognizer";
+global.UITapGestureRecognizer = UITapGestureRecognizer
+
+import { UILongPressGestureRecognizer } from "./uikit/UILongPressGestureRecognizer";
+global.UILongPressGestureRecognizer = UILongPressGestureRecognizer
+
+import { UIPanGestureRecognizer } from "./uikit/UIPanGestureRecognizer";
+global.UIPanGestureRecognizer = UIPanGestureRecognizer
+
 import { UIColor } from './uikit/UIColor'
 global.UIColor = UIColor
 
