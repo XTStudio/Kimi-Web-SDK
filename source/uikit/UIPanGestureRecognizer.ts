@@ -1,6 +1,6 @@
 import { UIGestureRecognizer, UIGestureRecognizerState } from "./UIGestureRecognizer";
 import { UIPoint } from "./UIPoint";
-import { UIView } from "./UIView";
+import { UIView, sharedVelocityTracker } from "./UIView";
 import { UITouch, UITouchPhase } from "./UITouch";
 
 export class UIPanGestureRecognizer extends UIGestureRecognizer {
@@ -32,10 +32,8 @@ export class UIPanGestureRecognizer extends UIGestureRecognizer {
     }
 
     velocityInView(view: UIView | undefined): UIPoint {
-        // val x = UIView.sharedVelocityTracker.xVelocity.toDouble() / scale
-        // val y = UIView.sharedVelocityTracker.yVelocity.toDouble() / scale
-        // return CGPoint(x, y)
-        return { x: 0, y: 0 }
+        sharedVelocityTracker.computeCurrentVelocity()
+        return sharedVelocityTracker.velocity
     }
 
     lockedDirection: number | undefined = undefined

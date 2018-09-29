@@ -11,8 +11,9 @@ const longPress = new UIPanGestureRecognizer()
     .on("changed", () => {
         aView.backgroundColor = UIColor.gray
     })
-    .on("ended", () => {
+    .on("ended", (sender) => {
         aView.backgroundColor = UIColor.red
+        console.log(sender.velocityInView(undefined))
     })
 aView.addGestureRecognizer(longPress)
 global.aView = aView

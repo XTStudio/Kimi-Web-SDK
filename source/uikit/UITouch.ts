@@ -41,3 +41,37 @@ export class UITouch {
     }
 
 }
+
+export class VelocityTracker {
+
+    private movements: UITouch[] = []
+    velocity: UIPoint = { x: 0, y: 0 }
+
+    reset() {
+        this.movements = []
+        this.velocity = { x: 0, y: 0 }
+    }
+
+    addMovement(touch: UITouch) {
+        this.movements.push({ ...touch } as UITouch)
+    }
+
+    computeCurrentVelocity() {
+        for (let index = this.movements.length - 1; index >= 1; index--) {
+            const current = this.movements[index]
+            const last = this.movements[index - 1]
+            if (!current.windowPoint || !last.windowPoint) {
+                continue
+            }
+            const timeDiff = current.timestamp - last.timestamp
+            if (timeDiff > 0.008) {
+                this.velocity = {
+                    x: (current.windowPoint.x - last.windowPoint.x) / timeDiff,
+                    y: (current.windowPoint.y - last.windowPoint.y) / timeDiff,
+                }
+                break
+            }
+        }
+    }
+
+}

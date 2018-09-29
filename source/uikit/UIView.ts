@@ -7,7 +7,9 @@ import { UIViewContentMode } from "./UIEnums";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { EventEmitter } from "../kimi/EventEmitter";
 import { Matrix } from "./helpers/Matrix";
-import { UITouch, UITouchPhase } from "./UITouch";
+import { UITouch, UITouchPhase, VelocityTracker } from "./UITouch";
+
+export const sharedVelocityTracker = new VelocityTracker
 
 export class UIView extends EventEmitter {
 
@@ -548,13 +550,16 @@ export class UIWindow extends UIView {
                     touch.window = this
                     touch.windowPoint = point
                     touch.view = target
+                    if (touch.identifier == 0) {
+                        sharedVelocityTracker.reset()
+                        sharedVelocityTracker.addMovement(touch)
+                    }
                     touch.view.touchesBegan([touch])
                 }
             }
             e.preventDefault()
         })
         this.domElement.addEventListener("touchmove", (e) => {
-            // sharedVelocityTracker.computeCurrentVelocity(1000)
             for (let index = 0; index < e.changedTouches.length; index++) {
                 const pointer = e.changedTouches[index];
                 const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
@@ -565,6 +570,9 @@ export class UIWindow extends UIView {
                 touch.phase = UITouchPhase.moved
                 touch.timestamp = Date.now() / 1000.0
                 touch.windowPoint = point
+                if (touch.identifier == 0) {
+                    sharedVelocityTracker.addMovement(touch)
+                }
                 if (touch.view) {
                     touch.view.touchesMoved([touch])
                 }
@@ -580,6 +588,9 @@ export class UIWindow extends UIView {
                     touch.phase = UITouchPhase.ended
                     touch.timestamp = Date.now() / 1000.0
                     touch.windowPoint = point
+                    if (touch.identifier == 0) {
+                        sharedVelocityTracker.addMovement(touch)
+                    }
                     if (touch.view) {
                         touch.view.touchesEnded([touch])
                     }
@@ -618,6 +629,9 @@ export class UIWindow extends UIView {
                     touch.phase = UITouchPhase.cancelled
                     touch.timestamp = Date.now() / 1000.0
                     touch.windowPoint = point
+                    if (touch.identifier == 0) {
+                        sharedVelocityTracker.addMovement(touch)
+                    }
                     if (touch.view) {
                         touch.view.touchesCancelled([touch])
                     }

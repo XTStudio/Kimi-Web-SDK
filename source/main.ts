@@ -40,6 +40,12 @@ global.UILongPressGestureRecognizer = UILongPressGestureRecognizer
 import { UIPanGestureRecognizer } from "./uikit/UIPanGestureRecognizer";
 global.UIPanGestureRecognizer = UIPanGestureRecognizer
 
+import { UIPinchGestureRecognizer } from "./uikit/UIPinchGestureRecognizer";
+global.UIPinchGestureRecognizer = UIPinchGestureRecognizer
+
+import { UIRotationGestureRecognizer } from "./uikit/UIRotationGestureRecognizer";
+global.UIRotationGestureRecognizer = UIRotationGestureRecognizer
+
 import { UIColor } from './uikit/UIColor'
 global.UIColor = UIColor
 
