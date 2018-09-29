@@ -8,6 +8,7 @@ import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { EventEmitter } from "../kimi/EventEmitter";
 import { Matrix } from "./helpers/Matrix";
 import { UITouch, UITouchPhase, VelocityTracker } from "./UITouch";
+import { UIEdgeInsets, UIEdgeInsetsZero } from "./UIEdgeInsets";
 
 export const sharedVelocityTracker = new VelocityTracker
 
@@ -54,6 +55,8 @@ export class UIView extends EventEmitter {
     public bounds: UIRect = UIRectZero
 
     private _transform: UIAffineTransform = UIAffineTransformIdentity
+
+    touchAreaInsets: UIEdgeInsets = UIEdgeInsetsZero
 
     public tag: number = 0
 
@@ -499,13 +502,10 @@ export class UIView extends EventEmitter {
     }
 
     pointInside(point: UIPoint): boolean {
-        // touchAreaInsets?.let { touchAreaInsets ->
-        //     return point.x >= 0.0 - touchAreaInsets.left &&
-        //             point.y >= 0.0 - touchAreaInsets.top &&
-        //             point.x <= this.frame.width + touchAreaInsets.right &&
-        //             point.y <= this.frame.height + touchAreaInsets.bottom
-        // }
-        return point.x >= 0.0 && point.y >= 0.0 && point.x <= this.frame.width && point.y <= this.frame.height
+        return point.x >= 0.0 - this.touchAreaInsets.left &&
+            point.y >= 0.0 - this.touchAreaInsets.top &&
+            point.x <= this.frame.width + this.touchAreaInsets.right &&
+            point.y <= this.frame.height + this.touchAreaInsets.bottom
     }
 }
 
