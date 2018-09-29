@@ -766,125 +766,204 @@ export class UIWindow extends UIView {
     private upCount: Map<UIPoint, number> = new Map()
     private upTimestamp: Map<UIPoint, number> = new Map()
 
-    setupTouches() {
-        this.domElement.addEventListener("touchstart", (e) => {
-            for (let index = 0; index < e.changedTouches.length; index++) {
-                const pointer = e.changedTouches[index];
-                this.currentTouchesID.push(pointer.identifier)
-                const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
-                const target = this.hitTest(point)
-                if (target) {
-                    if (target instanceof UINativeTouchView) {
-                        return false
-                    }
-                    const touch = new UITouch()
-                    this.touches[pointer.identifier] = touch
-                    touch.identifier = pointer.identifier
-                    touch.phase = UITouchPhase.began
-                    touch.tapCount = (() => {
-                        for (const [key, value] of this.upCount) {
-                            const timestamp = this.upTimestamp.get(key) || 0.0
-                            if (Date.now() / 1000.0 - timestamp < 1.0
-                                && Math.abs(key.x - point.x) < 44.0 && Math.abs(key.y - point.y) < 44.0) {
-                                return value + 1
-                            }
-                        }
-                        return 1
-                    })()
-                    touch.timestamp = Date.now() / 1000.0
-                    touch.window = this
-                    touch.windowPoint = point
-                    touch.view = target
-                    if (touch.identifier == 0) {
-                        sharedVelocityTracker.addMovement(touch)
-                    }
-                    touch.view.touchesBegan([touch])
-                }
-            }
-            e.preventDefault()
-        })
-        this.domElement.addEventListener("touchmove", (e) => {
-            for (let index = 0; index < e.changedTouches.length; index++) {
-                const pointer = e.changedTouches[index];
-                const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
-                const touch = this.touches[pointer.identifier]
-                if (touch === undefined) {
+    private handleTouchStart(e: TouchEvent) {
+        const changedTouches = this.standardlizeTouches(e)
+        for (let index = 0; index < changedTouches.length; index++) {
+            const pointer = changedTouches[index];
+            const pointerIdentifier = this.standardlizeTouchIdentifier(pointer)
+            this.currentTouchesID.push(pointerIdentifier)
+            const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
+            const target = this.hitTest(point)
+            if (target) {
+                if (target instanceof UINativeTouchView) {
                     return false
                 }
-                touch.phase = UITouchPhase.moved
+                const touch = new UITouch()
+                this.touches[pointerIdentifier] = touch
+                touch.identifier = pointerIdentifier
+                touch.phase = UITouchPhase.began
+                touch.tapCount = (() => {
+                    for (const [key, value] of this.upCount) {
+                        const timestamp = this.upTimestamp.get(key) || 0.0
+                        if (Date.now() / 1000.0 - timestamp < 1.0
+                            && Math.abs(key.x - point.x) < 44.0 && Math.abs(key.y - point.y) < 44.0) {
+                            return value + 1
+                        }
+                    }
+                    return 1
+                })()
+                touch.timestamp = Date.now() / 1000.0
+                touch.window = this
+                touch.windowPoint = point
+                touch.view = target
+                if (touch.identifier == 0) {
+                    sharedVelocityTracker.addMovement(touch)
+                }
+                touch.view.touchesBegan([touch])
+            }
+        }
+        e.preventDefault()
+    }
+
+    private handleTouchMove(e: TouchEvent) {
+        const changedTouches = this.standardlizeTouches(e)
+        for (let index = 0; index < changedTouches.length; index++) {
+            const pointer = changedTouches[index];
+            const pointerIdentifier = this.standardlizeTouchIdentifier(pointer)
+            const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
+            const touch = this.touches[pointerIdentifier]
+            if (touch === undefined) {
+                return false
+            }
+            touch.phase = UITouchPhase.moved
+            touch.timestamp = Date.now() / 1000.0
+            touch.windowPoint = point
+            if (touch.identifier == 0) {
+                sharedVelocityTracker.addMovement(touch)
+            }
+            if (touch.view) {
+                touch.view.touchesMoved([touch])
+            }
+        }
+        e.preventDefault()
+    }
+
+    private handleTouchEnd(e: TouchEvent) {
+        const changedTouches = this.standardlizeTouches(e)
+        for (let index = 0; index < changedTouches.length; index++) {
+            const pointer = changedTouches[index];
+            const pointerIdentifier = this.standardlizeTouchIdentifier(pointer)
+            const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
+            const touch = this.touches[pointerIdentifier]
+            if (touch !== undefined) {
+                touch.phase = UITouchPhase.ended
                 touch.timestamp = Date.now() / 1000.0
                 touch.windowPoint = point
                 if (touch.identifier == 0) {
                     sharedVelocityTracker.addMovement(touch)
                 }
                 if (touch.view) {
-                    touch.view.touchesMoved([touch])
+                    touch.view.touchesEnded([touch])
                 }
             }
-            e.preventDefault()
-        })
-        this.domElement.addEventListener("touchend", (e) => {
-            for (let index = 0; index < e.changedTouches.length; index++) {
-                const pointer = e.changedTouches[index];
-                const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
-                const touch = this.touches[pointer.identifier]
-                if (touch !== undefined) {
-                    touch.phase = UITouchPhase.ended
-                    touch.timestamp = Date.now() / 1000.0
-                    touch.windowPoint = point
-                    if (touch.identifier == 0) {
-                        sharedVelocityTracker.addMovement(touch)
-                    }
-                    if (touch.view) {
-                        touch.view.touchesEnded([touch])
-                    }
-                }
-                const idx = this.currentTouchesID.indexOf(pointer.identifier)
-                if (idx >= 0) {
-                    this.currentTouchesID.splice(idx, 1)
-                }
+            const idx = this.currentTouchesID.indexOf(pointerIdentifier)
+            if (idx >= 0) {
+                this.currentTouchesID.splice(idx, 1)
             }
-            if (this.currentTouchesID.length == 0) {
-                this.upCount.clear()
-                this.upTimestamp.clear()
-                for (const key in this.touches) {
-                    if (this.touches.hasOwnProperty(key)) {
-                        const it = this.touches[key];
-                        if (it.windowPoint) {
-                            this.upCount.set(it.windowPoint, it.tapCount)
-                            this.upTimestamp.set(it.windowPoint, it.timestamp)
-                        }
-                    }
-                }
-                this.touches = {}
-                sharedVelocityTracker.reset()
-                setTimeout(() => {
-                    UIView.recognizedGesture = undefined
-                }, 0)
-            }
-            e.preventDefault()
-        })
-        this.domElement.addEventListener("touchcancel", (e) => {
-            for (let index = 0; index < e.changedTouches.length; index++) {
-                const pointer = e.changedTouches[index];
-                const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
-                const touch = this.touches[pointer.identifier]
-                if (touch) {
-                    touch.phase = UITouchPhase.cancelled
-                    touch.timestamp = Date.now() / 1000.0
-                    touch.windowPoint = point
-                    if (touch.identifier == 0) {
-                        sharedVelocityTracker.addMovement(touch)
-                    }
-                    if (touch.view) {
-                        touch.view.touchesCancelled([touch])
-                    }
-                }
-            }
+        }
+        if (this.currentTouchesID.length == 0) {
             this.upCount.clear()
             this.upTimestamp.clear()
+            for (const key in this.touches) {
+                if (this.touches.hasOwnProperty(key)) {
+                    const it = this.touches[key];
+                    if (it.windowPoint) {
+                        this.upCount.set(it.windowPoint, it.tapCount)
+                        this.upTimestamp.set(it.windowPoint, it.timestamp)
+                    }
+                }
+            }
             this.touches = {}
-            e.preventDefault()
+            sharedVelocityTracker.reset()
+            setTimeout(() => {
+                UIView.recognizedGesture = undefined
+            }, 0)
+        }
+        e.preventDefault()
+    }
+
+    private handleTouchCancel(e: TouchEvent) {
+        const changedTouches = this.standardlizeTouches(e)
+        for (let index = 0; index < changedTouches.length; index++) {
+            const pointer = changedTouches[index];
+            const pointerIdentifier = this.standardlizeTouchIdentifier(pointer)
+            const point: UIPoint = { x: pointer.pageX, y: pointer.pageY }
+            const touch = this.touches[pointerIdentifier]
+            if (touch) {
+                touch.phase = UITouchPhase.cancelled
+                touch.timestamp = Date.now() / 1000.0
+                touch.windowPoint = point
+                if (touch.identifier == 0) {
+                    sharedVelocityTracker.addMovement(touch)
+                }
+                if (touch.view) {
+                    touch.view.touchesCancelled([touch])
+                }
+            }
+        }
+        this.upCount.clear()
+        this.upTimestamp.clear()
+        this.touches = {}
+        e.preventDefault()
+    }
+
+    private standardlizeTouches(e: TouchEvent): Touch[] {
+        if (e.changedTouches) {
+            return new Array(e.changedTouches.length)
+                .fill(0)
+                .map((_, i) => e.changedTouches[i])
+                .map(it => {
+                    if (it.identifier < -100 || it.identifier > 100) {
+                        (it as any).identifier_2 = (() => {
+                            for (let index = 0; index < e.touches.length; index++) {
+                                if (e.touches[index].identifier === it.identifier) {
+                                    return index
+                                }
+                            }
+                            return 0
+                        })()
+                        return it
+                    }
+                    else {
+                        return it
+                    }
+                })
+        }
+        else if (e.constructor.toString().startsWith("function MouseEvent()")) {
+            const ee: MouseEvent = e as any
+            return [
+                {
+                    identifier: 0,
+                    pageX: ee.pageX,
+                    pageY: ee.pageY,
+                }
+            ] as Touch[]
+        }
+        else {
+            return []
+        }
+    }
+
+    private standardlizeTouchIdentifier(touch: any): number {
+        return typeof touch.identifier_2 === "number" ? touch.identifier_2 : touch.identifier
+    }
+
+    private mouseDowned = false
+
+    setupTouches() {
+        this.domElement.addEventListener("mousedown", (e) => {
+            this.mouseDowned = true
+            this.handleTouchStart(e as any)
+        })
+        this.domElement.addEventListener("mousemove", (e) => {
+            if (!this.mouseDowned) { return }
+            this.handleTouchMove(e as any)
+        })
+        this.domElement.addEventListener("mouseup", (e) => {
+            this.handleTouchEnd(e as any)
+            this.mouseDowned = false
+        })
+        this.domElement.addEventListener("touchstart", (e) => {
+            this.handleTouchStart(e)
+        })
+        this.domElement.addEventListener("touchmove", (e) => {
+            this.handleTouchMove(e)
+        })
+        this.domElement.addEventListener("touchend", (e) => {
+            this.handleTouchEnd(e)
+        })
+        this.domElement.addEventListener("touchcancel", (e) => {
+            this.handleTouchCancel(e)
         })
     }
 

@@ -63,8 +63,15 @@ export class VelocityTracker {
             if (!current.windowPoint || !last.windowPoint) {
                 continue
             }
+            if (current.phase == UITouchPhase.ended && last.phase == UITouchPhase.moved && current.timestamp - last.timestamp > 0.024) {
+                this.velocity = { x: 0, y: 0 }
+                break
+            }
+            if (current.phase != UITouchPhase.moved || last.phase != UITouchPhase.moved) {
+                continue
+            }
             const timeDiff = current.timestamp - last.timestamp
-            if (timeDiff > 0.008) {
+            if (timeDiff > 0.002) {
                 this.velocity = {
                     x: (current.windowPoint.x - last.windowPoint.x) / timeDiff,
                     y: (current.windowPoint.y - last.windowPoint.y) / timeDiff,
