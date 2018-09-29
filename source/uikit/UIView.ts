@@ -1,14 +1,15 @@
-import { UIRect, UIRectZero } from "./UIRect";
+import { UIRect, UIRectZero, UIRectEqualToRect } from "./UIRect";
 import { UIColor } from "./UIColor";
 import { CALayer } from "../coregraphics/CALayer";
 import { UIPoint, UIPointZero } from "./UIPoint";
-import { UIAffineTransform, UIAffineTransformIdentity, UIAffineTransformIsIdentity } from "./UIAffineTransform";
+import { UIAffineTransform, UIAffineTransformIdentity, UIAffineTransformIsIdentity, UIAffineTransformEqual } from "./UIAffineTransform";
 import { UIViewContentMode } from "./UIEnums";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { EventEmitter } from "../kimi/EventEmitter";
 import { Matrix } from "./helpers/Matrix";
 import { UITouch, UITouchPhase, VelocityTracker } from "./UITouch";
 import { UIEdgeInsets, UIEdgeInsetsZero } from "./UIEdgeInsets";
+import { UIAnimator, UIAnimation } from "./UIAnimator";
 
 export const sharedVelocityTracker = new VelocityTracker
 
@@ -279,7 +280,32 @@ export class UIView extends EventEmitter {
         return this._alpha;
     }
 
+    private alpha_animation: UIAnimation | undefined
+
     public set alpha(value: number) {
+        if (this._alpha === value) {
+            return
+        }
+        if (!UIAnimator.duringAnimationValueSet) {
+            if (this.alpha_animation) {
+                this.alpha_animation.cancel()
+                this.alpha_animation = undefined
+            }
+        }
+        if (UIAnimator.activeAnimator && !UIAnimator.duringAnimationValueSet) {
+            if (UIAnimator.activeAnimator.animationCreater) {
+                const animation = UIAnimator.activeAnimator.animationCreater()
+                this.alpha_animation = animation
+                animation.setUpdateListener((newValue) => {
+                    UIAnimator.duringAnimationValueSet = true
+                    this.alpha = newValue
+                    UIAnimator.duringAnimationValueSet = false
+                })
+                animation.setStartValue(this.alpha)
+                animation.setEndValue(value)
+                return
+            }
+        }
         this._alpha = value;
         this.domElement.style.opacity = value.toString()
     }
@@ -288,7 +314,81 @@ export class UIView extends EventEmitter {
         return this._backgroundColor;
     }
 
+    private backgroundColor_animations: UIAnimation[] = []
+
     public set backgroundColor(value: UIColor | undefined) {
+        if (this._backgroundColor && value && this._backgroundColor.r === value.r && this._backgroundColor.g === value.g && this._backgroundColor.b === value.b && this._backgroundColor.a === value.a) {
+            return
+        }
+        if (!UIAnimator.duringAnimationValueSet) {
+            if (this.backgroundColor_animations) {
+                this.backgroundColor_animations.forEach(it => it.cancel())
+                this.backgroundColor_animations = []
+            }
+        }
+        if (UIAnimator.activeAnimator && !UIAnimator.duringAnimationValueSet) {
+            if (UIAnimator.activeAnimator.animationCreater && this._backgroundColor && value) {
+                const animations = []
+                if (this._backgroundColor.r != value.r) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        const backgroundColor = this.backgroundColor
+                        if (backgroundColor) {
+                            UIAnimator.duringAnimationValueSet = true
+                            this.backgroundColor = new UIColor(Math.max(0.0, Math.min(1.0, it)), backgroundColor.g, backgroundColor.b, backgroundColor.a)
+                            UIAnimator.duringAnimationValueSet = false
+                        }
+                    })
+                    animation.setStartValue(this._backgroundColor.r)
+                    animation.setEndValue(value.r)
+                    animations.push(animation)
+                }
+                if (this._backgroundColor.g != value.g) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        const backgroundColor = this.backgroundColor
+                        if (backgroundColor) {
+                            UIAnimator.duringAnimationValueSet = true
+                            this.backgroundColor = new UIColor(backgroundColor.r, Math.max(0.0, Math.min(1.0, it)), backgroundColor.b, backgroundColor.a)
+                            UIAnimator.duringAnimationValueSet = false
+                        }
+                    })
+                    animation.setStartValue(this._backgroundColor.g)
+                    animation.setEndValue(value.g)
+                    animations.push(animation)
+                }
+                if (this._backgroundColor.b != value.b) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        const backgroundColor = this.backgroundColor
+                        if (backgroundColor) {
+                            UIAnimator.duringAnimationValueSet = true
+                            this.backgroundColor = new UIColor(backgroundColor.r, backgroundColor.g, Math.max(0.0, Math.min(1.0, it)), backgroundColor.a)
+                            UIAnimator.duringAnimationValueSet = false
+                        }
+                    })
+                    animation.setStartValue(this._backgroundColor.b)
+                    animation.setEndValue(value.b)
+                    animations.push(animation)
+                }
+                if (this._backgroundColor.a != value.a) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        const backgroundColor = this.backgroundColor
+                        if (backgroundColor) {
+                            UIAnimator.duringAnimationValueSet = true
+                            this.backgroundColor = new UIColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, Math.max(0.0, Math.min(1.0, it)))
+                            UIAnimator.duringAnimationValueSet = false
+                        }
+                    })
+                    animation.setStartValue(this._backgroundColor.a)
+                    animation.setEndValue(value.a)
+                    animations.push(animation)
+                }
+                this.backgroundColor_animations = animations
+                return
+            }
+        }
         this._backgroundColor = value;
         this.domElement.style.backgroundColor = value ? value.toStyle() : null
     }
@@ -297,7 +397,65 @@ export class UIView extends EventEmitter {
         return this._frame;
     }
 
+    private frame_animations: UIAnimation[] = []
+
     public set frame(value: UIRect) {
+        if (UIRectEqualToRect(this._frame, value)) { return }
+        if (!UIAnimator.duringAnimationValueSet) {
+            this.frame_animations.forEach(it => it.cancel())
+            this.frame_animations = []
+        }
+        if (UIAnimator.activeAnimator && !UIAnimator.duringAnimationValueSet) {
+            if (UIAnimator.activeAnimator.animationCreater) {
+                const animations = []
+                if (this._frame.x !== value.x) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        UIAnimator.duringAnimationValueSet = true
+                        this.frame = { ...this.frame, x: it }
+                        UIAnimator.duringAnimationValueSet = false
+                    })
+                    animation.setStartValue(this._frame.x)
+                    animation.setEndValue(value.x)
+                    animations.push(animation)
+                }
+                if (this._frame.y !== value.y) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        UIAnimator.duringAnimationValueSet = true
+                        this.frame = { ...this.frame, y: it }
+                        UIAnimator.duringAnimationValueSet = false
+                    })
+                    animation.setStartValue(this._frame.y)
+                    animation.setEndValue(value.y)
+                    animations.push(animation)
+                }
+                if (this._frame.width !== value.width) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        UIAnimator.duringAnimationValueSet = true
+                        this.frame = { ...this.frame, width: it }
+                        UIAnimator.duringAnimationValueSet = false
+                    })
+                    animation.setStartValue(this._frame.width)
+                    animation.setEndValue(value.width)
+                    animations.push(animation)
+                }
+                if (this._frame.height !== value.height) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        UIAnimator.duringAnimationValueSet = true
+                        this.frame = { ...this.frame, height: it }
+                        UIAnimator.duringAnimationValueSet = false
+                    })
+                    animation.setStartValue(this._frame.height)
+                    animation.setEndValue(value.height)
+                    animations.push(animation)
+                }
+                this.frame_animations = animations
+                return
+            }
+        }
         const boundsChanged = this._frame.width != value.width || this._frame.height != value.height
         this._frame = value;
         this.layer.frame = value
@@ -323,7 +481,94 @@ export class UIView extends EventEmitter {
         return this._transform;
     }
 
+    private transform_animations: UIAnimation[] = []
+
     public set transform(value: UIAffineTransform) {
+        if (UIAffineTransformEqual(this._transform, value)) {
+            return
+        }
+        if (!UIAnimator.duringAnimationValueSet) {
+            this.transform_animations.forEach(it => it.cancel())
+            this.transform_animations = []
+        }
+        if (UIAnimator.activeAnimator && !UIAnimator.duringAnimationValueSet) {
+            if (UIAnimator.activeAnimator.animationCreater) {
+                const animations = []
+                const fieldUnmatrix = Matrix.unmatrix(this._transform as Matrix)
+                const valueUnmatrix = Matrix.unmatrix(value as Matrix)
+                if (fieldUnmatrix.scale.x != valueUnmatrix.scale.x) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        const matrix = new Matrix()
+                        matrix.setValues(this._transform)
+                        matrix.setScale(it)
+                        UIAnimator.duringAnimationValueSet = true
+                        this.transform = matrix.getValues()
+                        UIAnimator.duringAnimationValueSet = false
+                    })
+                    animation.setStartValue(fieldUnmatrix.scale.x)
+                    animation.setEndValue(valueUnmatrix.scale.x)
+                    animations.push(animation)
+                }
+                if (fieldUnmatrix.scale.y != valueUnmatrix.scale.y) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        const matrix = new Matrix()
+                        matrix.setValues(this._transform)
+                        matrix.setScale(undefined, it)
+                        UIAnimator.duringAnimationValueSet = true
+                        this.transform = matrix.getValues()
+                        UIAnimator.duringAnimationValueSet = false
+                    })
+                    animation.setStartValue(fieldUnmatrix.scale.y)
+                    animation.setEndValue(valueUnmatrix.scale.y)
+                    animations.push(animation)
+                }
+                if (fieldUnmatrix.degree != valueUnmatrix.degree) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        const matrix = new Matrix()
+                        matrix.setValues(this._transform)
+                        matrix.setRotate(it * Math.PI / 180.0)
+                        UIAnimator.duringAnimationValueSet = true
+                        this.transform = matrix.getValues()
+                        UIAnimator.duringAnimationValueSet = false
+                    })
+                    animation.setStartValue(fieldUnmatrix.degree)
+                    animation.setEndValue(valueUnmatrix.degree)
+                    animations.push(animation)
+                }
+                if (fieldUnmatrix.translate.x != valueUnmatrix.translate.x) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        const matrix = new Matrix()
+                        matrix.setValues(this._transform)
+                        matrix.setTranslate(it)
+                        UIAnimator.duringAnimationValueSet = true
+                        this.transform = matrix.getValues()
+                        UIAnimator.duringAnimationValueSet = false
+                    })
+                    animation.setStartValue(fieldUnmatrix.translate.x)
+                    animation.setEndValue(valueUnmatrix.translate.x)
+                    animations.push(animation)
+                }
+                if (fieldUnmatrix.translate.y != valueUnmatrix.translate.y) {
+                    const animation = UIAnimator.activeAnimator.animationCreater()
+                    animation.setUpdateListener((it) => {
+                        const matrix = new Matrix()
+                        matrix.setValues(this._transform)
+                        matrix.setTranslate(undefined, it)
+                        UIAnimator.duringAnimationValueSet = true
+                        this.transform = matrix.getValues()
+                        UIAnimator.duringAnimationValueSet = false
+                    })
+                    animation.setStartValue(fieldUnmatrix.translate.y)
+                    animation.setEndValue(valueUnmatrix.translate.y)
+                    animations.push(animation)
+                }
+                return
+            }
+        }
         this._transform = value;
         this.domElement.style.transform = 'matrix(' + value.a + ', ' + value.b + ', ' + value.c + ', ' + value.d + ', ' + value.tx + ', ' + value.ty + ')'
         this.domElement.style.webkitTransform = this.domElement.style.transform
@@ -551,7 +796,6 @@ export class UIWindow extends UIView {
                     touch.windowPoint = point
                     touch.view = target
                     if (touch.identifier == 0) {
-                        sharedVelocityTracker.reset()
                         sharedVelocityTracker.addMovement(touch)
                     }
                     touch.view.touchesBegan([touch])
@@ -613,7 +857,7 @@ export class UIWindow extends UIView {
                     }
                 }
                 this.touches = {}
-                // sharedVelocityTracker.clear()
+                sharedVelocityTracker.reset()
                 setTimeout(() => {
                     UIView.recognizedGesture = undefined
                 }, 0)

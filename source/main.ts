@@ -49,5 +49,8 @@ global.UIRotationGestureRecognizer = UIRotationGestureRecognizer
 import { UIColor } from './uikit/UIColor'
 global.UIColor = UIColor
 
+import { UIAnimator } from "./uikit/UIAnimator";
+global.UIAnimator = UIAnimator
+
 import { DispatchQueue } from "./foundation/DispatchQueue";
 global.DispatchQueue = DispatchQueue
