@@ -1,5 +1,6 @@
+declare var require: any
 import { LinearAndCurveAnimator } from "./helpers/LinearAnimator";
-import { SpringSystem, Spring } from "rebound";
+const { SpringSystem } = require('./helpers/rebound.min')
 
 export interface UIAnimation {
 
@@ -40,7 +41,7 @@ class LinearAnimation implements UIAnimation {
 
 class SpringAnimation implements UIAnimation {
 
-    constructor(readonly spring: Spring) { }
+    constructor(readonly spring: any) { }
 
     setStartValue(value: number): void {
         this.spring.setCurrentValue(value)

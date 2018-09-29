@@ -22,6 +22,8 @@ class SrcBundler {
         return browserify({
             cache: {},
             packageCache: {},
+            detectGlobals: false,
+            insertGlobals: false,
         })
             .add('source/main.ts')
             .plugin(tsify, this.compilerOptions())
@@ -78,9 +80,14 @@ class SrcBundler {
 
     build(dest) {
         const b = this.createBrowserify()
-        b.bundle(function () {
-            console.log("✅ Built at: " + new Date())
+        b.bundle(function (err) {
+            if (!err) {
+                console.log("✅ Built at: " + new Date())
+            }
         })
+            .on('error', (error) => {
+                console.error(error)
+            })
             .pipe(fs.createWriteStream(dest));
         console.log("📌 Started at: " + new Date())
     }
