@@ -11,6 +11,10 @@ export class UIColor {
 
     constructor(readonly r: number, readonly g: number, readonly b: number, readonly a: number) { }
 
+    colorWithAlphaComponent(value: number): UIColor {
+        return new UIColor(this.r, this.g, this.b, this.a * value)
+    }
+
     toStyle(): string {
         return 'rgba(' + (this.r * 255).toFixed(0) + ', ' + (this.g * 255).toFixed(0) + ', ' + (this.b * 255).toFixed(0) + ', ' + this.a.toString() + ')'
     }

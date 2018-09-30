@@ -6,20 +6,35 @@ scrollView.frame = { x: 0, y: 0, width: UIScreen.main.bounds.width, height: UISc
 // const aLabel = new UILabel
 // aLabel.frame = { x: 0, y: 44, width: 300, height: 100 }
 // aLabel.backgroundColor = UIColor.yellow
-// aLabel.text = "Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!"
+// aLabel.text = "Hello, World!"
 // aLabel.textColor = UIColor.red
-// aLabel.font = new UIFont(17)
+// aLabel.font = new UIFont(14)
 // aLabel.numberOfLines = 0
+// ;console.log((aLabel as any).intrinsicContentSize())
 // scrollView.addSubview(aLabel)
 
-const img = new UIImage({ base64: "iVBORw0KGgoAAAANSUhEUgAAAEAAAAAXCAMAAACMPLmjAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcQ///+dozAHT5P8gzxxteBXA1/8Axv8A/wD///8AqQD//+xYyf8AsOsAWwHS4wCf3gnT5P8AtP8Auf8Ar8+Fxv8AwP8Fu4nA0v8MvP8ArhrR5P8Acf////8LvQvS4/8AlP8AvuRn1th0ye1DyP8Bvudi0PwSxKaj1+layf8ACP8AE1rH4ednz+88wiDQ4/8H17Ka1fNOy/8Avj/M4gPS4yzP47aW1QbS5P4Awv8AACTQ49x50Iq23lzF4FPJ4P8AiSjP40LL4jnN43u83sKR1BfR4+dexhrR4/FMyehq1b+c29Z1zw/S5Ia63dV50THP4lHH4RnR40XL4jXP4pOv286A0xzQ40zJ4SnP42HF4BvR5MWL0fBAyHu83hXR40rK4SzO4qSm1w3R4w3S45yr23634ZKw22zB4GrB35Gy3Iyz3E/I4kfJ4rmV1KOl2RPS5I2z3Kqi2Iq11PA7yBrS4+ZUzC7P4izP4819z0DN4aOm2IS53f8AwCDQ41jF4FPJ4CDQ42++3/8AxBDR41PI4G2/3zvN4yLQ4zDP4zXN4na/3tp5zlvG4CXQ5H+73grR5BTR5CrP40HO5VvG4DbO4nu94R3R4yjP5ONmzpO13D3N48SM1SvQ5OZazQjR4/8AoBjR5Ii23VTJ4Kqf2HO+34G53DPN4iPP48eC0UfM46Cp217H4QDS5GbD4GrB32PD3ynP4jrM47qX1bmU1FfH3yzP4z/M4pKz3aeh0x/Q4rKY1GTD32m/3SrR5BTR5Hm83mXB3v8ApmrB3rSX1Xy53vglxz3N4fcrxyLQ46am16ud1gfS49d3zzTN4Xu63Xi33UHN4sx/0FPF4FrF4f8AABXR4wbR5BTQ4zbO40LL4cWL0G6+3YW53T/L4STP4+JjzkzJ4IK73lHJ4VrG4HLC4EvI4VXI4FHI4QDe8ADW5wDX6ADZ6gLa7ADc7gDV5gDh8gDn+ADr/QDj9ADq/ADg8QDY6QDf8ADm+ADh8wDd7wDu/wDk9gDx/wD9/wDT5MXOgB8AAADodFJOUwADFPwFAQQBAgEDAg0aAv4C/AgUHAkbIgQSGPAKAQz8DB4DBQsZCw4UFwcEjBAJxAYvGCbP++gf+i8D1RtWbwYGu7jCYyjHErQeEgxF+YsWWrmoPYN1SYQx4ibODiJU9au+Ocj1RRVJa5hMcZmdKzHIhmkMNa88rG04W2VPF/C2YIujONd+fpvr4dhNKnfbSd7itESaqSPkvx9EsULJM/gQ3DiSPIsv0lYyaD+G9VmGs+yeVmBJuN49KZlhm0ROfI2eF41PhSmuQG4aWc4gTZGWfEI6kgyN5u3dxixza5TdMbF9rzt2o56yKIh1AAAEQUlEQVQ4y6WUdVTbSRDHJ8mPbIwkEJIgaQKBAEGDBJfg7u6U4lr3Uvert1cvdZfTnru7W0/a8wchCTQCBNpc6C9B7t/O27dvdr8zn9k3894CzDAqPI4RyNZtythsi0SgA5AJM/lU9v+q0SdjmbOubB4xCFMY82HWW9lkwnSwufCBl1OrUgvzZ+SjwvW4W7Q+ff78JcsXAd1aDoo+LbfWwPObl6iGJoaHR8eLgWwt97HyDBz4Pss7fXCoX63un0jNsnbJEb56uA7K8q0EOjRv0ipJoQVrQ0WbzaoFEB5xEhIe7kzQkSIi5CS5XLvOCneEzbra8Af7mBT8LIZlWtP2VyJDQiJXrLFHFgBKkScJjiX/MtZnZ1CZRCy5etc04Lou1rV1j0KMNxleM2i2ZdvWZGTwOF4yGwKZTKUS6CjFlHhaAL/rRaqwF1gjGlZ/LJDZZDKdSoiH66PtrqDwZFo6sFWvLOHECGWyAC7maG00StHUw832JLVyw4cbn3uq11DA85yDaxTw015zuupNm4NHekVrd4Q4yZj4c7ifL89vbr4cD90D/8C8fxOHf4rk89342c+GcABef+OjSu7lZvAbutLDehIfLBtectG+6pqFzEM3j7Zor1H34EbV6F8QZDgIgbf+1IW6EYWZwRJOsG/lvLkfuJgCdVfhnPqJhh/CERWfwYs5Q1t8F5Ef4S726TV32u7oI86aAX4Q+EfbcG83TUyTeVYrvPfGgY8kcWLgJnQqa67ti6FR8RYcExkTJ73ysjL7rWOaNr6b84UbKb5BhlsQ2NExYoyDeEDIEYqjo2JiOCf6NC3QyeI1nZEqLC9oyDEplz2/Mt2kv388Sbs9kn/U7d6lbkWP8m8I/PUUafBwHsSz6fGwf7cPo1p4pY7VxOyq47REO2F4u7GMCoPcqDb2myI02y7pd/C8qhU/35VCz0ArOpL8XYFRdRuP9NPFmfdzatF56PrRtf2k0B0fCldwcDQngkQisVia3i8HVa0AikMTv10M0iQzE2oFJ1wMqqqV5ZXfxG1hGfcXJyg1I8cbug77rD5ibwG4e90LnVCy7ER2oqGwjV8YxlILN4nuuuwKMsVGzd0jcP6k12hU5zSKxis6Gu+P65R1Fb3fdu5m1t6OsgCQJ2fxhqeV6hG1IWwVn//uO/V+sStO8QXnB1p8D51Fec7Za+sG9XpV4wWH0vfeenNV6dL3feqjYeczYAEAjSFxW7pwQe6ChYslwcFrTgt8XNdIOE5Hkz/zCvdXyIi2/NKS3NySryU1vLdtbR3ceBJO02rXvHB7sQWAMA8pz8FstpI0exmDSMz0Z3gEBAijhB4KmZiJMYJtzeYskQoZRKk0zawx7BXmhaGp34OCefgTiUT/AAwhJg2jURACJsbFaO5iBIgmY2QSiWkMjEKZ1JgI0bhcTCye9YMhCo1mzpt1hdCUR5kt2kxrj2v/AUo5WrrUGB3AAAAAAElFTkSuQmCC" })
-const iv = new UIImageView
-iv.loadImageWithURLString("https://file.calicali.cc/7e4e1072ef957f231ebc.jpg", img)
-iv.frame = { x: 44, y: 44, width: 300, height: 300 }
-iv.contentMode = UIViewContentMode.scaleAspectFill
-scrollView.addSubview(iv)
+const img = new UIImage({ name: "location@2x.png", base64: "iVBORw0KGgoAAAANSUhEUgAAAB0AAAAjCAMAAABfPfHgAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAD2UExURUdwTP84VP85U/9VVf83V/83Vf84VP8zTP84U/85VP84VP84VP85U/85U/85VP84VP86Vf84VP85U/84Vf84Vf88Vf84VP85U/85U/84U/85VP85Uf85Vf8/Vf84VP8/P/84Vf84VP85VP8qVf8AAP81Vf8zZv84U/8/X/83Uv85U/81V/84U/84Vf85U/9ISP83WP85Uv86WP84U/85VP84U/84VP85VP85VP85U/85Vf85U/85VP85U/84VP85U/85U/84VP84U/83Vf85U/85Uf84VP84VP85U/84Vf85U/84VP85VP84VP84U/84Vf84VP85VP/xwSoAAABRdFJOUwD78AMge7wK/P7mnWu3zcIwrEN1GxWCWTru2jV4DPgECce/BgEYBeUIJdUmq36NBxc+GmipnnlzfJZLm7LMs9ZMmply2yzptY8tqMGO79hs1FUFrfcAAAEkSURBVBgZdcGHQoJgGAXQC4KAe9vQLMtZmu299+6+/8skfvwypHMwt5/Z+dapPxZ/9hFVKNpU7GIBQf1Pm0H2ax9znRyjch14qitctFLFzO4V4+R24Roz3hhTTxrjaW8ADqmkaqVCqZaisgNMNHqOmnA10/RoExzQk4aSpucA7xQpC4rVozjEL4UJn0kxhE6xBN8ShQ56DPgMCgdfFKvwrVI8I09xAt8DxQdGFDctKK0hxQjbDsUpFJPC2QaSFE55C66tskORBLBHJV+vbFbqeSp7mMoy3gtcgzXGWRtg5phxTIjEBhdtJOAxlhm1bGDu3GaYfYuABsMaCDlj0D3CEpf0XW8iwmpTaVtYYCUpkhZirGfpyq4jVveO5EUX/8n0Mgj6A8R+sSkxxWjZAAAAAElFTkSuQmCC" })
+// const iv = new UIImageView
+// iv.loadImageWithURLString("https://file.calicali.cc/7e4e1072ef957f231ebc.jpg", img)
+// iv.frame = { x: 44, y: 44, width: 300, height: 300 }
+// iv.contentMode = UIViewContentMode.scaleAspectFill
+// scrollView.addSubview(iv)
+
+
+const button = new UIButton
+button.setTitle("Hello, World!", UIControlState.normal)
+button.setImage(img, UIControlState.normal)
+button.backgroundColor = UIColor.yellow
+button.frame = { x: 44, y: 44, width: 250, height: 44 }
+button.titleEdgeInsets = { top: 0, left: 4, bottom: 0, right: 0 }
+button.imageEdgeInsets = { top: 0, left: 0, bottom: 0, right: 4 }
+button.on("touchUpInside", () => {
+    button.backgroundColor = UIColor.gray
+})
+scrollView.addSubview(button)
 
 global.aView = scrollView
+global.img = img
 
 
 // console.log(img.size)

@@ -3,6 +3,8 @@ import { UILineBreakMode, UITextAlignment } from "./UIEnums";
 import { UIColor } from "./UIColor";
 import { UIFont } from "./UIFont";
 import { UIAttributedString } from "./UIAttributedString";
+import { UISize } from "./UISize";
+import { TextMeasurer } from "./helpers/TextMeasurer";
 
 export class UILabel extends UIView {
 
@@ -202,6 +204,17 @@ export class UILabel extends UIView {
     layoutSubviews() {
         super.layoutSubviews()
         this.resetLineClamp()
+    }
+
+    intrinsicContentSize(): UISize {
+        if (this.text) {
+            return TextMeasurer.measureText(this.text, {
+                font: this.font || new UIFont(14),
+                inRect: { x: 0, y: 0, width: Infinity, height: Infinity },
+                numberOfLines: this.numberOfLines
+            })
+        }
+        return { width: 0, height: 0 }
     }
 
 }

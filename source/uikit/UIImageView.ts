@@ -2,6 +2,7 @@ import { UIView } from "./UIView";
 import { UIImage } from "./UIImage";
 import { UIViewContentMode } from "./UIEnums";
 import { currentAnimationTimeMillis } from "./helpers/Now";
+import { UISize, UISizeZero } from "./UISize";
 
 let cachingImages: { [key: string]: UIImage } = {}
 
@@ -124,6 +125,13 @@ export class UIImageView extends UIView {
                     break
             }
         }
+    }
+
+    intrinsicContentSize(): UISize {
+        if (this.image) {
+            return this.image.size
+        }
+        return UISizeZero
     }
 
 }

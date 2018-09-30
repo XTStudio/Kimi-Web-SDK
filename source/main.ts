@@ -31,6 +31,9 @@ global.UIAlert = UIAlert
 import { UIAnimator } from "./uikit/UIAnimator";
 global.UIAnimator = UIAnimator
 
+import { UIButton } from "./uikit/UIButton";
+global.UIButton = UIButton
+
 import { UIColor } from './uikit/UIColor'
 global.UIColor = UIColor
 

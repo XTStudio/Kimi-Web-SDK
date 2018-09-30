@@ -10,6 +10,7 @@ import { Matrix } from "./helpers/Matrix";
 import { UITouch, UITouchPhase, VelocityTracker } from "./UITouch";
 import { UIEdgeInsets, UIEdgeInsetsZero } from "./UIEdgeInsets";
 import { UIAnimator, UIAnimation } from "./UIAnimator";
+import { UISize } from "./UISize";
 
 export const sharedVelocityTracker = new VelocityTracker
 
@@ -761,6 +762,10 @@ export class UIView extends EventEmitter {
         if (this.superview) {
             this.superview.touchesCancelled(touches)
         }
+    }
+
+    intrinsicContentSize(): UISize | undefined {
+        return undefined
     }
 
     pointInside(point: UIPoint): boolean {

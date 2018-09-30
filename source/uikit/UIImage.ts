@@ -15,16 +15,18 @@ export class UIImage extends EventEmitter {
 
     constructor(options: { name?: string, base64?: string, data?: any, renderingMode?: UIImageRenderingMode }) {
         super()
-        if (options.name) {
-
-        }
-        else if (options.base64) {
+        if (options.base64) {
             this.imageElement.src = "data:image;base64," + options.base64
             this.imageElement.addEventListener("load", () => {
-                this.size = { width: this.imageElement.width, height: this.imageElement.height }
+                const scale = options.name ? UIImage.scaleFromName(options.name) : 1.0
+                this.size = { width: this.imageElement.naturalWidth / scale, height: this.imageElement.naturalHeight / scale }
+                this.scale = scale
                 this.loaded = true
                 this.emit("load")
             })
+        }
+        else if (options.name) {
+
         }
         if (options.renderingMode) {
             this.renderingMode = this.renderingMode
@@ -35,11 +37,24 @@ export class UIImage extends EventEmitter {
         const image = new UIImage({})
         image.imageElement.src = url
         image.imageElement.addEventListener("load", () => {
-            image.size = { width: image.imageElement.width, height: image.imageElement.height }
+            image.size = { width: image.imageElement.naturalWidth, height: image.imageElement.naturalHeight }
             image.loaded = true
             image.emit("load")
         })
         return image
+    }
+
+    static scaleFromName(name: string): number {
+        if (name.indexOf("@2x") > 0) {
+            return 2.0
+        }
+        else if (name.indexOf("@3x") > 0) {
+            return 3.0
+        }
+        else if (name.indexOf("@4x") > 0) {
+            return 4.0
+        }
+        return 1.0
     }
 
     async fetchSize(): Promise<UISize> {
