@@ -37,6 +37,9 @@ global.UIButton = UIButton
 import { UIColor } from './uikit/UIColor'
 global.UIColor = UIColor
 
+import { UIConfirm } from "./uikit/UIConfirm";
+global.UIConfirm = UIConfirm
+
 import { UIFont } from "./uikit/UIFont";
 global.UIFont = UIFont
 
@@ -61,6 +64,9 @@ global.UIPanGestureRecognizer = UIPanGestureRecognizer
 
 import { UIPinchGestureRecognizer } from "./uikit/UIPinchGestureRecognizer";
 global.UIPinchGestureRecognizer = UIPinchGestureRecognizer
+
+import { UIPrompt } from "./uikit/UIPrompt";
+global.UIPrompt = UIPrompt
 
 import { UIRotationGestureRecognizer } from "./uikit/UIRotationGestureRecognizer";
 global.UIRotationGestureRecognizer = UIRotationGestureRecognizer

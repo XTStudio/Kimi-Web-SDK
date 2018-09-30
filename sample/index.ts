@@ -29,7 +29,12 @@ button.frame = { x: 44, y: 44, width: 250, height: 44 }
 button.titleEdgeInsets = { top: 0, left: 4, bottom: 0, right: 0 }
 button.imageEdgeInsets = { top: 0, left: 0, bottom: 0, right: 4 }
 button.on("touchUpInside", () => {
-    button.backgroundColor = UIColor.gray
+    new UIPrompt("请输入密码").show((text) => {
+        document.title = text
+    })
+    // new UIConfirm("你确认要毁灭地球吗？").show(() => {
+    //     button.backgroundColor = UIColor.gray
+    // })
 })
 scrollView.addSubview(button)
 
