@@ -1,14 +1,14 @@
 export class UIPrompt {
-    
+
     constructor(public message: string) { }
 
-    confirmTitle: string
+    confirmTitle: string = ""
 
-    cancelTitle: string
+    cancelTitle: string = ""
 
-    placeholder: string
+    placeholder: string = ""
 
-    defaultValue: string
+    defaultValue: string | undefined = undefined
 
     show(completed: (text: string) => void, cancelled?: () => void): void {
         const value = window.prompt(this.message, this.defaultValue)

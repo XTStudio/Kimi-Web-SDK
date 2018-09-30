@@ -65,6 +65,9 @@ global.UIPanGestureRecognizer = UIPanGestureRecognizer
 import { UIPinchGestureRecognizer } from "./uikit/UIPinchGestureRecognizer";
 global.UIPinchGestureRecognizer = UIPinchGestureRecognizer
 
+import { UIProgressView } from "./uikit/UIProgressView";
+global.UIProgressView = UIProgressView
+
 import { UIPrompt } from "./uikit/UIPrompt";
 global.UIPrompt = UIPrompt
 
