@@ -64,7 +64,7 @@ export class UILongPressGestureRecognizer extends UIGestureRecognizer {
                     this.emit("ended", this)
                     setTimeout(() => {
                         UIView.recognizedGesture = undefined
-                    })
+                    }, 0)
                 }
                 this.state = UIGestureRecognizerState.possible
                 this.beganPoints = {}
@@ -78,7 +78,7 @@ export class UILongPressGestureRecognizer extends UIGestureRecognizer {
                     this.emit("cancelled", this)
                     setTimeout(() => {
                         UIView.recognizedGesture = undefined
-                    })
+                    }, 0)
                 }
                 this.state = UIGestureRecognizerState.possible
                 this.beganPoints = {}
