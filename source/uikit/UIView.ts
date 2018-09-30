@@ -250,7 +250,7 @@ export class UIView extends EventEmitter {
 
     private _opaque: boolean = false
 
-    private _contentMode: UIViewContentMode = UIViewContentMode.scaleToFill
+    protected _contentMode: UIViewContentMode = UIViewContentMode.scaleToFill
 
     private _tintColor: UIColor | undefined = undefined
 
