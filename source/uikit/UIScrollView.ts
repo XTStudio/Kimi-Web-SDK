@@ -48,6 +48,7 @@ export class UIScrollView extends UIView {
     public set contentSize(value: UISize) {
         this._contentSize = value;
         this.resetContentViewFrame()
+        this.resetLockedDirection()
     }
 
     private _contentInset: UIEdgeInsets = UIEdgeInsetsZero
@@ -66,6 +67,7 @@ export class UIScrollView extends UIView {
      */
     public set contentInset(value: UIEdgeInsets) {
         this._contentInset = value;
+        this.resetLockedDirection()
     }
 
     directionalLockEnabled: boolean = false
@@ -94,6 +96,7 @@ export class UIScrollView extends UIView {
      */
     public set scrollEnabled(value: boolean) {
         this._scrollEnabled = value;
+        this.panGestureRecognizer.enabled = value
     }
 
     private _showsHorizontalScrollIndicator: boolean = true
@@ -133,18 +136,45 @@ export class UIScrollView extends UIView {
     }
 
     setContentOffset(contentOffset: UIPoint, animated: boolean): void {
+        this.scroller.abortAnimation()
+        if (this.decelerating) {
+            this.didEndDecelerating()
+        }
         if (animated) {
-            UIAnimator.curve(0.25, () => {
-                this.contentOffset = contentOffset
-            }, undefined)
+            this.scroller.startScroll(
+                this.contentOffset.x,
+                this.contentOffset.y,
+                (contentOffset.x - this.contentOffset.x),
+                (contentOffset.y - this.contentOffset.y),
+                500
+            )
+            this.loopScrollAnimation()
         }
         else {
             this.contentOffset = contentOffset
+            this.didScroll()
         }
     }
 
     scrollRectToVisible(rect: UIRect, animated: boolean): void {
-
+        var targetContentOffset = this.contentOffset
+        if (rect.x < this.contentOffset.x) {
+            targetContentOffset = { x: rect.x, y: targetContentOffset.y }
+        }
+        else if (rect.x + rect.width > this.contentOffset.x + this.bounds.width) {
+            targetContentOffset = { x: rect.x + rect.width - this.bounds.width, y: targetContentOffset.y }
+        }
+        if (rect.y < this.contentOffset.y) {
+            targetContentOffset = { x: targetContentOffset.x, y: rect.y }
+        }
+        else if (rect.y + rect.height > this.contentOffset.y + this.bounds.height) {
+            targetContentOffset = { x: targetContentOffset.x, y: rect.y + rect.height - this.bounds.height }
+        }
+        targetContentOffset = {
+            x: Math.max(0.0, Math.min(this.contentSize.width - this.bounds.width, targetContentOffset.x)),
+            y: Math.max(0.0, Math.min(this.contentSize.height - this.bounds.height, targetContentOffset.y))
+        }
+        this.setContentOffset(targetContentOffset, animated)
     }
 
     private _tracking: boolean = false
@@ -608,6 +638,7 @@ export class UIScrollView extends UIView {
     layoutSubviews() {
         super.layoutSubviews()
         this.resetContentViewFrame()
+        this.resetLockedDirection()
         // this.refreshControl?.animationView?.frame = CGRect(0.0, 0.0, this.bounds.width, 44.0)
     }
 
