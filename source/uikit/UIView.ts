@@ -16,12 +16,12 @@ export const sharedVelocityTracker = new VelocityTracker
 
 export class UIView extends EventEmitter {
 
-    protected domElement = document.createElement("div")
+    public domElement = document.createElement("div")
 
     constructor() {
         super()
         this.domElement.style.position = "absolute"
-        this.layer._view = this
+        this.layer.view = this
     }
 
     attachToElement(element: HTMLElement) {
@@ -714,9 +714,8 @@ export class UIView extends EventEmitter {
 
     hitTest(point: UIPoint): UIView | undefined {
         if (this.userInteractionEnabled && this.alpha > 0.0 && !this.hidden && this.pointInside(point)) {
-            const reversedSubviews = this._subviews.reverse()
-            for (let index = 0; index < reversedSubviews.length; index++) {
-                const it = reversedSubviews[index]
+            for (let index = this._subviews.length - 1; index >= 0; index--) {
+                const it = this._subviews[index]
                 const convertedPoint = it.convertPointFromView(point, this)
                 const testedView = it.hitTest(convertedPoint)
                 if (testedView !== undefined) {
@@ -774,6 +773,7 @@ export class UIView extends EventEmitter {
             point.x <= this.frame.width + this.touchAreaInsets.right &&
             point.y <= this.frame.height + this.touchAreaInsets.bottom
     }
+
 }
 
 export class UIWindow extends UIView {

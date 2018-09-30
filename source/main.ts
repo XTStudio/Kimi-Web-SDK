@@ -83,6 +83,9 @@ global.UIScrollView = UIScrollView
 import { UISlider } from "./uikit/UISlider";
 global.UISlider = UISlider
 
+import { UISwitch } from "./uikit/UISwitch";
+global.UISwitch = UISwitch
+
 import { UITapGestureRecognizer } from "./uikit/UITapGestureRecognizer";
 global.UITapGestureRecognizer = UITapGestureRecognizer
 
