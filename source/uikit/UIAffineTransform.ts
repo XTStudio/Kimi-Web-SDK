@@ -13,7 +13,7 @@ export const UIAffineTransformIsIdentity = function (transform: UIAffineTransfor
     return transform.a == 1.0 && transform.b == 0.0 && transform.c == 0.0 && transform.d == 1.0 && transform.tx == 0.0 && transform.ty == 0.0
 }
 
-export const UIAffineTransformEqual = function (a: UIAffineTransform, b: UIAffineTransform) {
+export const UIAffineTransformEqualTo = function (a: UIAffineTransform, b: UIAffineTransform) {
     return a.a == b.a &&
         a.b == b.b &&
         a.c == b.c &&

@@ -27,6 +27,9 @@ import { UIView, UIWindow } from './uikit/UIView'
 global.UIView = UIView
 global.UIWindow = UIWindow
 
+import { UIScrollView } from "./uikit/UIScrollView";
+global.UIScrollView = UIScrollView
+
 import { UIGestureRecognizerState, UIGestureRecognizer } from "./uikit/UIGestureRecognizer";
 global.UIGestureRecognizerState = UIGestureRecognizerState
 global.UIGestureRecognizer = UIGestureRecognizer

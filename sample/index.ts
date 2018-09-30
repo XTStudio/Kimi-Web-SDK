@@ -1,39 +1,29 @@
 /// <reference path="../node_modules/xtstudio/types/index.d.ts" />
 
-const aView = new UIView
-aView.frame = { x: 44, y: 44, width: 88, height: 88 }
-aView.backgroundColor = UIColor.red
-aView.clipsToBounds = true
-const longPress = new UIPanGestureRecognizer()
-    .on("began", () => {
-        aView.backgroundColor = UIColor.yellow
-    })
-    .on("changed", () => {
-        aView.backgroundColor = UIColor.gray
-    })
-    .on("ended", (sender) => {
-        aView.backgroundColor = UIColor.red
-        console.log(sender.velocityInView(undefined))
-    })
-aView.addGestureRecognizer(longPress)
-global.aView = aView
+const scrollView = new UIScrollView
+scrollView.frame = { x: 0, y: 0, width: 320, height: 568 }
 
-const bView = new UIView
-bView.frame = { x: 22, y: 22, width: 22, height: 22 }
-bView.backgroundColor = UIColor.green
-aView.addSubview(bView)
+const redView = new UIView
+redView.frame = { x: 0, y: 0, width: 44, height: 44 }
+redView.backgroundColor = UIColor.red
+scrollView.addSubview(redView)
 
-const cView = new UIView
-cView.frame = { x: 11, y: 11, width: 22, height: 22 }
-cView.backgroundColor = UIColor.gray
-cView.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
-    UIAnimator.bouncy(20.0, 8.0, () => {
-        aView.frame = { x: 44, y: 44, width: 200, height: 200 }
-    }, () => {
-        cView.backgroundColor = UIColor.yellow
-    })
-    // cView.backgroundColor = UIColor.yellow
-}))
-// cView.hidden = true
+const blueView = new UIView
+blueView.frame = { x: 0, y: 500, width: 44, height: 44 }
+blueView.backgroundColor = UIColor.blue
+scrollView.addSubview(blueView)
 
-aView.insertSubviewAboveSubview(cView, bView)
+const yellowView = new UIView
+yellowView.frame = { x: 0, y: 700, width: 44, height: 44 }
+yellowView.backgroundColor = UIColor.yellow
+scrollView.addSubview(yellowView)
+
+const greenView = new UIView
+greenView.frame = { x: 0, y: 1400, width: 44, height: 44 }
+greenView.backgroundColor = UIColor.green
+scrollView.addSubview(greenView)
+
+scrollView.contentSize = { width: 0, height: 1744 }
+
+global.aView = scrollView
+

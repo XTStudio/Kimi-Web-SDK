@@ -2,7 +2,7 @@ import { UIRect, UIRectZero, UIRectEqualToRect } from "./UIRect";
 import { UIColor } from "./UIColor";
 import { CALayer } from "../coregraphics/CALayer";
 import { UIPoint, UIPointZero } from "./UIPoint";
-import { UIAffineTransform, UIAffineTransformIdentity, UIAffineTransformIsIdentity, UIAffineTransformEqual } from "./UIAffineTransform";
+import { UIAffineTransform, UIAffineTransformIdentity, UIAffineTransformIsIdentity, UIAffineTransformEqualTo } from "./UIAffineTransform";
 import { UIViewContentMode } from "./UIEnums";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { EventEmitter } from "../kimi/EventEmitter";
@@ -27,6 +27,7 @@ export class UIView extends EventEmitter {
         if (element == document.body) {
             document.body.style.width = "100%"
             document.body.style.height = "100%"
+            document.body.style.margin = "0"
             document.getElementsByTagName('html')[0].style.height = "100%"
             document.getElementsByTagName('html')[0].style.overflow = "hidden"
         }
@@ -63,7 +64,23 @@ export class UIView extends EventEmitter {
 
     protected superview: UIView | undefined = undefined
 
-    protected subviews: UIView[] = []
+    protected _subviews: UIView[] = []
+
+    /**
+     * Getter subviews
+     * @return {UIView[] }
+     */
+    public get subviews(): UIView[] {
+        return this._subviews;
+    }
+
+    /**
+     * Setter subviews
+     * @param {UIView[] } value
+     */
+    public set subviews(value: UIView[]) {
+        this._subviews = value;
+    }
 
     public get window(): UIWindow | undefined {
         if (this instanceof UIWindow) {
@@ -93,7 +110,7 @@ export class UIView extends EventEmitter {
         }
         view.willMoveToSuperview(this)
         view.superview = this
-        this.subviews.splice(index, 0, view)
+        this._subviews.splice(index, 0, view)
         this.domElement.insertBefore(view.domElement, this.domElement.children[index])
         this.setNeedsDisplay()
         view.didMoveToSuperview()
@@ -102,24 +119,24 @@ export class UIView extends EventEmitter {
 
     exchangeSubview(index1: number, index2: number): void {
         if (index1 < index2) {
-            const index1View = this.subviews[index1];
-            const index2View = this.subviews[index2];
+            const index1View = this._subviews[index1];
+            const index2View = this._subviews[index2];
             this.domElement.removeChild(index1View.domElement);
             this.domElement.insertBefore(index1View.domElement, index2View.domElement)
             this.domElement.removeChild(index2View.domElement);
             this.domElement.insertBefore(index2View.domElement, this.domElement.children[index1]);
         }
         else if (index1 > index2) {
-            const index1View = this.subviews[index1];
-            const index2View = this.subviews[index2];
+            const index1View = this._subviews[index1];
+            const index2View = this._subviews[index2];
             this.domElement.removeChild(index2View.domElement);
             this.domElement.insertBefore(index2View.domElement, index1View.domElement)
             this.domElement.removeChild(index1View.domElement);
             this.domElement.insertBefore(index1View.domElement, this.domElement.children[index2]);
         }
-        const index2View = this.subviews[index2]
-        this.subviews[index2] = this.subviews[index1]
-        this.subviews[index1] = index2View
+        const index2View = this._subviews[index2]
+        this._subviews[index2] = this._subviews[index1]
+        this._subviews[index1] = index2View
     }
 
     addSubview(view: UIView): void {
@@ -128,7 +145,7 @@ export class UIView extends EventEmitter {
         }
         view.willMoveToSuperview(this)
         view.superview = this
-        this.subviews.push(view)
+        this._subviews.push(view)
         this.domElement.appendChild(view.domElement)
         this.setNeedsDisplay()
         view.didMoveToSuperview()
@@ -136,34 +153,34 @@ export class UIView extends EventEmitter {
     }
 
     insertSubviewBelowSubview(view: UIView, belowSubview: UIView): void {
-        let index = this.subviews.indexOf(belowSubview)
+        let index = this._subviews.indexOf(belowSubview)
         if (index >= 0) {
             this.insertSubviewAtIndex(view, index)
         }
     }
 
     insertSubviewAboveSubview(view: UIView, aboveSubview: UIView): void {
-        let index = this.subviews.indexOf(aboveSubview)
+        let index = this._subviews.indexOf(aboveSubview)
         if (index >= 0) {
             this.insertSubviewAtIndex(view, index + 1)
         }
     }
 
     bringSubviewToFront(view: UIView): void {
-        let index = this.subviews.indexOf(view)
+        let index = this._subviews.indexOf(view)
         if (index >= 0) {
-            this.subviews.splice(index, 1)
-            this.subviews.push(view)
+            this._subviews.splice(index, 1)
+            this._subviews.push(view)
             this.domElement.removeChild(view.domElement)
             this.domElement.appendChild(view.domElement)
         }
     }
 
     sendSubviewToBack(view: UIView): void {
-        let index = this.subviews.indexOf(view)
+        let index = this._subviews.indexOf(view)
         if (index >= 0) {
-            this.subviews.splice(index, 1)
-            this.subviews.unshift(view)
+            this._subviews.splice(index, 1)
+            this._subviews.unshift(view)
             this.domElement.removeChild(view.domElement)
             this.domElement.insertBefore(view.domElement, this.domElement.firstChild)
         }
@@ -238,7 +255,7 @@ export class UIView extends EventEmitter {
     private _tintColor: UIColor | undefined = undefined
 
     tintColorDidChange(): void {
-        this.subviews.forEach(it => it.tintColorDidChange())
+        this._subviews.forEach(it => it.tintColorDidChange())
     }
 
     // GestureRecognizers
@@ -283,9 +300,6 @@ export class UIView extends EventEmitter {
     private alpha_animation: UIAnimation | undefined
 
     public set alpha(value: number) {
-        if (this._alpha === value) {
-            return
-        }
         if (!UIAnimator.duringAnimationValueSet) {
             if (this.alpha_animation) {
                 this.alpha_animation.cancel()
@@ -306,6 +320,9 @@ export class UIView extends EventEmitter {
                 return
             }
         }
+        if (this._alpha === value) {
+            return
+        }
         this._alpha = value;
         this.domElement.style.opacity = value.toString()
     }
@@ -317,9 +334,6 @@ export class UIView extends EventEmitter {
     private backgroundColor_animations: UIAnimation[] = []
 
     public set backgroundColor(value: UIColor | undefined) {
-        if (this._backgroundColor && value && this._backgroundColor.r === value.r && this._backgroundColor.g === value.g && this._backgroundColor.b === value.b && this._backgroundColor.a === value.a) {
-            return
-        }
         if (!UIAnimator.duringAnimationValueSet) {
             if (this.backgroundColor_animations) {
                 this.backgroundColor_animations.forEach(it => it.cancel())
@@ -389,6 +403,9 @@ export class UIView extends EventEmitter {
                 return
             }
         }
+        if (this._backgroundColor && value && this._backgroundColor.r === value.r && this._backgroundColor.g === value.g && this._backgroundColor.b === value.b && this._backgroundColor.a === value.a) {
+            return
+        }
         this._backgroundColor = value;
         this.domElement.style.backgroundColor = value ? value.toStyle() : null
     }
@@ -400,7 +417,6 @@ export class UIView extends EventEmitter {
     private frame_animations: UIAnimation[] = []
 
     public set frame(value: UIRect) {
-        if (UIRectEqualToRect(this._frame, value)) { return }
         if (!UIAnimator.duringAnimationValueSet) {
             this.frame_animations.forEach(it => it.cancel())
             this.frame_animations = []
@@ -456,6 +472,7 @@ export class UIView extends EventEmitter {
                 return
             }
         }
+        if (UIRectEqualToRect(this._frame, value)) { return }
         const boundsChanged = this._frame.width != value.width || this._frame.height != value.height
         this._frame = value;
         this.layer.frame = value
@@ -484,9 +501,6 @@ export class UIView extends EventEmitter {
     private transform_animations: UIAnimation[] = []
 
     public set transform(value: UIAffineTransform) {
-        if (UIAffineTransformEqual(this._transform, value)) {
-            return
-        }
         if (!UIAnimator.duringAnimationValueSet) {
             this.transform_animations.forEach(it => it.cancel())
             this.transform_animations = []
@@ -568,6 +582,9 @@ export class UIView extends EventEmitter {
                 }
                 return
             }
+        }
+        if (UIAffineTransformEqualTo(this._transform, value)) {
+            return
         }
         this._transform = value;
         this.domElement.style.transform = 'matrix(' + value.a + ', ' + value.b + ', ' + value.c + ', ' + value.d + ', ' + value.tx + ', ' + value.ty + ')'
@@ -696,7 +713,7 @@ export class UIView extends EventEmitter {
 
     hitTest(point: UIPoint): UIView | undefined {
         if (this.userInteractionEnabled && this.alpha > 0.0 && !this.hidden && this.pointInside(point)) {
-            const reversedSubviews = this.subviews.reverse()
+            const reversedSubviews = this._subviews.reverse()
             for (let index = 0; index < reversedSubviews.length; index++) {
                 const it = reversedSubviews[index]
                 const convertedPoint = it.convertPointFromView(point, this)

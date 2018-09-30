@@ -7,4 +7,6 @@ export class CALayer {
 
     frame: UIRect = UIRectZero
 
+    cornerRadius: number = 0.0
+
 }
