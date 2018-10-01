@@ -3,8 +3,12 @@
 const scrollView = new UIView
 scrollView.frame = { x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height }
 
-const pv = new UISwitch
-pv.frame = { x: 44, y: 44, width: 66, height: 44 }
+const pv = new UIActivityIndicatorView
+pv.backgroundColor = UIColor.yellow
+pv.frame = { x: 0, y: 0, width: 300, height: 300 }
+pv.color = UIColor.red
+pv.largeStyle = true
+pv.startAnimating()
 scrollView.addSubview(pv)
 
 global.aView = scrollView

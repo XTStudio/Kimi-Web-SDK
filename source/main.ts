@@ -25,6 +25,9 @@ global.UIStackViewDistribution = UIStackViewDistribution
 global.UIStackViewAlignment = UIStackViewAlignment
 global.UIStatusBarStyle = UIStatusBarStyle
 
+import { UIActivityIndicatorView } from "./uikit/UIActivityIndicatorView";
+global.UIActivityIndicatorView = UIActivityIndicatorView
+
 import { UIAlert } from "./uikit/UIAlert";
 global.UIAlert = UIAlert
 
