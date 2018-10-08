@@ -44,6 +44,7 @@ declare class EventEmitterDefines {
     trigger(event: RegExp, ...args: any[]): this;
     emit(event: string, ...args: any[]): this;
     emit(event: RegExp, ...args: any[]): this;
+    val(event: string, ...args: any[]): any;
     setOnceReturnValue(value: any): this;
 }
 

@@ -89,6 +89,10 @@ global.UISlider = UISlider
 import { UISwitch } from "./uikit/UISwitch";
 global.UISwitch = UISwitch
 
+import { UITableView, UITableViewCell } from "./uikit/UITableView";
+global.UITableView = UITableView
+global.UITableViewCell = UITableViewCell
+
 import { UITapGestureRecognizer } from "./uikit/UITapGestureRecognizer";
 global.UITapGestureRecognizer = UITapGestureRecognizer
 

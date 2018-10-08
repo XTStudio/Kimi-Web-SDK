@@ -63,7 +63,7 @@ export class UIView extends EventEmitter {
 
     public tag: number = 0
 
-    protected superview: UIView | undefined = undefined
+    public superview: UIView | undefined = undefined
 
     protected _subviews: UIView[] = []
 
@@ -263,7 +263,7 @@ export class UIView extends EventEmitter {
 
     public userInteractionEnabled: boolean = true
 
-    protected gestureRecognizers: UIGestureRecognizer[] = []
+    public gestureRecognizers: UIGestureRecognizer[] = []
 
     public addGestureRecognizer(gestureRecognizer: UIGestureRecognizer): void {
         this.gestureRecognizers.push(gestureRecognizer)

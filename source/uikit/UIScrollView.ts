@@ -29,7 +29,10 @@ export class UIScrollView extends UIView {
         this._contentOffset = value;
         this.resetContentViewFrame()
         this.resetScrollIndicators()
+        this.contentOffsetDidChanged()
     }
+
+    protected contentOffsetDidChanged() { }
 
     private _contentSize: UISize = UISizeZero
 
