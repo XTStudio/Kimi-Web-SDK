@@ -111,6 +111,9 @@ global.UITableViewCell = UITableViewCell
 import { UITapGestureRecognizer } from "./uikit/UITapGestureRecognizer";
 global.UITapGestureRecognizer = UITapGestureRecognizer
 
+import { UITextField } from "./uikit/UITextField";
+global.UITextField = UITextField
+
 import { UIView, UIWindow } from './uikit/UIView'
 global.UIView = UIView
 global.UIWindow = UIWindow

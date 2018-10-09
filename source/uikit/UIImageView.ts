@@ -12,6 +12,7 @@ export class UIImageView extends UIView {
 
     constructor() {
         super()
+        this.userInteractionEnabled = false
         this.contentElement.style.position = "absolute"
         this.contentElement.style.width = "100%"
         this.contentElement.style.height = "100%"

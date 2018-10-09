@@ -81,6 +81,7 @@ export class UIProgressView extends UIView {
 
     constructor() {
         super()
+        this.userInteractionEnabled = false
         this.progressTintColor = this.tintColor
         this.trackTintColor = this.tintColor.colorWithAlphaComponent(0.35)
         this.addSubview(this.trackView)

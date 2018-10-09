@@ -12,6 +12,7 @@ export class UILabel extends UIView {
 
     constructor() {
         super()
+        this.userInteractionEnabled = false
         this.textElement.style.position = "absolute"
         this.textElement.style.userSelect = "none";
         this.textElement.style.cursor = "default"

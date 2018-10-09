@@ -28,6 +28,7 @@ export class UIView extends EventEmitter {
         if (element == document.body) {
             document.body.style.width = "100%"
             document.body.style.height = "100%"
+            document.body.style.overflow = "hidden"
             document.body.style.margin = "0"
             document.getElementsByTagName('html')[0].style.height = "100%"
             document.getElementsByTagName('html')[0].style.overflow = "hidden"
@@ -261,7 +262,16 @@ export class UIView extends EventEmitter {
 
     // GestureRecognizers
 
-    public userInteractionEnabled: boolean = true
+    private _userInteractionEnabled: boolean = true
+
+	public get userInteractionEnabled(): boolean  {
+		return this._userInteractionEnabled;
+	}
+
+	public set userInteractionEnabled(value: boolean ) {
+        this._userInteractionEnabled = value;
+        this.domElement.style.pointerEvents = value ? "auto" : "none"
+	}
 
     public gestureRecognizers: UIGestureRecognizer[] = []
 
@@ -783,6 +793,7 @@ export class UIWindow extends UIView {
         this.setupTouches()
     }
 
+    private shouldPreventDefault = true
     private currentTouchesID: number[] = []
     private touches: { [key: number]: UITouch } = {}
     private upCount: Map<UIPoint, number> = new Map()
@@ -798,6 +809,7 @@ export class UIWindow extends UIView {
             const target = this.hitTest(point)
             if (target) {
                 if (target instanceof UINativeTouchView) {
+                    this.shouldPreventDefault = false
                     return false
                 }
                 const touch = new UITouch()
@@ -824,7 +836,9 @@ export class UIWindow extends UIView {
                 touch.view.touchesBegan([touch])
             }
         }
-        e.preventDefault()
+        if (this.shouldPreventDefault) {
+            // e.preventDefault()
+        }
     }
 
     private handleTouchMove(e: TouchEvent) {
@@ -847,7 +861,9 @@ export class UIWindow extends UIView {
                 touch.view.touchesMoved([touch])
             }
         }
-        e.preventDefault()
+        if (this.shouldPreventDefault) {
+            e.preventDefault()
+        }
     }
 
     private handleTouchEnd(e: TouchEvent) {
@@ -891,7 +907,12 @@ export class UIWindow extends UIView {
                 UIView.recognizedGesture = undefined
             }, 0)
         }
-        e.preventDefault()
+        if (this.shouldPreventDefault) {
+            e.preventDefault()
+        }
+        if (this.currentTouchesID.length == 0) {
+            this.shouldPreventDefault = true
+        }
     }
 
     private handleTouchCancel(e: TouchEvent) {
@@ -916,7 +937,10 @@ export class UIWindow extends UIView {
         this.upCount.clear()
         this.upTimestamp.clear()
         this.touches = {}
-        e.preventDefault()
+        if (this.shouldPreventDefault) {
+            e.preventDefault()
+        }
+        this.shouldPreventDefault = true
     }
 
     private standardlizeTouches(e: TouchEvent): Touch[] {
