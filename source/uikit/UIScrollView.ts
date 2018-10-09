@@ -8,6 +8,7 @@ import { UIAnimator } from "./UIAnimator";
 import { UITouch } from "./UITouch";
 import { Scroller } from "./helpers/Scroller";
 import { UIColor } from "./UIColor";
+import { UIRefreshControl } from "./UIRefreshControl";
 
 export class UIScrollView extends UIView {
 
@@ -151,7 +152,7 @@ export class UIScrollView extends UIView {
                 (contentOffset.y - this.contentOffset.y),
                 500
             )
-            this.loopScrollAnimation()
+            this.loopScrollAnimation(true)
         }
         else {
             this.contentOffset = contentOffset
@@ -280,13 +281,13 @@ export class UIScrollView extends UIView {
                     translation = { x: 0.0, y: translation.y }
                 }
                 // this.createFetchMoreEffect(translation)
-                // const refreshOffset = this.createRefreshEffect(translation)
+                const refreshOffset: number | undefined = this.createRefreshEffect(translation)
                 // if (refreshOffset == undefined) {
                 //     this.createBounceEffect(translation, this.locationInView(undefined))
                 // }
                 this.contentOffset = {
                     x: Math.max(this.contentInset.left, Math.min(Math.max(0.0, this.contentSize.width + this.contentInset.right - this.bounds.width), this.contentOffset.x - translation.x)),
-                    y: Math.max(this.contentInset.top, Math.min(Math.max(0.0, this.contentSize.height + this.contentInset.bottom - this.bounds.height), this.contentOffset.y - translation.y))
+                    y: Math.max(this.contentInset.top - (this.refreshControl && this.refreshControl.enabled ? 240.0 : 0.0), Math.min(Math.max(0.0, this.contentSize.height + this.contentInset.bottom - this.bounds.height), this.contentOffset.y - (refreshOffset !== undefined ? refreshOffset : translation.y)))
                 }
                 sender.setTranslation({ x: 0, y: 0 }, undefined)
                 this.didScroll()
@@ -308,22 +309,21 @@ export class UIScrollView extends UIView {
                     velocity = { x: 0.0, y: velocity.y }
                 }
                 this.willEndDragging(velocity)
-                // if (this.refreshControl != undefined && this.refreshControl!!.animationView.alpha >= 1.0) {
-                //     this.didEndDragging(false)
-                //     this.willBeginDecelerating()
-                //     this.didEndDecelerating()
-                //     this.refreshControl!!.beginRefreshing_callFromScrollView()
-                //     this.setContentOffset(CGPoint(0.0, -this.contentInset.top - 44.0), true)
-                // }
-                // else if (this.refreshControl != undefined && this.refreshControl!!.animationView.alpha > 0.0) {
-                //     this.didEndDragging(false)
-                //     this.willBeginDecelerating()
-                //     this.didEndDecelerating()
-                //     this.refreshControl!!.animationView.alpha = 0.0
-                //     this.setContentOffset(CGPoint(0.0, -this.contentInset.top), true)
-                // }
-                // else 
-                if (this.shouldDecelerating(velocity)) {
+                if (this.refreshControl !== undefined && this.refreshControl.animationView.alpha >= 1.0) {
+                    this.didEndDragging(false)
+                    this.willBeginDecelerating()
+                    this.didEndDecelerating()
+                    this.refreshControl.beginRefreshing_callFromScrollView()
+                    this.setContentOffset({ x: 0.0, y: -this.contentInset.top - 44.0 }, true)
+                }
+                else if (this.refreshControl !== undefined && this.refreshControl.animationView.alpha > 0.0) {
+                    this.didEndDragging(false)
+                    this.willBeginDecelerating()
+                    this.didEndDecelerating()
+                    this.refreshControl.animationView.alpha = 0.0
+                    this.setContentOffset({ x: 0.0, y: -this.contentInset.top }, true)
+                }
+                else if (this.shouldDecelerating(velocity)) {
                     this.didEndDragging(true)
                     this.willBeginDecelerating()
                     this.startDecelerating(velocity)
@@ -487,13 +487,16 @@ export class UIScrollView extends UIView {
         this.loopScrollAnimation()
     }
 
-    private loopScrollAnimation() {
+    private loopScrollAnimation(ignoreBoundes: boolean = false) {
         const finished = !this.scroller.computeScrollOffset()
         if (!finished) {
             var minY = -this.contentInset.top
-            // if (refreshControl ?.refreshing == true) {
-            //     minY -= 88.0
-            // }
+            if (this.refreshControl && this.refreshControl.refreshing === true) {
+                minY -= 44.0
+            }
+            if (ignoreBoundes === true) {
+                minY = -Infinity
+            }
             this.contentOffset = {
                 x: Math.max(-this.contentInset.left, Math.min(Math.max(-this.contentInset.left, this.contentSize.width + this.contentInset.right - this.bounds.width), this.scroller.currX)),
                 y: Math.max(minY, Math.min(Math.max(minY, this.contentSize.height + this.contentInset.bottom - this.bounds.height), this.scroller.currY))
@@ -509,7 +512,9 @@ export class UIScrollView extends UIView {
                 this.didEndDecelerating()
                 return
             }
-            requestAnimationFrame(this.loopScrollAnimation.bind(this))
+            requestAnimationFrame(() => {
+                this.loopScrollAnimation(ignoreBoundes)
+            })
         }
         else if (this.decelerating) {
             this.didEndDecelerating()
@@ -611,10 +616,10 @@ export class UIScrollView extends UIView {
     }
 
     addSubview(view: UIView) {
-        // if (view is UIRefreshControl) {
-        //     this.refreshControl = view
-        //     return
-        // }
+        if (view instanceof UIRefreshControl) {
+            this.refreshControl = view
+            return
+        }
         // if (view is UIFetchMoreControl) {
         //     this.fetchMoreControl = view
         //     return
@@ -642,7 +647,39 @@ export class UIScrollView extends UIView {
         super.layoutSubviews()
         this.resetContentViewFrame()
         this.resetLockedDirection()
-        // this.refreshControl?.animationView?.frame = CGRect(0.0, 0.0, this.bounds.width, 44.0)
+        if (this.refreshControl) {
+            this.refreshControl.animationView.frame = { x: 0.0, y: 0.0, width: this.bounds.width, height: 44.0 }
+        }
+    }
+
+    // RefreshControl
+    private _refreshControl: UIRefreshControl | undefined = undefined
+
+    public get refreshControl(): UIRefreshControl | undefined {
+        return this._refreshControl;
+    }
+
+    public set refreshControl(value: UIRefreshControl | undefined) {
+        this._refreshControl = value;
+        if (value) {
+            super.addSubview(value.animationView)
+            value.animationView.frame = { x: 0, y: 0, width: this.bounds.width, height: 44.0 }
+            value.scrollView = this
+        }
+    }
+
+    private createRefreshEffect(translation: UIPoint): number | undefined {
+        if (this.refreshControl && this.refreshControl.enabled && this.contentSize.width <= this.bounds.width) {
+            if (this.contentOffset.y - translation.y < -this.contentInset.top) {
+                const progress = Math.max(0.0, Math.min(1.0, (-this.contentInset.top - (this.contentOffset.y - translation.y)) / 88.0))
+                this.refreshControl.animationView.alpha = progress
+                return translation.y / 3.0
+            }
+            else {
+                this.refreshControl.animationView.alpha = 0.0
+            }
+        }
+        return undefined
     }
 
 }

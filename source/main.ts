@@ -83,6 +83,9 @@ global.UIProgressView = UIProgressView
 import { UIPrompt } from "./uikit/UIPrompt";
 global.UIPrompt = UIPrompt
 
+import { UIRefreshControl } from "./uikit/UIRefreshControl";
+global.UIRefreshControl = UIRefreshControl
+
 import { UIRotationGestureRecognizer } from "./uikit/UIRotationGestureRecognizer";
 global.UIRotationGestureRecognizer = UIRotationGestureRecognizer
 

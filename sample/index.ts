@@ -47,5 +47,14 @@ collectionView.on("didSelectItem", (indexPath: UIIndexPath) => {
     collectionView.deselectItem(indexPath, true)
 })
 collectionView.reloadData()
+
+const refreshControl = new UIRefreshControl
+refreshControl.on("refresh", (sender) => {
+    DispatchQueue.main.asyncAfter(3.0, () => {
+        sender.endRefreshing()
+    })
+})
+collectionView.addSubview(refreshControl)
+
 global.aView = collectionView
 // console.log(img.size)
