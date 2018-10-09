@@ -9,6 +9,7 @@ import { UITouch } from "./UITouch";
 import { Scroller } from "./helpers/Scroller";
 import { UIColor } from "./UIColor";
 import { UIRefreshControl } from "./UIRefreshControl";
+import { UIFetchMoreControl } from "./UIFetchMoreControl";
 
 export class UIScrollView extends UIView {
 
@@ -280,7 +281,7 @@ export class UIScrollView extends UIView {
                 else if (this.directionalLockEnabled && this.currentLockedDirection == 1) {
                     translation = { x: 0.0, y: translation.y }
                 }
-                // this.createFetchMoreEffect(translation)
+                this.createFetchMoreEffect(translation)
                 const refreshOffset: number | undefined = this.createRefreshEffect(translation)
                 // if (refreshOffset == undefined) {
                 //     this.createBounceEffect(translation, this.locationInView(undefined))
@@ -620,10 +621,10 @@ export class UIScrollView extends UIView {
             this.refreshControl = view
             return
         }
-        // if (view is UIFetchMoreControl) {
-        //     this.fetchMoreControl = view
-        //     return
-        // }
+        if (view instanceof UIFetchMoreControl) {
+            this.fetchMoreControl = view
+            return
+        }
         this.contentView.addSubview(view)
     }
 
@@ -680,6 +681,42 @@ export class UIScrollView extends UIView {
             }
         }
         return undefined
+    }
+
+    // FetchMoreControl
+
+    private _fetchMoreControl: UIFetchMoreControl | undefined = undefined
+
+    /**
+     * Getter fetchMoreControl
+     * @return {UIFetchMoreControl }
+     */
+    public get fetchMoreControl(): UIFetchMoreControl | undefined {
+        return this._fetchMoreControl;
+    }
+
+    /**
+     * Setter fetchMoreControl
+     * @param {UIFetchMoreControl } value
+     */
+    public set fetchMoreControl(value: UIFetchMoreControl | undefined) {
+        this._fetchMoreControl = value;
+        if (value) {
+            value.scrollView = this
+        }
+    }
+
+    private createFetchMoreEffect(translation: UIPoint): boolean {
+        if (this.fetchMoreControl && this.fetchMoreControl.enabled && this.contentSize.width <= this.bounds.width) {
+            if (this.fetchMoreControl.fetching) {
+                return true
+            }
+            else if (this.contentOffset.y - translation.y > this.contentSize.height + this.contentInset.bottom - this.bounds.height * 2) {
+                this.fetchMoreControl.beginFetching()
+                return true
+            }
+        }
+        return false
     }
 
 }

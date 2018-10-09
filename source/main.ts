@@ -52,6 +52,9 @@ global.UIColor = UIColor
 import { UIConfirm } from "./uikit/UIConfirm";
 global.UIConfirm = UIConfirm
 
+import { UIFetchMoreControl } from "./uikit/UIFetchMoreControl";
+global.UIFetchMoreControl = UIFetchMoreControl
+
 import { UIFont } from "./uikit/UIFont";
 global.UIFont = UIFont
 
