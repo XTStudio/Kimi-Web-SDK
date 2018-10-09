@@ -37,6 +37,15 @@ global.UIAnimator = UIAnimator
 import { UIButton } from "./uikit/UIButton";
 global.UIButton = UIButton
 
+import { UICollectionView, UICollectionViewCell, UICollectionViewLayout } from "./uikit/UICollectionView";
+global.UICollectionView = UICollectionView
+global.UICollectionViewCell = UICollectionViewCell
+global.UICollectionViewLayout = UICollectionViewLayout
+
+import { UICollectionViewFlowLayout, UICollectionViewScrollDirection } from "./uikit/UICollectionViewFlowLayout";
+global.UICollectionViewFlowLayout = UICollectionViewFlowLayout
+global.UICollectionViewScrollDirection = UICollectionViewScrollDirection
+
 import { UIColor } from './uikit/UIColor'
 global.UIColor = UIColor
 

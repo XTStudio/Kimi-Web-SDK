@@ -20,3 +20,15 @@ export const UIRectIntersectsRect = function (a: UIRect, b: UIRect): boolean {
     }
     return true
 }
+
+export const UIRectUnion = function (r1: UIRect, r2: UIRect): UIRect {
+    const x = Math.min(r1.x, r2.x)
+    const y = Math.min(r1.y, r2.y)
+    const width = Math.max(r1.x + r1.width, r2.x + r2.width)
+    const height = Math.max(r1.y + r1.height, r2.y + r2.height)
+    return { x, y, width, height }
+}
+
+export const UIRectIsEmpty = function(rect: UIRect): boolean {
+    return rect.width == 0.0 || rect.height == 0.0
+}
