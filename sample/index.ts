@@ -7,6 +7,12 @@ class FooCell extends UICollectionViewCell {
     constructor(context: any) {
         super(context)
         this.aLabel.backgroundColor = UIColor.yellow
+        this.on("highlighted", (_, highlighted: boolean) => {
+            this.aLabel.backgroundColor = highlighted ? UIColor.red : UIColor.yellow
+        })
+        this.on("selected", (_, selected: boolean) => {
+            this.aLabel.backgroundColor = selected ? UIColor.red : UIColor.yellow
+        })
         this.contentView.addSubview(this.aLabel)
     }
 
@@ -36,6 +42,9 @@ collectionView.on("cellForItem", (indexPath: UIIndexPath) => {
     const cell = collectionView.dequeueReusableCell("Cell", indexPath) as FooCell
     // cell.aLabel.text = "index = " + indexPath.row
     return cell
+})
+collectionView.on("didSelectItem", (indexPath: UIIndexPath) => {
+    collectionView.deselectItem(indexPath, true)
 })
 collectionView.reloadData()
 global.aView = collectionView

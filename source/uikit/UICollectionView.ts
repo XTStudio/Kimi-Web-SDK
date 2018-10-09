@@ -7,6 +7,7 @@ import { UIAffineTransform, UIAffineTransformIdentity } from "./UIAffineTransfor
 import { UIPoint, UIPointZero } from "./UIPoint";
 import { UIAnimator } from "./UIAnimator";
 import { EventEmitter } from "../kimi/EventEmitter";
+import { UITouch, UITouchPhase } from "./UITouch";
 
 export enum ItemType {
     cell,
@@ -60,15 +61,15 @@ export class UICollectionViewLayoutAttributes {
     representedElementKind: string = this.elementKind
 
     isDecorationView(): boolean {
-        return this.representedElementCategory == ItemType.decorationView
+        return this.representedElementCategory === ItemType.decorationView
     }
 
     isSupplementaryView(): boolean {
-        return this.representedElementCategory == ItemType.supplementaryView
+        return this.representedElementCategory === ItemType.supplementaryView
     }
 
     isCell(): boolean {
-        return this.representedElementCategory == ItemType.cell
+        return this.representedElementCategory === ItemType.cell
     }
 
     static layoutAttributesForCellWithIndexPath(indexPath: UIIndexPath): UICollectionViewLayoutAttributes {
@@ -349,7 +350,7 @@ export class UICollectionView extends UIScrollView {
 
     private updateVisibleCellsNow(now: Boolean = false) {
         const layoutAttributesArray = this._collectionViewData.layoutAttributesForElementsInRect(this.visibleBoundRects)
-        if (layoutAttributesArray.length == 0) {
+        if (layoutAttributesArray.length === 0) {
             return
         }
         const itemKeysToAddDict: Map<UICollectionViewItemKey, UICollectionViewLayoutAttributes> = new Map()
@@ -446,7 +447,7 @@ export class UICollectionView extends UIScrollView {
     }
 
     private addControlledSubview(subview: UICollectionReusableView) {
-        if (subview.superview == undefined) {
+        if (subview.superview === undefined) {
             this.addSubview(subview)
         }
         subview.hidden = false
@@ -488,6 +489,165 @@ export class UICollectionView extends UIScrollView {
         this.queueReusableView(decorationView, this._decorationViewReuseQueues, reuseIdentifier)
     }
 
+    // Touches
+
+    touchesBegan(touches: UITouch[]) {
+        super.touchesBegan(touches)
+        const firstTouch = touches[0]
+        if (!firstTouch) {
+            return
+        }
+        this.handleTouch(UITouchPhase.began, firstTouch)
+    }
+
+    touchesMoved(touches: UITouch[]) {
+        super.touchesMoved(touches)
+        const firstTouch = touches[0]
+        if (!firstTouch) {
+            return
+        }
+        this.handleTouch(UITouchPhase.moved, firstTouch)
+    }
+
+    touchesEnded(touches: UITouch[]) {
+        super.touchesEnded(touches)
+        const firstTouch = touches[0]
+        if (!firstTouch) {
+            return
+        }
+        this.handleTouch(UITouchPhase.ended, firstTouch)
+    }
+
+    touchesCancelled(touches: UITouch[]) {
+        super.touchesCancelled(touches)
+        const firstTouch = touches[0]
+        if (!firstTouch) {
+            return
+        }
+        this.handleTouch(UITouchPhase.cancelled, firstTouch)
+    }
+
+    private firstTouchPoint: UIPoint | undefined = undefined
+
+    private firstTouchCell: UICollectionViewCell | undefined = undefined
+
+    private handleTouch(phase: UITouchPhase, currentTouch: UITouch) {
+        if (!this.allowsSelection) { return }
+        switch (phase) {
+            case UITouchPhase.began: {
+                if (!this.tracking) {
+                    var hitTestView = currentTouch.view
+                    var cellShouldHighlighted = true
+                    while (hitTestView !== undefined) {
+                        if (hitTestView instanceof UICollectionViewCell) {
+                            break
+                        }
+                        if (hitTestView.gestureRecognizers.length > 0) {
+                            cellShouldHighlighted = false
+                        }
+                        hitTestView = hitTestView.superview
+                    }
+                    if (cellShouldHighlighted) {
+                        this.firstTouchPoint = currentTouch.windowPoint
+                        if (hitTestView instanceof UICollectionViewCell) {
+                            this.firstTouchCell = hitTestView
+                            setTimeout(() => {
+                                if (this.firstTouchPoint === undefined || !(hitTestView instanceof UICollectionViewCell)) { return }
+                                if (hitTestView.currentIndexPath) {
+                                    this._indexPathsForHighlightedItems.push(hitTestView.currentIndexPath)
+                                }
+                                hitTestView.highlighted = true
+                            }, 150)
+                        }
+                    }
+                }
+                break;
+            }
+            case UITouchPhase.moved: {
+                if (this.firstTouchPoint && currentTouch.windowPoint) {
+                    if (UIView.recognizedGesture !== undefined || Math.abs(currentTouch.windowPoint.y - this.firstTouchPoint.y) > 8) {
+                        this._indexPathsForHighlightedItems = []
+                        this._allVisibleViewsDict.forEach(it => {
+                            if (it instanceof UICollectionViewCell) {
+                                it.highlighted = false
+                            }
+                        })
+                        this.firstTouchPoint = undefined
+                        this.firstTouchCell = undefined
+                    }
+                }
+                break;
+            }
+            case UITouchPhase.ended: {
+                if (this.firstTouchCell) {
+                    const cell = this.firstTouchCell
+                    this._indexPathsForHighlightedItems = []
+                    if (!this.allowsMultipleSelection) {
+                        this._indexPathsForSelectedItems.forEach(indexPath => {
+                            this._allVisibleViewsDict.forEach((it, key) => {
+                                if (key.indexPath && key.indexPath.mapKey() === indexPath.mapKey()) {
+                                    if (it instanceof UICollectionViewCell) {
+                                        it.selected = false
+                                        this.emit("didDeselectItem", it.currentIndexPath, it)
+                                    }
+                                }
+                            })
+                        })
+                        this._indexPathsForSelectedItems = []
+                    }
+                    this.firstTouchPoint = undefined
+                    this.firstTouchCell = undefined
+                    this._indexPathsForHighlightedItems = []
+                    this._allVisibleViewsDict.forEach(it => {
+                        if (it instanceof UICollectionViewCell) {
+                            it.highlighted = false
+                        }
+                    })
+                    if (cell.currentIndexPath) {
+                        const idx = this._indexPathsForSelectedItems.map(it => it.mapKey()).indexOf(cell.currentIndexPath.mapKey())
+                        if (idx >= 0) {
+                            this._indexPathsForSelectedItems.splice(idx, 1)
+                        }
+                        else {
+                            this._indexPathsForSelectedItems.push(cell.currentIndexPath)
+                        }
+                    }
+                    cell.selected = !cell.selected
+                    if (cell.selected) {
+                        this.emit("didSelectItem", cell.currentIndexPath, cell)
+                    }
+                    else {
+                        this.emit("didDeselectItem", cell.currentIndexPath, cell)
+                    }
+                }
+                else {
+                    this.firstTouchPoint = undefined
+                    this.firstTouchCell = undefined
+                    this._indexPathsForHighlightedItems = []
+                    this._allVisibleViewsDict.forEach(it => {
+                        if (it instanceof UICollectionViewCell) {
+                            it.highlighted = false
+                        }
+                    })
+                }
+                break;
+            }
+            case UITouchPhase.cancelled: {
+                this.firstTouchPoint = undefined
+                this.firstTouchCell = undefined
+                this._indexPathsForHighlightedItems = []
+                this._allVisibleViewsDict.forEach(it => {
+                    if (it instanceof UICollectionViewCell) {
+                        it.highlighted = false
+                    }
+                })
+                break;
+            }
+        }
+    }
+
+    // DataSource & Delegate
+
     __cellForItemAtIndexPath(collectionView: UICollectionView, indexPath: UIIndexPath): UICollectionViewCell {
         return collectionView.val("cellForItem", indexPath) || new UICollectionViewCell()
     }
@@ -521,7 +681,7 @@ export class UICollectionReusableView extends UIView {
     }
 
     applyLayoutAttributes(layoutAttributes: UICollectionViewLayoutAttributes) {
-        if (layoutAttributes != this.layoutAttributes) {
+        if (layoutAttributes !== this.layoutAttributes) {
             this.layoutAttributes = layoutAttributes
             this.frame = layoutAttributes.frame
             this.transform = layoutAttributes.transform
@@ -532,9 +692,27 @@ export class UICollectionReusableView extends UIView {
 
 export class UICollectionViewCell extends UICollectionReusableView {
 
-    selected = false
+    private _selected: boolean = false
 
-    highlighted = false
+    public get selected(): boolean {
+        return this._selected;
+    }
+
+    public set selected(value: boolean) {
+        this._selected = value;
+        this.emit("selected", this, value)
+    }
+
+    private _highlighted: boolean = false
+
+    public get highlighted(): boolean {
+        return this._highlighted;
+    }
+
+    public set highlighted(value: boolean) {
+        this._highlighted = value;
+        this.emit("highlighted", this, value)
+    }
 
     contentView: UIView = new UIView
 
@@ -565,7 +743,7 @@ export class UICollectionViewData {
     validateLayoutInRect(rect: UIRect) {
         this.validateItemCounts()
         this.prepareToLoadData()
-        if (this.validLayoutRect == undefined || !UIRectEqualToRect(this.validLayoutRect, rect)) {
+        if (this.validLayoutRect === undefined || !UIRectEqualToRect(this.validLayoutRect, rect)) {
             this.validLayoutRect = rect
             this.cachedLayoutAttributes = this.layout.layoutAttributesForElementsInRect(rect).filter(it => {
                 return it.isCell() || it.isDecorationView() || it.isSupplementaryView()
