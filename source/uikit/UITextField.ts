@@ -2,7 +2,7 @@ import { UIView, UINativeTouchView } from "./UIView";
 import { UIColor } from "./UIColor";
 import { UIFont } from "./UIFont";
 import { UILabel } from "./UILabel";
-import { UITextAlignment, UITextFieldViewMode, UIControlState } from "./UIEnums";
+import { UITextAlignment, UITextFieldViewMode, UIControlState, UITextAutocapitalizationType, UITextAutocorrectionType, UITextSpellCheckingType, UIKeyboardType, UIReturnKeyType } from "./UIEnums";
 import { UIButton } from "./UIButton";
 import { UIImage, UIImageRenderingMode } from "./UIImage";
 
@@ -22,6 +22,7 @@ class NativeEditText extends UINativeTouchView {
         this.inputElement.style.outline = "none"
         this.inputElement.style.color = "black"
         this.inputElement.style.fontSize = "14px"
+        this.inputElement.type = "text"
         if (navigator.vendor === "Apple Computer, Inc." && navigator.platform === "iPhone") {
             this.inputElement.style.marginLeft = "-8px"
             this.inputElement.style.marginTop = "-3px"
@@ -35,6 +36,7 @@ export class UITextField extends UIView {
 
     editText = new NativeEditText
     placeholderLabel = new UILabel
+    private _oldValue: any = ""
 
     constructor() {
         super()
@@ -65,6 +67,14 @@ export class UITextField extends UIView {
             this.emit("didEndEditing", this)
         })
         this.editText.inputElement.addEventListener("input", () => {
+            if (this.keyboardType === UIKeyboardType.numberPad || this.keyboardType === UIKeyboardType.decimalPad) {
+                if (!this.editText.inputElement.checkValidity()) {
+                    this.editText.inputElement.value = this._oldValue
+                }
+                else {
+                    this._oldValue = this.editText.inputElement.value
+                }
+            }
             this.reloadExtraContents()
         })
     }
@@ -223,12 +233,103 @@ export class UITextField extends UIView {
         this.editText.inputElement.blur()
     }
 
-    // autocapitalizationType: UITextAutocapitalizationType
-    // autocorrectionType: UITextAutocorrectionType
-    // spellCheckingType: UITextSpellCheckingType
-    // keyboardType: UIKeyboardType
-    // returnKeyType: UIReturnKeyType
-    // secureTextEntry: boolean
+    private _autocapitalizationType: UITextAutocapitalizationType = UITextAutocapitalizationType.none
+
+    public get autocapitalizationType(): UITextAutocapitalizationType {
+        return this._autocapitalizationType;
+    }
+
+    public set autocapitalizationType(value: UITextAutocapitalizationType) {
+        this._autocapitalizationType = value;
+        switch (value) {
+            case UITextAutocapitalizationType.none:
+                (this.editText.inputElement as any).autocapitalize = "off";
+                break;
+            case UITextAutocapitalizationType.allCharacters:
+                (this.editText.inputElement as any).autocapitalize = "characters";
+                break;
+            case UITextAutocapitalizationType.sentences:
+                (this.editText.inputElement as any).autocapitalize = "sentences";
+                break;
+            case UITextAutocapitalizationType.words:
+                (this.editText.inputElement as any).autocapitalize = "words";
+                break;
+        }
+    }
+
+    private _autocorrectionType: UITextAutocorrectionType = UITextAutocorrectionType.default
+
+    public get autocorrectionType(): UITextAutocorrectionType {
+        return this._autocorrectionType;
+    }
+
+    public set autocorrectionType(value: UITextAutocorrectionType) {
+        this._autocorrectionType = value;
+        if (value == UITextAutocorrectionType.yes) {
+            this.editText.inputElement.setAttribute("autocorrect", "on")
+        }
+        else {
+            this.editText.inputElement.setAttribute("autocorrect", "off")
+        }
+    }
+
+    private _spellCheckingType: UITextSpellCheckingType = UITextSpellCheckingType.default
+
+    public get spellCheckingType(): UITextSpellCheckingType {
+        return this._spellCheckingType;
+    }
+
+    public set spellCheckingType(value: UITextSpellCheckingType) {
+        this._spellCheckingType = value;
+        this.editText.inputElement.spellcheck = value !== UITextSpellCheckingType.no
+    }
+
+    private _keyboardType: UIKeyboardType = UIKeyboardType.default
+
+    public get keyboardType(): UIKeyboardType {
+        return this._keyboardType;
+    }
+
+    public set keyboardType(value: UIKeyboardType) {
+        this._keyboardType = value;
+        this.resetInputType()
+    }
+
+    returnKeyType: UIReturnKeyType = UIReturnKeyType.default
+
+    private _secureTextEntry: boolean = false
+
+    public get secureTextEntry(): boolean {
+        return this._secureTextEntry;
+    }
+
+    public set secureTextEntry(value: boolean) {
+        this._secureTextEntry = value;
+        this.resetInputType()
+    }
+
+    resetInputType() {
+        if (this.secureTextEntry) {
+            this.editText.inputElement.type = "password"
+        }
+        else if (this.keyboardType == UIKeyboardType.numberPad) {
+            this.editText.inputElement.type = "number"
+            this.editText.inputElement.step = ""
+        }
+        else if (this.keyboardType == UIKeyboardType.decimalPad) {
+            this.editText.inputElement.type = "number"
+            this.editText.inputElement.step = "0.0000001"
+        }
+        else if (this.keyboardType == UIKeyboardType.phonePad) {
+            this.editText.inputElement.type = "tel"
+        }
+        else if (this.keyboardType == UIKeyboardType.emailAddress) {
+            this.editText.inputElement.type = "email"
+        }
+        else {
+            this.editText.inputElement.type = "text"
+        }
+    }
 
     layoutSubviews() {
         super.layoutSubviews()

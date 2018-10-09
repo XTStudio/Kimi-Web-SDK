@@ -19,5 +19,10 @@ leftView.backgroundColor = UIColor.red
 leftView.frame = { x: 0, y: 0, width: 22, height: 44 }
 textField.rightView = leftView
 textField.rightViewMode = UITextFieldViewMode.always
+// textField.autocapitalizationType = UITextAutocapitalizationType.allCharacters
+// textField.autocorrectionType = UITextAutocorrectionType.no
+// textField.spellCheckingType = UITextSpellCheckingType.no
+// textField.secureTextEntry = true
+textField.keyboardType = UIKeyboardType.decimalPad
 
 global.aView = mainView
