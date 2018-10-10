@@ -56,6 +56,7 @@ export class UITextField extends UIView {
             if (this.clearsOnBeginEditing) {
                 this.text = ""
             }
+            this._oldValue = this.editText.inputElement.value
             this.emit("didBeginEditing", this)
         })
         this.editText.inputElement.addEventListener("blur", () => {
@@ -66,16 +67,25 @@ export class UITextField extends UIView {
             this.editing = false
             this.emit("didEndEditing", this)
         })
-        this.editText.inputElement.addEventListener("input", () => {
+        this.editText.inputElement.addEventListener("input", (e: any) => {
             if (this.keyboardType === UIKeyboardType.numberPad || this.keyboardType === UIKeyboardType.decimalPad) {
                 if (!this.editText.inputElement.checkValidity()) {
                     this.editText.inputElement.value = this._oldValue
                 }
-                else {
-                    this._oldValue = this.editText.inputElement.value
+            }
+            if (e.inputType === "insertText") {
+                if (this.val("shouldChange", this, { location: 0, length: 0 }, e.data) === false) {
+                    this.editText.inputElement.value = this._oldValue
                 }
             }
+            this._oldValue = this.editText.inputElement.value
             this.reloadExtraContents()
+        })
+        this.editText.inputElement.addEventListener("keypress", (e) => {
+            if (e.keyCode === 13) {
+                this.emit("shouldReturn", this)
+                e.preventDefault()
+            }
         })
     }
 

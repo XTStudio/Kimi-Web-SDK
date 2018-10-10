@@ -24,5 +24,15 @@ textField.rightViewMode = UITextFieldViewMode.always
 // textField.spellCheckingType = UITextSpellCheckingType.no
 // textField.secureTextEntry = true
 textField.keyboardType = UIKeyboardType.decimalPad
+textField.on("shouldReturn", (sender: UITextField) => {
+    sender.blur()
+    return true
+})
+textField.on("shouldChange", (_, __, str) => {
+    if (str === "9") {
+        return false
+    }
+    return true
+})
 
 global.aView = mainView
