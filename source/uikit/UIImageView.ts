@@ -1,10 +1,12 @@
 import { UIView } from "./UIView";
-import { UIImage } from "./UIImage";
+import { UIImage, UIImageRenderingMode } from "./UIImage";
 import { UIViewContentMode } from "./UIEnums";
 import { currentAnimationTimeMillis } from "./helpers/Now";
 import { UISize, UISizeZero } from "./UISize";
 
 let cachingImages: { [key: string]: UIImage } = {}
+const svgFilterRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+document.body.appendChild(svgFilterRoot)
 
 export class UIImageView extends UIView {
 
@@ -70,6 +72,7 @@ export class UIImageView extends UIView {
                 }, 0)
             }
         }
+        this.createTintFilter()
     }
 
     private currentURLString: string | undefined = undefined
@@ -112,6 +115,11 @@ export class UIImageView extends UIView {
         this.resetContentObjectFit()
     }
 
+    tintColorDidChange() {
+        super.tintColorDidChange()
+        this.createTintFilter()
+    }
+
     private resetContentObjectFit() {
         if (this.image) {
             switch (this.contentMode) {
@@ -125,6 +133,37 @@ export class UIImageView extends UIView {
                     this.image.imageElement.style.setProperty("object-fit", "fill")
                     break
             }
+        }
+    }
+
+    private filterElement: SVGFilterElement | undefined = undefined
+
+    didRemovedFromWindow() {
+        super.didRemovedFromWindow()
+        if (this.filterElement) {
+            svgFilterRoot.removeChild(this.filterElement)
+        }
+    }
+
+    private createTintFilter() {
+        if (this.image && this.image.renderingMode === UIImageRenderingMode.alwaysTemplate) {
+            if (this.filterElement) {
+                svgFilterRoot.removeChild(this.filterElement)
+            }
+            const filterUUID = "com.xt.filter." + Math.random() + Math.random()
+            const filterElement = document.createElementNS("http://www.w3.org/2000/svg", "filter")
+            filterElement.id = filterUUID
+            filterElement.innerHTML = `
+            <feColorMatrix in="SourceGraphic"
+                        type="matrix"
+                        values="${this.tintColor.r} 0 0 0 0
+                                0 ${this.tintColor.g} 0 0 0
+                                0 0 ${this.tintColor.b} 0 0 
+                                0 0 0 ${this.tintColor.a} 0" />
+            `
+            svgFilterRoot.appendChild(filterElement)
+            this.filterElement = filterElement
+            this.image.imageElement.style.filter = `url(#${filterUUID})`
         }
     }
 

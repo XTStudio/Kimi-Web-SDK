@@ -111,7 +111,12 @@ export class UIView extends EventEmitter {
             superview.domElement.removeChild(this.domElement)
             this.superview = undefined
             this.didMoveToSuperview()
+            this.didRemovedFromWindow()
         }
+    }
+
+    didRemovedFromWindow() {
+        this.subviews.forEach(it => it.didRemovedFromWindow())
     }
 
     insertSubviewAtIndex(view: UIView, index: number): void {

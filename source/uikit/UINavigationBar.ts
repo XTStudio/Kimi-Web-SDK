@@ -329,12 +329,12 @@ export class UINavigationBar extends UIView {
                     it.alpha = 1.0
                 })
             }, () => {
-                fromItem.allViews().forEach(it => it.removeFromSuperview)
+                fromItem.allViews().forEach(it => it.removeFromSuperview())
                 this.displayItems()
             })
         }
         else {
-            fromItem.allViews().forEach(it => it.removeFromSuperview)
+            fromItem.allViews().forEach(it => it.removeFromSuperview())
             this.displayItems()
         }
     }
@@ -403,7 +403,7 @@ export class UINavigationBar extends UIView {
                 }
             })
             it.backButton.hidden = it.hidesBackButton || index == 0 || it.leftBarButtonItems.length > 0
-            it.backButton.setImage(this.backIndicatorImage, UIControlState.normal)
+            it.backButton.setImage(this.backIndicatorImage ? this.backIndicatorImage.clone() : undefined, UIControlState.normal)
         })
         this.layoutItems()
     }

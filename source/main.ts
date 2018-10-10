@@ -62,8 +62,9 @@ import { UIGestureRecognizerState, UIGestureRecognizer } from "./uikit/UIGesture
 global.UIGestureRecognizerState = UIGestureRecognizerState
 global.UIGestureRecognizer = UIGestureRecognizer
 
-import { UIImage } from "./uikit/UIImage";
+import { UIImage, UIImageRenderingMode } from "./uikit/UIImage";
 global.UIImage = UIImage
+global.UIImageRenderingMode = UIImageRenderingMode
 
 import { UIImageView } from "./uikit/UIImageView";
 global.UIImageView = UIImageView

@@ -13,7 +13,7 @@ export class UIImage extends EventEmitter {
 
     readonly renderingMode: UIImageRenderingMode = UIImageRenderingMode.alwaysOriginal
 
-    constructor(options: { name?: string, base64?: string, data?: any, renderingMode?: UIImageRenderingMode }) {
+    constructor(readonly options: { name?: string, base64?: string, data?: any, renderingMode?: UIImageRenderingMode }) {
         super()
         if (options.base64) {
             this.imageElement.src = "data:image;base64," + options.base64
@@ -28,8 +28,8 @@ export class UIImage extends EventEmitter {
         else if (options.name) {
 
         }
-        if (options.renderingMode) {
-            this.renderingMode = this.renderingMode
+        if (options.renderingMode !== undefined) {
+            this.renderingMode = options.renderingMode
         }
     }
 
@@ -75,5 +75,10 @@ export class UIImage extends EventEmitter {
     size: UISize = UISizeZero
 
     scale: number = 1.0
+
+    clone(): UIImage {
+        const img = new UIImage(this.options)
+        return img
+    }
 
 }
