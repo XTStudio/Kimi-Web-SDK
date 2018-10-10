@@ -114,6 +114,9 @@ global.UITapGestureRecognizer = UITapGestureRecognizer
 import { UITextField } from "./uikit/UITextField";
 global.UITextField = UITextField
 
+import { UITextView } from "./uikit/UITextView";
+global.UITextView = UITextView
+
 import { UIView, UIWindow } from './uikit/UIView'
 global.UIView = UIView
 global.UIWindow = UIWindow
