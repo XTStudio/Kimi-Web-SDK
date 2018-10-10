@@ -24,7 +24,7 @@ export class UIView extends EventEmitter {
         this.layer.view = this
     }
 
-    attachToElement(element: HTMLElement) {
+    attachToElement(element: HTMLElement, rootViewController: any = undefined) {
         if (element == document.body) {
             document.body.style.width = "100%"
             document.body.style.height = "100%"
@@ -38,7 +38,13 @@ export class UIView extends EventEmitter {
                 return this
             }
             const rootWindow = new UIWindow()
-            rootWindow.addSubview(this)
+            rootWindow.clipsToBounds = true
+            if ((rootViewController as any) !== undefined && (rootViewController as any)._isUIViewController === true) {
+                rootWindow.rootViewController = rootViewController
+            }
+            else {
+                rootWindow.addSubview(this)
+            }
             return rootWindow
         })()
         element.appendChild(rootWindow.domElement)
@@ -55,6 +61,8 @@ export class UIView extends EventEmitter {
     readonly layer = new CALayer
 
     private _frame: UIRect = UIRectZero
+
+    public viewDelegate: any = undefined
 
     public bounds: UIRect = UIRectZero
 
@@ -215,7 +223,11 @@ export class UIView extends EventEmitter {
 
     // Delegates
 
-    didAddSubview(subview: UIView): void { }
+    didAddSubview(subview: UIView): void {
+        if (this.viewDelegate) {
+            this.viewDelegate.didAddSubview(subview)
+        }
+    }
     willRemoveSubview(subview: UIView): void { }
     willMoveToSuperview(newSuperview: UIView | undefined): void { }
     didMoveToSuperview(): void {
@@ -236,7 +248,12 @@ export class UIView extends EventEmitter {
         this.layoutSubviews()
     }
 
-    layoutSubviews(): void { }
+    layoutSubviews(): void {
+        if (this.viewDelegate) {
+            this.viewDelegate.viewWillLayoutSubviews()
+            this.viewDelegate.viewDidLayoutSubviews()
+        }
+    }
 
     // Rendering
 
@@ -248,7 +265,7 @@ export class UIView extends EventEmitter {
 
     private _alpha: number = 1.0
 
-    private _hidden: boolean = false
+    public _hidden: boolean = false
 
     private _opaque: boolean = false
 
@@ -264,14 +281,14 @@ export class UIView extends EventEmitter {
 
     private _userInteractionEnabled: boolean = true
 
-	public get userInteractionEnabled(): boolean  {
-		return this._userInteractionEnabled;
-	}
+    public get userInteractionEnabled(): boolean {
+        return this._userInteractionEnabled;
+    }
 
-	public set userInteractionEnabled(value: boolean ) {
+    public set userInteractionEnabled(value: boolean) {
         this._userInteractionEnabled = value;
         this.domElement.style.pointerEvents = value ? "auto" : "none"
-	}
+    }
 
     public gestureRecognizers: UIGestureRecognizer[] = []
 
@@ -1011,6 +1028,31 @@ export class UIWindow extends UIView {
         this.domElement.addEventListener("touchcancel", (e) => {
             this.handleTouchCancel(e)
         })
+    }
+
+    private _rootViewController: any | undefined = undefined
+
+    public get rootViewController(): any | undefined {
+        return this._rootViewController;
+    }
+
+    public set rootViewController(value: any | undefined) {
+        if (this._rootViewController) {
+            (this._rootViewController as any).window = undefined
+            this._rootViewController.view.removeFromSuperview()
+        }
+        this._rootViewController = value;
+        if (this._rootViewController) {
+            (this._rootViewController as any).window = this
+            this.addSubview((this._rootViewController as any).view)
+        }
+    }
+
+    layoutSubviews() {
+        super.layoutSubviews()
+        if (this.rootViewController) {
+            this.rootViewController.view.frame = this.bounds
+        }
     }
 
 }

@@ -74,6 +74,17 @@ global.UILabel = UILabel
 import { UILongPressGestureRecognizer } from "./uikit/UILongPressGestureRecognizer";
 global.UILongPressGestureRecognizer = UILongPressGestureRecognizer
 
+import { UINavigationBar, UINavigationItem, UIBarButtonItem } from "./uikit/UINavigationBar";
+global.UINavigationBar = UINavigationBar
+global.UINavigationItem = UINavigationItem
+global.UIBarButtonItem = UIBarButtonItem
+
+import { UINavigationController } from "./uikit/UINavigationController";
+global.UINavigationController = UINavigationController
+
+import { UINavigationBarViewController } from "./uikit/UINavigationBarViewController";
+global.UINavigationBarViewController = UINavigationBarViewController
+
 import { UIPanGestureRecognizer } from "./uikit/UIPanGestureRecognizer";
 global.UIPanGestureRecognizer = UIPanGestureRecognizer
 
@@ -120,6 +131,9 @@ global.UITextView = UITextView
 import { UIView, UIWindow } from './uikit/UIView'
 global.UIView = UIView
 global.UIWindow = UIWindow
+
+import { UIViewController } from "./uikit/UIViewController";
+global.UIViewController = UIViewController
 
 // Foundation
 

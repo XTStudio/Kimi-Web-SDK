@@ -1,27 +1,26 @@
 /// <reference path="../node_modules/xtstudio/types/index.d.ts" />
 
-const mainView = new UIView
-mainView.frame = UIScreen.main.bounds
-mainView.backgroundColor = UIColor.yellow
+class FooViewController extends UIViewController {
 
-const textField = new UITextView
-textField.frame = { x: 44, y: 44, width: 200, height: 200 }
-textField.backgroundColor = UIColor.white
-textField.font = new UIFont(17)
-// textField.placeholder = "请输入用户名"
-textField.on("shouldBeginEditing", () => {
-    return true
-})
-// textField.clearButtonMode = UITextFieldViewMode.whileEditing
-mainView.addSubview(textField)
-textField.on("shouldChange", (_, __, str) => {
-    if (str === "9") {
-        return false
+    e = new UIView
+
+    viewDidLoad() {
+        super.viewDidLoad()
+        this.title = "First Page"
+        this.e.backgroundColor = UIColor.red
+        this.e.layer.cornerRadius = 8
+        this.e.frame = { x: 44, y: 44, width: 44, height: 44 }
+        this.e.addGestureRecognizer(new UITapGestureRecognizer().on('touch', () => {
+            if (this.navigationController) {
+                this.navigationController.pushViewController(new FooViewController)
+            }
+        }))
+        this.view.addSubview(this.e)
+        this.view.backgroundColor = UIColor.yellow
     }
-    return true
-})
-textField.text = "Hello, World!"
-textField.editable = false
-textField.selectable = false
 
-global.aView = mainView
+}
+
+const fooWindow = new UIWindow
+fooWindow.rootViewController = new UINavigationController(new FooViewController)
+global.fooWindow = fooWindow
