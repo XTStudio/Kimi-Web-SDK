@@ -206,6 +206,7 @@ export class UIBarButtonItem extends EventEmitter {
 
     resetText() {
         if (this.customView instanceof UIBarButton) {
+            this.customView.tintColor = this.tintColor
             this.customView.setTitle(this.title, UIControlState.normal)
         }
     }

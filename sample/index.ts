@@ -16,7 +16,6 @@ class FooViewController extends UIViewController {
             }
         }))
         this.view.addSubview(this.e)
-        // this.view.backgroundColor = UIColor.yellow
     }
 
 }
