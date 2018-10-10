@@ -21,6 +21,9 @@ export class UIView extends EventEmitter {
     constructor() {
         super()
         this.domElement.style.position = "absolute"
+        this.domElement.style.userSelect = 'none';
+        this.domElement.style.webkitUserSelect = 'none';
+        this.domElement.style.setProperty("webkitTouchCallout", "none");
         this.layer.view = this
     }
 
@@ -30,6 +33,10 @@ export class UIView extends EventEmitter {
             document.body.style.height = "100%"
             document.body.style.overflow = "hidden"
             document.body.style.margin = "0"
+            document.addEventListener("contextmenu", (e) => e.preventDefault())
+            document.documentElement.style.userSelect = 'none';
+            document.documentElement.style.webkitUserSelect = 'none';
+            document.documentElement.style.setProperty("webkitTouchCallout", "none");
             document.getElementsByTagName('html')[0].style.height = "100%"
             document.getElementsByTagName('html')[0].style.overflow = "hidden"
         }
