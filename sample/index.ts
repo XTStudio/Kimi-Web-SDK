@@ -2,20 +2,36 @@
 
 class FooViewController extends UIViewController {
 
-    e = new UIView
+    e = new UIPageViewController
 
     viewDidLoad() {
         super.viewDidLoad()
         this.title = "First Page"
-        this.e.backgroundColor = UIColor.red
-        this.e.layer.cornerRadius = 8
-        this.e.frame = { x: 44, y: 44, width: 44, height: 44 }
-        this.e.addGestureRecognizer(new UITapGestureRecognizer().on('touch', () => {
-            if (this.navigationController) {
-                this.navigationController.pushViewController(new FooViewController)
-            }
-        }))
-        this.view.addSubview(this.e)
+        this.e.pageItems = [
+            (() => {
+                let v = new UIViewController()
+                v.view.backgroundColor = UIColor.gray
+                return v
+            })(),
+            (() => {
+                let v = new UIViewController()
+                v.view.backgroundColor = UIColor.green
+                return v
+            })(),
+            (() => {
+                let v = new UIViewController()
+                v.view.backgroundColor = UIColor.yellow
+                return v
+            })(),
+        ]
+        this.e.loops = true
+        this.addChildViewController(this.e)
+        this.view.addSubview(this.e.view)
+    }
+
+    viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        this.e.view.frame = this.view.bounds
     }
 
 }

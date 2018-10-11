@@ -86,6 +86,9 @@ global.UINavigationController = UINavigationController
 import { UINavigationBarViewController } from "./uikit/UINavigationBarViewController";
 global.UINavigationBarViewController = UINavigationBarViewController
 
+import { UIPageViewController } from "./uikit/UIPageViewController";
+global.UIPageViewController = UIPageViewController
+
 import { UIPanGestureRecognizer } from "./uikit/UIPanGestureRecognizer";
 global.UIPanGestureRecognizer = UIPanGestureRecognizer
 

@@ -287,8 +287,8 @@ export class UIScrollView extends UIView {
                 //     this.createBounceEffect(translation, this.locationInView(undefined))
                 // }
                 this.contentOffset = {
-                    x: Math.max(this.contentInset.left, Math.min(Math.max(0.0, this.contentSize.width + this.contentInset.right - this.bounds.width), this.contentOffset.x - translation.x)),
-                    y: Math.max(this.contentInset.top - (this.refreshControl && this.refreshControl.enabled ? 240.0 : 0.0), Math.min(Math.max(0.0, this.contentSize.height + this.contentInset.bottom - this.bounds.height), this.contentOffset.y - (refreshOffset !== undefined ? refreshOffset : translation.y)))
+                    x: Math.max(-this.contentInset.left, Math.min(Math.max(0.0, this.contentSize.width + this.contentInset.right - this.bounds.width), this.contentOffset.x - translation.x)),
+                    y: Math.max(-this.contentInset.top - (this.refreshControl && this.refreshControl.enabled ? 240.0 : 0.0), Math.min(Math.max(0.0, this.contentSize.height + this.contentInset.bottom - this.bounds.height), this.contentOffset.y - (refreshOffset !== undefined ? refreshOffset : translation.y)))
                 }
                 sender.setTranslation({ x: 0, y: 0 }, undefined)
                 this.didScroll()
@@ -445,6 +445,9 @@ export class UIScrollView extends UIView {
     }
 
     private shouldDecelerating(velocity: UIPoint): Boolean {
+        if (this.pagingEnabled) {
+            return true
+        }
         if (velocity.y > 0 && this.contentOffset.y < this.contentSize.height + this.contentInset.bottom - this.bounds.height) {
             return true
         }
