@@ -11,6 +11,14 @@ class FooViewController extends UIViewController {
             (() => {
                 let v = new UIViewController()
                 v.view.backgroundColor = UIColor.gray
+                v.view.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
+                    if (this.navigationController) {
+                        const r = new UIViewController
+                        // r.title = "Second"
+                        r.view.backgroundColor = UIColor.yellow
+                        this.navigationController.pushViewController(r)
+                    }
+                }))
                 return v
             })(),
             (() => {
@@ -37,5 +45,14 @@ class FooViewController extends UIViewController {
 }
 
 const fooWindow = new UIWindow
-fooWindow.rootViewController = new UINavigationController(new FooViewController)
+const ee = new UITabBarController
+const a = new UINavigationController(new FooViewController)
+a.tabBarItem.title = "首页"
+const b = new UINavigationController(new UIViewController)
+b.tabBarItem.title = "我"
+ee.setViewControllers([
+    a,
+    b,
+], false)
+fooWindow.rootViewController = ee
 global.fooWindow = fooWindow

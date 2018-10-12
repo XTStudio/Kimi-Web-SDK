@@ -119,6 +119,13 @@ global.UISlider = UISlider
 import { UISwitch } from "./uikit/UISwitch";
 global.UISwitch = UISwitch
 
+import { UITabBar } from "./uikit/UITabBar";
+import { UITabBarController } from "./uikit/UITabBarController";
+import { UITabBarItem } from "./uikit/UITabBarItem";
+global.UITabBar = UITabBar
+global.UITabBarController = UITabBarController
+global.UITabBarItem = UITabBarItem
+
 import { UITableView, UITableViewCell } from "./uikit/UITableView";
 global.UITableView = UITableView
 global.UITableViewCell = UITableViewCell

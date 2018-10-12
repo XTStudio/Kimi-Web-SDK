@@ -259,15 +259,6 @@ export class UINavigationBar extends UIView {
         this.domElement.style.borderBottomColor = new UIColor(0x98 / 255.0, 0x96 / 255.0, 0x9b / 255.0, 0.75).toStyle()
     }
 
-    // override fun draw(canvas: Canvas?) {
-    //     super.draw(canvas)
-    //     const canvas = canvas ?: return
-    //     shadowPaint.color = Color.rgb(0x98, 0x96, 0x9b)
-    //     shadowPaint.strokeWidth = 1f
-    //     shadowPaint.style = Paint.Style.STROKE
-    //     canvas.drawLine(0.0f, canvas.height.toFloat() - 1f, canvas.width.toFloat(), canvas.height.toFloat() - 1f, shadowPaint)
-    // }
-
     // Implementation
 
     public get topItem(): UINavigationItem | undefined {

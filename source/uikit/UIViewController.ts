@@ -2,6 +2,7 @@ import { EventEmitter } from "../kimi/EventEmitter";
 import { UIView, UIWindow } from "./UIView";
 import { UIColor } from "./UIColor";
 import { UINavigationItem } from "./UINavigationBar";
+import { UITabBarItem } from "./UITabBarItem";
 
 export class UIViewController extends EventEmitter {
 
@@ -46,7 +47,9 @@ export class UIViewController extends EventEmitter {
         this.view.backgroundColor = UIColor.white
     }
 
-    viewDidLoad() { }
+    viewDidLoad() {
+        this.navigationItem.viewController = this
+    }
 
     viewWillAppear(animated: boolean) {
         this.childViewControllers.forEach(it => it.viewWillAppear(animated))
@@ -146,19 +149,18 @@ export class UIViewController extends EventEmitter {
 
     hidesBottomBarWhenPushed: boolean = false
 
-    // val tabBarController: UITabBarController?
-    //     get() {
-    //         var current: UIViewController? = this
-    //         while (current != null) {
-    //             (current as? UITabBarController)?.let {
-    //                 return it
-    //             }
-    //             current = current.parentViewController
-    //         }
-    //         return null
-    //     }
+    public get tabBarController(): any {
+        var current: UIViewController | undefined = this
+        while (current != undefined) {
+            if ((current as any)._isUITabBarController === true) {
+                return current as any
+            }
+            current = current.parentViewController
+        }
+        return undefined
+    }
 
-    // val tabBarItem = UITabBarItem()
+    tabBarItem = new UITabBarItem
 
     private _window: UIWindow | undefined = undefined
 
@@ -212,34 +214,6 @@ export class UIViewController extends EventEmitter {
     //     }
     //     (this as? UITabBarController)?.let {
     //         it.selectedViewController?.goBack()
-    //     }
-    // }
-
-    // // Keyboard support.
-
-    // internal fun keyboardWillShow(keyboardHeight: Double) {
-    //     EDOJavaHelper.emit(this, "keyboardWillShow", CGRect(0.0, 0.0, this.view.bounds.width, keyboardHeight), 0.0)
-    //     this.childViewControllers.forEach { it.keyboardWillShow(keyboardHeight) }
-    // }
-
-    // internal fun keyboardWillHide() {
-    //     EDOJavaHelper.emit(this, "keyboardWillHide", 0.0)
-    //     this.childViewControllers.forEach { it.keyboardWillHide() }
-    // }
-
-    // // StatusBar support.
-
-    // open fun setNeedsStatusBarAppearanceUpdate(activity: Activity? = null) {
-    //     (EDOJavaHelper.value(this, "statusBarStyle") as? UIStatusBarStyle)?.let {
-    //         val activity = activity ?: currentActivity ?: return@let
-    //         when (it) {
-    //             UIStatusBarStyle.default -> {
-    //                 activity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-    //             }
-    //             UIStatusBarStyle.lightContent -> {
-    //                 activity.window.decorView.systemUiVisibility = 0
-    //             }
-    //         }
     //     }
     // }
 

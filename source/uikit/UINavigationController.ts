@@ -34,7 +34,9 @@ export class UINavigationController extends UIViewController {
             viewController.hidesBottomBarWhenPushed = true
         }
         if (viewController.hidesBottomBarWhenPushed) {
-            // this.tabBarController?.view?.bringSubviewToFront(this.view)
+            if (this.tabBarController) {
+                this.tabBarController.view.bringSubviewToFront(this.view)
+            }
         }
         this.addChildViewController(viewController)
         this.view.addSubview(viewController.view)
@@ -89,9 +91,9 @@ export class UINavigationController extends UIViewController {
                 fromViewController.viewDidDisappear(true)
                 toViewController.viewDidAppear(true)
                 if (!toViewController.hidesBottomBarWhenPushed) {
-                    // this.tabBarController?.let {
-                    //     it.view.bringSubviewToFront(it.tabBar)
-                    // }
+                    if (this.tabBarController) {
+                        this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+                    }
                 }
                 this.beingAnimating = false
             })
@@ -103,9 +105,9 @@ export class UINavigationController extends UIViewController {
             fromViewController.viewDidDisappear(true)
             toViewController.viewDidAppear(true)
             if (!toViewController.hidesBottomBarWhenPushed) {
-                // this.tabBarController?.let {
-                //     it.view.bringSubviewToFront(it.tabBar)
-                // }
+                if (this.tabBarController) {
+                    this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+                }
             }
         }
         this.navigationBar.popNavigationItem(animated != false)
@@ -135,9 +137,9 @@ export class UINavigationController extends UIViewController {
                     fromViewControllers.forEach(it => { it.viewDidDisappear(true) })
                     toViewController.viewDidAppear(true)
                     if (!toViewController.hidesBottomBarWhenPushed) {
-                        // this.tabBarController ?.let {
-                        //     it.view.bringSubviewToFront(it.tabBar)
-                        // }
+                        if (this.tabBarController) {
+                            this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+                        }
                     }
                     this.beingAnimating = false
                 }
@@ -150,9 +152,9 @@ export class UINavigationController extends UIViewController {
             fromViewControllers.forEach(it => { it.viewDidDisappear(false) })
             toViewController.viewDidAppear(false)
             if (!toViewController.hidesBottomBarWhenPushed) {
-                // this.tabBarController ?.let {
-                //     it.view.bringSubviewToFront(it.tabBar)
-                // }
+                if (this.tabBarController) {
+                    this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+                }
             }
         }
         this.navigationBar.popToNavigationItem(toViewController.navigationItem, animated != false)
@@ -180,14 +182,14 @@ export class UINavigationController extends UIViewController {
         })
         this.navigationBar.setItems(viewControllers.map(it => { return it.navigationItem }), animated != false)
         if (viewControllers[viewControllers.length - 1] && viewControllers[viewControllers.length - 1].hidesBottomBarWhenPushed == true) {
-            // this.tabBarController?.let {
-            //     it.view.bringSubviewToFront(this.view)
-            // }
+            if (this.tabBarController) {
+                this.tabBarController.view.bringSubviewToFront(this.view)
+            }
         }
         else {
-            // this.tabBarController?.let {
-            //     it.view.bringSubviewToFront(it.tabBar)
-            // }
+            if (this.tabBarController) {
+                this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+            }
         }
     }
 
@@ -211,8 +213,12 @@ export class UINavigationController extends UIViewController {
             return { x: 0.0, y: this.barFrame.height, width: this.view.bounds.width, height: this.view.bounds.height - this.barFrame.height }
         }
         else {
-            return { x: 0.0, y: this.barFrame.height, width: this.view.bounds.width, height: this.view.bounds.height - this.barFrame.height - 0.0 }
-            // return { x: 0.0, y: this.barFrame.height, width: this.view.bounds.width, height: this.view.bounds.height - this.barFrame.height - (this.tabBarController ?.tabBar ?.barHeight ?: 0.0})
+            if (this.tabBarController !== undefined) {
+                return { x: 0.0, y: this.barFrame.height, width: this.view.bounds.width, height: this.view.bounds.height - this.barFrame.height - this.tabBarController.tabBar.barHeight }
+            }
+            else {
+                return { x: 0.0, y: this.barFrame.height, width: this.view.bounds.width, height: this.view.bounds.height - this.barFrame.height - 0.0 }
+            }
         }
     }
 
@@ -277,8 +283,12 @@ export class UINavigationController extends UIViewController {
         else {
             this.navigationBar.hidden = hidden
         }
-
-        // (this.childViewControllers.lastOrNull() as? UINavigationBarViewController)?.navigationControllerState?.barHidden = hidden
+        {
+            const lastVC = this.childViewControllers[this.childViewControllers.length - 1]
+            if (lastVC instanceof UINavigationBarViewController && lastVC.navigationControllerState) {
+                lastVC.navigationControllerState.barHidden = hidden
+            }
+        }
     }
 
 }
