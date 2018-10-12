@@ -44,7 +44,7 @@ export class LinearAndCurveAnimator {
         }
         this.currentValue = this.startValue + (this.endValue - this.startValue) * progress
         this.allListenners.forEach(it => it.onUpdate(this.currentValue))
-        if (progress >= 1.0) {
+        if (1.0 - progress <= 0.000001) {
             this.allListenners.forEach(it => it.onEnd())
             return
         }

@@ -312,6 +312,10 @@ export class UIButton extends UIView {
         this.addGestureRecognizer(longPressGesture)
     }
 
+    tintColorDidChange() {
+        super.tintColorDidChange()
+        this.reloadContents()
+    }
 
     private reloadContents() {
         this.titleLabel.text = this.titleForState(this.currentState())

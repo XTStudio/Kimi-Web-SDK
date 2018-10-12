@@ -25,6 +25,9 @@ global.UIStackViewDistribution = UIStackViewDistribution
 global.UIStackViewAlignment = UIStackViewAlignment
 global.UIStatusBarStyle = UIStatusBarStyle
 
+import { UIActionSheet } from "./uikit/UIActionSheet";
+global.UIActionSheet = UIActionSheet
+
 import { UIActivityIndicatorView } from "./uikit/UIActivityIndicatorView";
 global.UIActivityIndicatorView = UIActivityIndicatorView
 

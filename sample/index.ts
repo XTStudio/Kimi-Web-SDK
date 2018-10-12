@@ -1,33 +1,42 @@
 /// <reference path="../node_modules/xtstudio/types/index.d.ts" />
 
-class FooViewController extends UIViewController {
-
-    fooLabel = new UILabel
+class BarViewController extends UIViewController {
 
     viewDidLoad() {
         super.viewDidLoad()
-        const paragraphStyle = new UIParagraphStyle
-        paragraphStyle.alignment = UITextAlignment.center
-        // paragraphStyle.minimumLineHeight = 60
-        const attributedString = new UIAttributedString("Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!", {
-            [UIAttributedStringKey.font]: new UIFont(18),
-            [UIAttributedStringKey.foregroundColor]: UIColor.gray,
-            [UIAttributedStringKey.backgroundColor]: UIColor.yellow,
-            [UIAttributedStringKey.kern]: 4,
-            [UIAttributedStringKey.paragraphStyle]: paragraphStyle,
-        })
-        const mutable = attributedString.mutable()
-        // mutable.deleteCharacters({ location: 0, length: 1 })
-        // mutable.addAttribute(UIAttributedStringKey.font as any, new UIFont(18, "bold"), { location: 1, length: 2 })
-        this.fooLabel.numberOfLines = 0
-        console.log(mutable.measure({ width: UIScreen.main.bounds.width, height: Infinity }))
-        this.fooLabel.attributedText = mutable
-        this.view.addSubview(this.fooLabel)
+        this.view.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
+            this.dismissViewController()
+        }))
+        this.view.backgroundColor = UIColor.green
+    }
+
+}
+
+class FooViewController extends UIViewController {
+
+    aView = new UIView
+
+    viewDidLoad() {
+        super.viewDidLoad()
+        this.aView.backgroundColor = UIColor.white
+        this.aView.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
+            const alert = new UIActionSheet
+            alert.message = "退出后不会删除任何历史数据，下次登录依然可以使用本帐号。"
+            alert.addDangerAction("退出登录", () => {
+                console.log("vvv")
+            })
+            alert.addCancelAction("取消", () => {
+                console.log("ccc")
+            })
+            alert.show()
+            // this.presentViewController(new BarViewController)
+        }))
+        this.view.addSubview(this.aView)
     }
 
     viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        this.fooLabel.frame = this.view.bounds
+        this.aView.frame = this.view.bounds
     }
 
 }

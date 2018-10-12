@@ -120,6 +120,9 @@ export class UIView extends EventEmitter {
             this.didMoveToSuperview()
             this.didRemovedFromWindow()
         }
+        else if (this.domElement.parentElement instanceof HTMLElement) {
+            this.domElement.parentElement.removeChild(this.domElement)
+        }
     }
 
     didRemovedFromWindow() {
@@ -697,9 +700,6 @@ export class UIView extends EventEmitter {
             current = current.superview
         }
         routes.forEach((it) => {
-            // (it.superview as? UIScrollWrapperView)?.let {
-            //     matrix.postTranslate(-it.scrollX / scale, -it.scrollY / scale)
-            // }
             matrix.postTranslate(it.frame.x, it.frame.y)
             if (!UIAffineTransformIsIdentity(it.transform)) {
                 const unmatrix = Matrix.unmatrix(it.transform as Matrix)
@@ -728,9 +728,6 @@ export class UIView extends EventEmitter {
             current = current.superview
         }
         routes.forEach((it) => {
-            // (it.superview as ?UIScrollWrapperView) ?.let {
-            //     matrix.postTranslate(-it.scrollX / scale, -it.scrollY / scale)
-            // }
             matrix.postTranslate(it.frame.x, it.frame.y)
             if (!UIAffineTransformIsIdentity(it.transform)) {
                 const unmatrix = Matrix.unmatrix(it.transform as Matrix)
@@ -866,7 +863,7 @@ export class UIWindow extends UIView {
             }
         }
         if (this.shouldPreventDefault) {
-            // e.preventDefault()
+            e.preventDefault()
         }
     }
 
@@ -1057,6 +1054,72 @@ export class UIWindow extends UIView {
         if (this._rootViewController) {
             (this._rootViewController as any).window = this
             this.addSubview((this._rootViewController as any).view)
+        }
+    }
+
+    presentedViewControllers: any[] = []
+
+    presentViewController(viewController: any, animated: boolean, complete: (() => void) | undefined = undefined) {
+        this.presentedViewControllers.push(viewController)
+        viewController.window = this
+        this.addSubview(viewController.view)
+        if (animated) {
+            viewController.view.frame = { x: 0.0, y: this.bounds.height, width: this.bounds.width, height: this.bounds.height }
+            UIAnimator.bouncy(0.0, 24.0, () => {
+                viewController.view.frame = this.bounds
+            }, () => {
+                this.presentedViewControllers.forEach(it => {
+                    if (it == viewController) { return }
+                    it.view.hidden = true
+                })
+                complete && complete()
+            })
+        }
+        else {
+            viewController.view.frame = this.bounds
+            this.presentedViewControllers.forEach(it => {
+                if (it == viewController) { return }
+                it.view.hidden = true
+            })
+            complete && complete()
+        }
+    }
+
+    dismissViewController(animated: Boolean, complete: (() => void) | undefined = undefined) {
+        if (this.presentedViewControllers.length > 0) {
+            const fromViewController = this.presentedViewControllers[this.presentedViewControllers.length - 1]
+            const toViewController = fromViewController.presentingViewController
+            if (toViewController === undefined) { return }
+            toViewController.view.hidden = false
+            {
+                const idx = this.presentedViewControllers.indexOf(fromViewController)
+                if (idx >= 0) {
+                    this.presentedViewControllers.splice(idx, 1)
+                }
+            }
+            fromViewController.viewWillDisappear(animated)
+            toViewController.viewWillAppear(animated)
+            if (fromViewController.presentingViewController) {
+                fromViewController.presentingViewController.presentedViewController = undefined
+            }
+            fromViewController.presentingViewController = undefined
+            fromViewController.window = undefined
+            if (animated) {
+                UIAnimator.bouncy(0.0, 24.0, () => {
+                    fromViewController.view.frame = { x: 0.0, y: this.bounds.height, width: this.bounds.width, height: this.bounds.height }
+                }, () => {
+                    fromViewController.view.removeFromSuperview()
+                    complete && complete()
+                    fromViewController.viewDidDisappear(animated)
+                    toViewController.viewDidAppear(animated)
+                })
+            }
+            else {
+                fromViewController.view.removeFromSuperview()
+                complete && complete()
+                fromViewController.viewDidDisappear(animated)
+                toViewController.viewDidAppear(animated)
+            }
         }
     }
 

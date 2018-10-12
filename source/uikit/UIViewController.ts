@@ -77,29 +77,34 @@ export class UIViewController extends EventEmitter {
     presentedViewController: UIViewController | undefined = undefined
     presentingViewController: UIViewController | undefined = undefined
 
-    // open fun presentViewController(viewController: UIViewController, animated: Boolean? = true, completion: EDOCallback? = null) {
-    //     val window = this.window ?: return
-    //     val visibleViewController = this.visibleViewController ?: return
-    //     if (visibleViewController.presentedViewController != null || viewController.presentingViewController != null || viewController.parentViewController != null) {
-    //         return
-    //     }
-    //     visibleViewController.viewWillDisappear(animated != false)
-    //     viewController.viewWillAppear(animated != false)
-    //     viewController.presentingViewController = visibleViewController
-    //     visibleViewController.presentedViewController = viewController
-    //     window.presentViewController(viewController, animated != false) {
-    //         completion?.invoke()
-    //         visibleViewController.viewDidDisappear(animated != false)
-    //         viewController.viewDidAppear(animated != false)
-    //     }
-    // }
+    presentViewController(viewController: UIViewController, animated: boolean = true, completion: (() => void) | undefined = undefined) {
+        const window = this.window
+        if (window === undefined) { return }
+        const visibleViewController = this.visibleViewController
+        if (visibleViewController === undefined) { return }
+        if (visibleViewController.presentedViewController !== undefined || viewController.presentingViewController !== undefined || viewController.parentViewController !== undefined) {
+            return
+        }
+        visibleViewController.viewWillDisappear(animated != false)
+        viewController.viewWillAppear(animated != false)
+        viewController.presentingViewController = visibleViewController
+        visibleViewController.presentedViewController = viewController
+        window.presentViewController(viewController, animated != false, () => {
+            completion && completion()
+            visibleViewController.viewDidDisappear(animated != false)
+            viewController.viewDidAppear(animated != false)
+        })
+    }
 
-    // open fun dismissViewController(animated: Boolean? = true, completion: EDOCallback? = null) {
-    //     val window = this.window ?: return
-    //     window.dismissViewController(animated != false) {
-    //         completion?.invoke()
-    //     }
-    // }
+    dismissViewController(animated: boolean = true, completion: (() => void) | undefined = undefined) {
+        const window = this.window
+        if (window === undefined) {
+            return
+        }
+        window.dismissViewController(animated != false, () => {
+            completion && completion()
+        })
+    }
 
     childViewControllers: UIViewController[] = []
 
@@ -173,11 +178,14 @@ export class UIViewController extends EventEmitter {
     }
 
     public get visibleViewController(): UIViewController | undefined {
+        if (this.window && this.window.presentedViewControllers.length > 0) {
+            return this.window.presentedViewControllers[this.window.presentedViewControllers.length - 1]
+        }
+        else if (this.window) {
+            return this.window.rootViewController
+        }
         return undefined
     }
-    // get() {
-    //     return window?.presentedViewControllers?.lastOrNull() ?: window?.rootViewController
-    // }
 
     // // Device Back Button Support
 

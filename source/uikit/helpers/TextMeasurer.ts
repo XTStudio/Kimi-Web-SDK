@@ -24,7 +24,14 @@ export class TextMeasurer {
             measureSpan.style.top = "-10000000px"
             document.body.appendChild(measureSpan);
         }
-        measureSpan.innerHTML = ''
+        else {
+            measureSpan.innerHTML = ''
+            measureSpan.setAttribute("style", "")
+            measureSpan.style.opacity = "0.0"
+            measureSpan.style.position = "absolute"
+            measureSpan.style.left = "-10000000px"
+            measureSpan.style.top = "-10000000px"
+        }
         measureSpan.style.overflow = "hidden"
         measureSpan.style.wordWrap = null;
         measureSpan.style.wordBreak = null;
@@ -42,6 +49,14 @@ export class TextMeasurer {
             measureSpan.style.left = "-10000000px"
             measureSpan.style.top = "-10000000px"
             document.body.appendChild(measureSpan);
+        }
+        else {
+            measureSpan.innerHTML = ''
+            measureSpan.setAttribute("style", "")
+            measureSpan.style.opacity = "0.0"
+            measureSpan.style.position = "absolute"
+            measureSpan.style.left = "-10000000px"
+            measureSpan.style.top = "-10000000px"
         }
         measureSpan.style.fontSize = params.font.pointSize.toString() + "px"
         measureSpan.style.fontFamily = typeof params.font.fontName === "string" ? params.font.fontName : null;
