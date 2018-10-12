@@ -90,7 +90,7 @@ class UIActionSheetController extends UIViewController {
                 view.setTitleColor(new UIColor(231.0 / 255.0, 45.0 / 255.0, 39.0 / 255.0, 1.0), UIControlState.normal)
             }
             else if (it.style == UIAlertActionStyle.cancel) {
-                view.setTitleFont(new UIFont(17.0))
+                view.setTitleFont(new UIFont(18.0))
             }
             view.frame = { x: 0.0, y: height, width: 0.0, height: 55.0 }
             view.domElement.style.borderBottom = "solid"
@@ -128,6 +128,9 @@ class UIActionSheetController extends UIViewController {
     }
 
     dismiss(animated: boolean, callback: () => void) {
+        if (UIActionSheet.currentActionSheet === undefined) {
+            return
+        }
         UIActionSheet.currentActionSheet = undefined
         if (animated) {
             this.backgroundView.alpha = 1.0
