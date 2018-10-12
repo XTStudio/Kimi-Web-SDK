@@ -59,7 +59,14 @@ export class UILabel extends UIView {
      */
     public set attributedText(value: UIAttributedString | undefined) {
         this._attributedText = value;
-        this.textElement.innerText = value ? value.toHTMLText() : ""
+        if (value) {
+            const el = value.toHTMLText()
+            this.textElement.appendChild(el)
+            this.domElement.style.textAlign = el.style.textAlign
+        }
+        else {
+            this.textElement.innerText = ""
+        }
     }
 
     private _font: UIFont | undefined = undefined

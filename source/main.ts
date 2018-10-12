@@ -34,6 +34,12 @@ global.UIAlert = UIAlert
 import { UIAnimator } from "./uikit/UIAnimator";
 global.UIAnimator = UIAnimator
 
+import { UIParagraphStyle, UIAttributedString, UIAttributedStringKey, UIMutableAttributedString } from "./uikit/UIAttributedString";
+global.UIParagraphStyle = UIParagraphStyle
+global.UIAttributedString = UIAttributedString
+global.UIAttributedStringKey = UIAttributedStringKey
+global.UIMutableAttributedString = UIMutableAttributedString
+
 import { UIButton } from "./uikit/UIButton";
 global.UIButton = UIButton
 

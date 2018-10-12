@@ -2,32 +2,32 @@
 
 class FooViewController extends UIViewController {
 
-    sampleView = new UIStackView([])
-    redView: UIView = new UIView
-    yellowView: UIView = new UIView
-    blueView: UIView = new UIView
+    fooLabel = new UILabel
 
     viewDidLoad() {
         super.viewDidLoad()
-        this.redView.backgroundColor = UIColor.red
-        this.redView.tag = 100
-        this.yellowView.backgroundColor = UIColor.yellow
-        this.yellowView.tag = 101
-        this.blueView.backgroundColor = UIColor.blue
-        this.blueView.tag = 102
-        this.sampleView.addArrangedSubview(this.redView)
-        this.sampleView.addArrangedSubview(this.yellowView)
-        this.sampleView.addArrangedSubview(this.blueView)
-        this.sampleView.layoutArrangedSubview(this.yellowView, { width: 50 })
-        this.sampleView.layoutArrangedSubview(this.blueView, { width: 50 })
-        this.sampleView.axis = UILayoutConstraintAxis.horizontal
-        this.sampleView.distribution = UIStackViewDistribution.fill
-        this.view.addSubview(this.sampleView)
+        const paragraphStyle = new UIParagraphStyle
+        paragraphStyle.alignment = UITextAlignment.center
+        // paragraphStyle.minimumLineHeight = 60
+        const attributedString = new UIAttributedString("Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!", {
+            [UIAttributedStringKey.font]: new UIFont(18),
+            [UIAttributedStringKey.foregroundColor]: UIColor.gray,
+            [UIAttributedStringKey.backgroundColor]: UIColor.yellow,
+            [UIAttributedStringKey.kern]: 4,
+            [UIAttributedStringKey.paragraphStyle]: paragraphStyle,
+        })
+        const mutable = attributedString.mutable()
+        // mutable.deleteCharacters({ location: 0, length: 1 })
+        // mutable.addAttribute(UIAttributedStringKey.font as any, new UIFont(18, "bold"), { location: 1, length: 2 })
+        this.fooLabel.numberOfLines = 0
+        console.log(mutable.measure({ width: UIScreen.main.bounds.width, height: Infinity }))
+        this.fooLabel.attributedText = mutable
+        this.view.addSubview(this.fooLabel)
     }
 
     viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        this.sampleView.frame = { x: 0, y: 0, width: 300, height: 88 }
+        this.fooLabel.frame = this.view.bounds
     }
 
 }

@@ -1,5 +1,7 @@
 import { UIFont } from "../UIFont";
 import { UIRect, UIRectZero } from "../UIRect";
+import { UIAttributedString } from "../UIAttributedString";
+import { UISize } from "../UISize";
 
 let measureSpan: HTMLSpanElement = document.createElement("span")
 
@@ -13,6 +15,25 @@ export interface TextMeasureParams {
 }
 
 export class TextMeasurer {
+
+    static measureAttributedText(text: UIAttributedString, inSize: UISize): UIRect {
+        if (measureSpan.parentNode === null) {
+            measureSpan.style.opacity = "0.0"
+            measureSpan.style.position = "absolute"
+            measureSpan.style.left = "-10000000px"
+            measureSpan.style.top = "-10000000px"
+            document.body.appendChild(measureSpan);
+        }
+        measureSpan.innerHTML = ''
+        measureSpan.style.overflow = "hidden"
+        measureSpan.style.wordWrap = null;
+        measureSpan.style.wordBreak = null;
+        measureSpan.style.display = "-webkit-box";
+        measureSpan.style.webkitBoxOrient = "vertical"
+        measureSpan.style.maxWidth = inSize.width.toString() + "px";
+        measureSpan.appendChild(text.toHTMLText())
+        return { x: 0.0, y: 0.0, width: Math.min(inSize.width, Math.ceil(measureSpan.offsetWidth + 1)), height: Math.min(inSize.height, Math.ceil(measureSpan.offsetHeight)) }
+    }
 
     static measureText(text: string, params: TextMeasureParams): UIRect {
         if (measureSpan.parentNode === null) {
