@@ -116,6 +116,9 @@ global.UIScrollView = UIScrollView
 import { UISlider } from "./uikit/UISlider";
 global.UISlider = UISlider
 
+import { UIStackView } from "./uikit/UIStackView";
+global.UIStackView = UIStackView
+
 import { UISwitch } from "./uikit/UISwitch";
 global.UISwitch = UISwitch
 

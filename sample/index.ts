@@ -2,57 +2,36 @@
 
 class FooViewController extends UIViewController {
 
-    e = new UIPageViewController
+    sampleView = new UIStackView([])
+    redView: UIView = new UIView
+    yellowView: UIView = new UIView
+    blueView: UIView = new UIView
 
     viewDidLoad() {
         super.viewDidLoad()
-        this.title = "First Page"
-        this.e.pageItems = [
-            (() => {
-                let v = new UIViewController()
-                v.view.backgroundColor = UIColor.gray
-                v.view.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
-                    if (this.navigationController) {
-                        const r = new UIViewController
-                        // r.title = "Second"
-                        r.view.backgroundColor = UIColor.yellow
-                        this.navigationController.pushViewController(r)
-                    }
-                }))
-                return v
-            })(),
-            (() => {
-                let v = new UIViewController()
-                v.view.backgroundColor = UIColor.green
-                return v
-            })(),
-            (() => {
-                let v = new UIViewController()
-                v.view.backgroundColor = UIColor.yellow
-                return v
-            })(),
-        ]
-        this.e.loops = true
-        this.addChildViewController(this.e)
-        this.view.addSubview(this.e.view)
+        this.redView.backgroundColor = UIColor.red
+        this.redView.tag = 100
+        this.yellowView.backgroundColor = UIColor.yellow
+        this.yellowView.tag = 101
+        this.blueView.backgroundColor = UIColor.blue
+        this.blueView.tag = 102
+        this.sampleView.addArrangedSubview(this.redView)
+        this.sampleView.addArrangedSubview(this.yellowView)
+        this.sampleView.addArrangedSubview(this.blueView)
+        this.sampleView.layoutArrangedSubview(this.yellowView, { width: 50 })
+        this.sampleView.layoutArrangedSubview(this.blueView, { width: 50 })
+        this.sampleView.axis = UILayoutConstraintAxis.horizontal
+        this.sampleView.distribution = UIStackViewDistribution.fill
+        this.view.addSubview(this.sampleView)
     }
 
     viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        this.e.view.frame = this.view.bounds
+        this.sampleView.frame = { x: 0, y: 0, width: 300, height: 88 }
     }
 
 }
 
 const fooWindow = new UIWindow
-const ee = new UITabBarController
-const a = new UINavigationController(new FooViewController)
-a.tabBarItem.title = "首页"
-const b = new UINavigationController(new UIViewController)
-b.tabBarItem.title = "我"
-ee.setViewControllers([
-    a,
-    b,
-], false)
-fooWindow.rootViewController = ee
+fooWindow.rootViewController = new FooViewController
 global.fooWindow = fooWindow
