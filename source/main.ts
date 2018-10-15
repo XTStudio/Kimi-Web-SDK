@@ -186,3 +186,6 @@ global.MutableData = MutableData
 
 import { DispatchQueue } from "./foundation/DispatchQueue";
 global.DispatchQueue = DispatchQueue
+
+import { Timer } from "./foundation/Timer";
+global.Timer = Timer
