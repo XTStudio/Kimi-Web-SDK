@@ -1,6 +1,6 @@
 import { UIPoint } from "./UIPoint";
 declare var require: any
-const d3 = require('d3-path')
+const d3 = require('./helpers/d3-path.min')
 
 export class UIBezierPath {
 

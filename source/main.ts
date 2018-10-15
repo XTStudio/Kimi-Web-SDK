@@ -189,3 +189,6 @@ global.DispatchQueue = DispatchQueue
 
 import { Timer } from "./foundation/Timer";
 global.Timer = Timer
+
+import { URL } from "./foundation/URL";
+global.URL = URL
