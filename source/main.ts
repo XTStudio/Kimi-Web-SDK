@@ -5,6 +5,11 @@ if (window.global === undefined) {
     window.global = window;
 }
 
+// CoreGraphics
+
+import { CALayer } from "./coregraphics/CALayer";
+global.CALayer = CALayer
+
 // UIKit
 
 import { UIViewContentMode, UIControlState, UIControlContentVerticalAlignment, UIControlContentHorizontalAlignment, UITextAlignment, UILineBreakMode, UITextFieldViewMode, UITextAutocapitalizationType, UITextAutocorrectionType, UITextSpellCheckingType, UIKeyboardType, UIReturnKeyType, UILayoutConstraintAxis, UIStackViewDistribution, UIStackViewAlignment, UIStatusBarStyle } from "./uikit/UIEnums";

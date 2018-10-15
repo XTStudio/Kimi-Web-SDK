@@ -521,6 +521,7 @@ export class UIView extends EventEmitter {
         this.layer.frame = value
         if (boundsChanged) {
             this.bounds = { ...value, x: 0, y: 0 }
+            this.layer.frame = this.bounds
         }
         this.setNeedsLayout(boundsChanged)
         this.domElement.style.left = value.x.toString() + "px"

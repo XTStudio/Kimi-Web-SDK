@@ -18,6 +18,30 @@ class FooViewController extends UIViewController {
 
     viewDidLoad() {
         super.viewDidLoad()
+        this.vv()
+        // this.tt()
+    }
+
+    vv() {
+        const fooLayer = new CALayer
+        fooLayer.frame = { x: 44, y: 44, width: 44, height: 44 }
+        fooLayer.backgroundColor = UIColor.yellow
+        fooLayer.cornerRadius = 22
+        fooLayer.borderColor = UIColor.red
+        fooLayer.borderWidth = 10
+        const barLayer = new CALayer
+        barLayer.frame = { x: 22, y: 22, width: 44, height: 44 }
+        barLayer.backgroundColor = UIColor.gray
+        fooLayer.addSublayer(barLayer)
+        fooLayer.masksToBounds = true
+        this.view.layer.addSublayer(fooLayer)
+        fooLayer.frame = { x: 44, y: 44, width: 44, height: 44 }
+        DispatchQueue.main.asyncAfter(2.0, () => {
+            fooLayer.frame = { x: 44, y: 44, width: 88, height: 88 }
+        })
+    }
+
+    tt() {
         this.aView.backgroundColor = UIColor.white
         this.aView.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
             const alert = new UIActionSheet
