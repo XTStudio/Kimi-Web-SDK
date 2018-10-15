@@ -7,6 +7,12 @@ if (window.global === undefined) {
 
 // CoreGraphics
 
+import { CADisplayLink } from "./coregraphics/CADisplayLink";
+global.CADisplayLink = CADisplayLink
+
+import { CAGradientLayer } from "./coregraphics/CAGradientLayer";
+global.CAGradientLayer = CAGradientLayer
+
 import { CALayer } from "./coregraphics/CALayer";
 global.CALayer = CALayer
 

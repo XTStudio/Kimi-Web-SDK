@@ -23,21 +23,24 @@ class FooViewController extends UIViewController {
     }
 
     vv() {
-        const fooLayer = new CALayer
-        fooLayer.frame = { x: 44, y: 44, width: 44, height: 44 }
-        fooLayer.backgroundColor = UIColor.yellow
-        fooLayer.cornerRadius = 22
-        fooLayer.borderColor = UIColor.red
-        fooLayer.borderWidth = 10
-        const barLayer = new CALayer
-        barLayer.frame = { x: 22, y: 22, width: 44, height: 44 }
-        barLayer.backgroundColor = UIColor.gray
-        fooLayer.addSublayer(barLayer)
-        fooLayer.masksToBounds = true
+        const fooLayer = new CAGradientLayer
+        fooLayer.frame = { x: 44, y: 44, width: 88, height: 88 }
+        fooLayer.colors = [UIColor.black, UIColor.red, UIColor.clear]
+        fooLayer.locations = [0, 0.3, 1]
+        fooLayer.startPoint = { x: 0, y: 0 }
+        fooLayer.endPoint = { x: 0, y: 1 }
+        // fooLayer.cornerRadius = 22
+        // fooLayer.borderColor = UIColor.red
+        // fooLayer.borderWidth = 10
+        // const barLayer = new CALayer
+        // barLayer.frame = { x: 22, y: 22, width: 44, height: 44 }
+        // barLayer.backgroundColor = UIColor.gray
+        // fooLayer.addSublayer(barLayer)
+        // fooLayer.masksToBounds = true
         this.view.layer.addSublayer(fooLayer)
-        fooLayer.frame = { x: 44, y: 44, width: 44, height: 44 }
+        // fooLayer.frame = { x: 44, y: 44, width: 44, height: 44 }
         DispatchQueue.main.asyncAfter(2.0, () => {
-            fooLayer.frame = { x: 44, y: 44, width: 88, height: 88 }
+            fooLayer.frame = { x: 44, y: 44, width: 88, height: 200 }
         })
     }
 

@@ -5,12 +5,12 @@ import { UISize } from "../uikit/UISize";
 
 export class CALayer {
 
-    private _uuid = "calayer." + Math.random() + Math.random()
-    private _svgElement: SVGGElement | undefined = undefined
-    private _clipPathElement: SVGClipPathElement = document.createElementNS("http://www.w3.org/2000/svg", "clipPath")
-    private _bgElement: SVGRectElement = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-    private _contentElement: SVGGElement = document.createElementNS("http://www.w3.org/2000/svg", "g")
-    private _borderElement: SVGGElement = document.createElementNS("http://www.w3.org/2000/svg", "g")
+    protected _uuid = "calayer." + Math.random() + Math.random()
+    protected _svgElement: SVGGElement | undefined = undefined
+    protected _clipPathElement: SVGClipPathElement = document.createElementNS("http://www.w3.org/2000/svg", "clipPath")
+    protected _bgElement: SVGRectElement = document.createElementNS("http://www.w3.org/2000/svg", "rect")
+    protected _contentElement: SVGGElement = document.createElementNS("http://www.w3.org/2000/svg", "g")
+    protected _borderElement: SVGGElement = document.createElementNS("http://www.w3.org/2000/svg", "g")
 
     private _view: UIView | undefined = undefined
 
@@ -170,7 +170,7 @@ export class CALayer {
         }
     }
 
-    private createSVGElement() {
+    protected createSVGElement() {
         if (this._svgElement !== undefined) { return }
         if (this._view !== undefined) {
             this._svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg")
@@ -235,11 +235,11 @@ export class CALayer {
         if (value) {
             this.createSVGElement()
             if (this._svgElement) {
-                this._clipPathElement.id = this._uuid
+                this._clipPathElement.id = "clip." + this._uuid
                 this._clipPathElement.innerHTML = ""
                 this._clipPathElement.appendChild(this._bgElement.cloneNode(true))
                 this._svgElement.appendChild(this._clipPathElement)
-                this._svgElement.setAttribute("clip-path", `url(#${this._uuid})`)
+                this._svgElement.setAttribute("clip-path", `url(#clip.${this._uuid})`)
             }
         }
         else {
