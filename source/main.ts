@@ -16,6 +16,12 @@ global.CAGradientLayer = CAGradientLayer
 import { CALayer } from "./coregraphics/CALayer";
 global.CALayer = CALayer
 
+import { CAShapeLayer, CAShapeFillRule, CAShapeLineCap, CAShapeLineJoin } from "./coregraphics/CAShapeLayer";
+global.CAShapeLayer = CAShapeLayer
+global.CAShapeFillRule = CAShapeFillRule
+global.CAShapeLineCap = CAShapeLineCap
+global.CAShapeLineJoin = CAShapeLineJoin
+
 // UIKit
 
 import { UIViewContentMode, UIControlState, UIControlContentVerticalAlignment, UIControlContentHorizontalAlignment, UITextAlignment, UILineBreakMode, UITextFieldViewMode, UITextAutocapitalizationType, UITextAutocorrectionType, UITextSpellCheckingType, UIKeyboardType, UIReturnKeyType, UILayoutConstraintAxis, UIStackViewDistribution, UIStackViewAlignment, UIStatusBarStyle } from "./uikit/UIEnums";
@@ -53,6 +59,9 @@ global.UIParagraphStyle = UIParagraphStyle
 global.UIAttributedString = UIAttributedString
 global.UIAttributedStringKey = UIAttributedStringKey
 global.UIMutableAttributedString = UIMutableAttributedString
+
+import { UIBezierPath } from "./uikit/UIBezierPath";
+global.UIBezierPath = UIBezierPath
 
 import { UIButton } from "./uikit/UIButton";
 global.UIButton = UIButton

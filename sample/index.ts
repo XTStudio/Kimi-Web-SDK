@@ -23,22 +23,29 @@ class FooViewController extends UIViewController {
     }
 
     vv() {
-        const fooLayer = new CAGradientLayer
-        fooLayer.frame = { x: 44, y: 44, width: 88, height: 88 }
-        fooLayer.colors = [UIColor.black, UIColor.red, UIColor.clear]
-        fooLayer.locations = [0, 0.3, 1]
-        fooLayer.startPoint = { x: 0, y: 0 }
-        fooLayer.endPoint = { x: 0, y: 1 }
-        // fooLayer.cornerRadius = 22
-        // fooLayer.borderColor = UIColor.red
-        // fooLayer.borderWidth = 10
-        // const barLayer = new CALayer
-        // barLayer.frame = { x: 22, y: 22, width: 44, height: 44 }
-        // barLayer.backgroundColor = UIColor.gray
-        // fooLayer.addSublayer(barLayer)
-        // fooLayer.masksToBounds = true
+        const fooLayer = new CAShapeLayer
+        fooLayer.frame = { x: 44, y: 44, width: 300, height: 300 }
+        const path = new UIBezierPath
+        path.moveTo({ x: 20, y: 20 })
+        path.addLineTo({ x: 80, y: 20 })
+        path.addLineTo({ x: 40, y: 40 })
+        path.addLineTo({ x: 20, y: 40 })
+        path.closePath()
+        // {
+        //     const path2 = new UIBezierPath
+        //     path2.moveTo({ x: 90, y: 90 })
+        //     path2.addLineTo({ x: 100, y: 90 })
+        //     path2.addLineTo({ x: 40, y: 200 })
+        //     path2.addLineTo({ x: 20, y: 200 })
+        //     path2.closePath()
+        //     path.appendPath(path2)
+        // }
+        fooLayer.path = path
+        fooLayer.fillColor = UIColor.clear
+        fooLayer.lineWidth = 6
+        fooLayer.lineJoin = CAShapeLineJoin.round
+        fooLayer.strokeColor = UIColor.red
         this.view.layer.addSublayer(fooLayer)
-        // fooLayer.frame = { x: 44, y: 44, width: 44, height: 44 }
         DispatchQueue.main.asyncAfter(2.0, () => {
             fooLayer.frame = { x: 44, y: 44, width: 88, height: 200 }
         })

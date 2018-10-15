@@ -19,6 +19,7 @@
   "homepage": "https://github.com/XTStudio/Kimi-Web-SDK#readme",
   "dependencies": {
     "browserify": "^16.2.2",
+    "d3-path": "^1.0.7",
     "rebound": "^0.1.0",
     "strip-json-comments": "^2.0.1",
     "tinyify": "^2.4.3",
