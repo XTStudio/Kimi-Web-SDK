@@ -18,6 +18,14 @@ class FooViewController extends UIViewController {
 
     viewDidLoad() {
         super.viewDidLoad()
+        const a = new CADisplayLink(() => {
+            console.log(a.timestamp)
+            if (a.timestamp > 8000) {
+                a.invalidate()
+            }
+        })
+        a.active()
+
         this.vv()
         // this.tt()
     }

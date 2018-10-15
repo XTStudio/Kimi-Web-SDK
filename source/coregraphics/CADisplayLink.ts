@@ -10,8 +10,13 @@ export class CADisplayLink {
 
     handler: any
 
+    private cancelled = false
+
     active(): void {
         this.handler = requestAnimationFrame(() => {
+            if (this.cancelled) {
+                return
+            }
             this.timestamp = currentAnimationTimeMillis()
             this.vsyncBlock()
             this.active()
@@ -19,6 +24,7 @@ export class CADisplayLink {
     }
 
     invalidate(): void {
+        this.cancelled = true
         cancelAnimationFrame(this.handler)
     }
 
