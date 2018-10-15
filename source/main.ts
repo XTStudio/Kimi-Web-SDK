@@ -180,5 +180,9 @@ global.UIViewController = UIViewController
 
 // Foundation
 
+import { Data, MutableData } from "./foundation/Data";
+global.Data = Data
+global.MutableData = MutableData
+
 import { DispatchQueue } from "./foundation/DispatchQueue";
 global.DispatchQueue = DispatchQueue
