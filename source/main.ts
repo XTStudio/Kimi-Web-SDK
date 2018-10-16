@@ -214,3 +214,6 @@ global.URLSessionTaskState = URLSessionTaskState
 
 import { UserDefaults } from "./foundation/UserDefaults";
 global.UserDefaults = UserDefaults
+
+import { UUID } from "./foundation/UUID";
+global.UUID = UUID
