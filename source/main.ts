@@ -180,12 +180,18 @@ global.UIViewController = UIViewController
 
 // Foundation
 
+import { Bundle } from "./foundation/Bundle";
+global.Bundle = Bundle
+
 import { Data, MutableData } from "./foundation/Data";
 global.Data = Data
 global.MutableData = MutableData
 
 import { DispatchQueue } from "./foundation/DispatchQueue";
 global.DispatchQueue = DispatchQueue
+
+import { FileManager } from "./foundation/FileManager";
+global.FileManager = FileManager
 
 import { Timer } from "./foundation/Timer";
 global.Timer = Timer
