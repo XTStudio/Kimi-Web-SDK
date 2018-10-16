@@ -207,5 +207,10 @@ global.URLRequestCachePolicy = URLRequestCachePolicy
 import { URLResponse } from "./foundation/URLResponse";
 global.URLResponse = URLResponse
 
-import { URLSession } from "./foundation/URLSession";
+import { URLSession, URLSessionTask, URLSessionTaskState } from "./foundation/URLSession";
 global.URLSession = URLSession
+global.URLSessionTask = URLSessionTask
+global.URLSessionTaskState = URLSessionTaskState
+
+import { UserDefaults } from "./foundation/UserDefaults";
+global.UserDefaults = UserDefaults

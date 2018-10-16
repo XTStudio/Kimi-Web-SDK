@@ -27,11 +27,28 @@ export class URLSession {
 
 }
 
+export enum URLSessionTaskState {
+    running,
+    suspended,
+    cancelling,
+    completed,
+}
+
 export class URLSessionTask {
 
     constructor(readonly request: URLRequest, readonly complete: (data?: Data, response?: URLResponse, error?: Error) => void) { }
 
     private _xmlRequest: XMLHttpRequest | undefined = undefined
+
+    state: URLSessionTaskState = URLSessionTaskState.suspended
+
+    countOfBytesExpectedToReceive: number = 0
+
+    countOfBytesReceived: number = 0
+
+    countOfBytesExpectedToSend: number = 0
+
+    countOfBytesSent: number = 0
 
     resume() {
         const xmlRequest = new XMLHttpRequest()
@@ -45,7 +62,14 @@ export class URLSessionTask {
                 }
             }
         }
+        xmlRequest.addEventListener("progress", (ev: ProgressEvent) => {
+            if (ev.lengthComputable) {
+                this.countOfBytesReceived = ev.loaded
+                this.countOfBytesExpectedToReceive = ev.total
+            }
+        })
         xmlRequest.addEventListener("loadend", () => {
+            this.state = URLSessionTaskState.completed
             const data: Data | undefined = xmlRequest.response instanceof ArrayBuffer ? new Data(xmlRequest.response) : undefined
             const response = new URLResponse
             response.URL = this.request.URL
@@ -78,12 +102,14 @@ export class URLSessionTask {
             this.complete(data, response, undefined)
         })
         xmlRequest.addEventListener("error", ((_: any, e: ErrorEvent) => {
+            this.state = URLSessionTaskState.completed
             const data: Data | undefined = xmlRequest.response instanceof ArrayBuffer ? new Data(xmlRequest.response) : undefined
             const response = new URLResponse
             response.URL = this.request.URL
             response.statusCode = xmlRequest.status
             this.complete(data, response, e.error)
         }) as any)
+        this.state = URLSessionTaskState.running
         if (this.request.HTTPBody instanceof Data) {
             xmlRequest.send(this.request.HTTPBody._arrayBuffer)
         }
@@ -94,6 +120,7 @@ export class URLSessionTask {
     }
 
     cancel() {
+        this.state = URLSessionTaskState.cancelling
         if (this._xmlRequest) {
             this._xmlRequest.abort()
         }
