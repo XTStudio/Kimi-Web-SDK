@@ -191,4 +191,21 @@ import { Timer } from "./foundation/Timer";
 global.Timer = Timer
 
 import { URL } from "./foundation/URL";
-global.URL = URL
+if (global.URL.toString() === "function URL() { [native code] }") {
+    global.URL.URLWithString = URL.URLWithString
+    global.URL.fileURLWithPath = URL.fileURLWithPath
+}
+else {
+    global.URL = URL
+}
+
+import { URLRequest, MutableURLRequest, URLRequestCachePolicy } from "./foundation/URLRequest";
+global.URLRequest = URLRequest
+global.MutableURLRequest = MutableURLRequest
+global.URLRequestCachePolicy = URLRequestCachePolicy
+
+import { URLResponse } from "./foundation/URLResponse";
+global.URLResponse = URLResponse
+
+import { URLSession } from "./foundation/URLSession";
+global.URLSession = URLSession
