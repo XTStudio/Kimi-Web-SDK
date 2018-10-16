@@ -14,7 +14,13 @@
     <script src="../build/dist.min.js?nocache"></script>
     <script src="./index.js?nocache"></script>
     <script>
-        fooWindow.attachToElement(document.body)
+        var kimiDebugger = new KIMIDebugger()
+        kimiDebugger.connect(() => {
+            fooWindow.attachToElement(document.body)
+        }, () => {
+            fooWindow.attachToElement(document.body)
+        })
+        // fooWindow.attachToElement(document.body)
     </script>
 </body>
 

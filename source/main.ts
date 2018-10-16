@@ -223,3 +223,13 @@ global.UserDefaults = UserDefaults
 
 import { UUID } from "./foundation/UUID";
 global.UUID = UUID
+
+// Kimi
+
+import { KMCore } from "./kimi/KMCore";
+global.KMCore = KMCore
+
+// Debugger
+
+import { KIMIDebugger } from "./debugger/KIMIDebugger";
+global.KIMIDebugger = KIMIDebugger

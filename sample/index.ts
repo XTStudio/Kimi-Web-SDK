@@ -18,12 +18,7 @@ class FooViewController extends UIViewController {
 
     viewDidLoad() {
         super.viewDidLoad()
-        var testMutableData = new Data({utf8String: 'Hello, World!'}).mutable()
-        testMutableData.appendData(new Data({utf8String: '!!!'}))
-        testMutableData.appendArrayBuffer(new Uint8Array([33, 33, 33]).buffer)
-        testMutableData.setData(new Data({utf8String: '!!!'}))
-        console.log(testMutableData.utf8String() === '!!!')
-        // this.vv()
+        this.vv()
         // this.tt()
     }
 
