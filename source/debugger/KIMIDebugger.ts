@@ -38,8 +38,12 @@ export class KIMIDebugger {
             xmlRequest.open("POST", `http://${this.remoteAddress}/source`, false)
             xmlRequest.addEventListener("loadend", () => {
                 const script = xmlRequest.responseText
-                eval(script)
-                callback()
+                try {
+                    eval(script)
+                    callback()
+                } catch (error) {
+                    console.error(error)
+                }
                 this.fetchUpdate(callback)
             })
             xmlRequest.addEventListener("error", () => {

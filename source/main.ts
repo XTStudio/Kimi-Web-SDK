@@ -81,6 +81,9 @@ global.UIColor = UIColor
 import { UIConfirm } from "./uikit/UIConfirm";
 global.UIConfirm = UIConfirm
 
+import { UIDevice } from "./uikit/UIDevice";
+global.UIDevice = UIDevice
+
 import { UIFetchMoreControl } from "./uikit/UIFetchMoreControl";
 global.UIFetchMoreControl = UIFetchMoreControl
 

@@ -27,7 +27,6 @@ export class UIActivityIndicatorView extends UIView {
         let elementString = this.largeStyle ? largeElement : smallElement
         if (this.color) {
             elementString = elementString.replace(/fill="#28292f"/g, 'fill=\"' + this.color.toStyle() + '\"');
-            console.log(elementString)
         }
         this.contentElement.innerHTML = elementString
         this.layoutSubviews()

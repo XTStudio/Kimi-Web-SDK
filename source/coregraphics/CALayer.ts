@@ -2,6 +2,7 @@ import { UIView } from "../uikit/UIView";
 import { UIRect, UIRectZero } from "../uikit/UIRect";
 import { UIColor } from "../uikit/UIColor";
 import { UISize } from "../uikit/UISize";
+import { UILabel } from "../uikit/UILabel";
 
 export class CALayer {
 
@@ -36,6 +37,7 @@ export class CALayer {
         if (this._view === undefined || this._svgElement !== undefined) {
             this.createSVGElement()
             if (this._svgElement) {
+                this._svgElement.style.position = "absolute"
                 this._svgElement.setAttribute("transform", `matrix(1.0, 0.0, 0.0, 1.0, ${value.x.toFixed()}, ${value.y.toFixed()})`)
                 this._svgElement.setAttribute("width", value.width.toFixed(2))
                 this._svgElement.setAttribute("height", value.height.toFixed(2))
@@ -111,8 +113,15 @@ export class CALayer {
 
     private resetBorder() {
         this.createSVGElement()
-        if (this._svgElement === undefined) { return }
-        if (this.borderWidth > 0 && this.borderColor) {
+        if (this._svgElement === undefined) {
+            if (this.borderWidth > 0 && this.borderColor && this._view) {
+                this._view.domElement.style.borderWidth = this.borderWidth.toString() + "px"
+                this._view.domElement.style.borderColor = this.borderColor.toStyle()
+                this._view.domElement.style.borderStyle = this.borderWidth > 0 ? "solid" : "unset"
+                this._view.domElement.style.boxSizing = this.borderWidth > 0 ? "border-box" : "unset"
+            }
+        }
+        else if (this.borderWidth > 0 && this.borderColor) {
             this._borderElement.style.strokeWidth = this.borderWidth.toFixed(2) + "px"
             this._borderElement.style.stroke = this.borderColor.toStyle()
             this._borderElement.innerHTML = ""
@@ -121,11 +130,17 @@ export class CALayer {
                 borderFillElement.style.fillOpacity = "0"
             }
             this._borderElement.appendChild(borderFillElement)
-            this._svgElement.style.display = null
+            this._borderElement.style.display = null
             this._svgElement.appendChild(this._borderElement)
+            if (this._view) {
+                this._view.domElement.style.borderStyle = "unset"
+            }
         }
         else {
-            this._svgElement.style.display = "none"
+            this._borderElement.style.display = "none"
+            if (this._view) {
+                this._view.domElement.style.borderStyle = "unset"
+            }
         }
     }
 
@@ -171,6 +186,7 @@ export class CALayer {
     }
 
     protected createSVGElement() {
+        if (this.sublayers.length == 0) { return }
         if (this._svgElement !== undefined) { return }
         if (this._view !== undefined) {
             this._svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg")
@@ -294,9 +310,15 @@ export class CALayer {
     private resetShadow() {
         if (this._view !== undefined) {
             if (this.shadowOpacity > 0 && this.shadowColor && this.shadowColor.a > 0) {
-                this._view.domElement.style.boxShadow = this.shadowOffset.width.toString() + "px " + this.shadowOffset.height.toString() + "px " + this.shadowRadius.toString() + "px " + this.shadowColor.colorWithAlphaComponent(this.shadowOpacity).toStyle()
+                if (this._view instanceof UILabel) {
+                    this._view.domElement.style.textShadow = this.shadowOffset.width.toString() + "px " + this.shadowOffset.height.toString() + "px " + this.shadowRadius.toString() + "px " + this.shadowColor.colorWithAlphaComponent(this.shadowOpacity).toStyle()
+                }
+                else {
+                    this._view.domElement.style.boxShadow = this.shadowOffset.width.toString() + "px " + this.shadowOffset.height.toString() + "px " + this.shadowRadius.toString() + "px " + this.shadowColor.colorWithAlphaComponent(this.shadowOpacity).toStyle()
+                }
             }
             else {
+                this._view.domElement.style.textShadow = null
                 this._view.domElement.style.boxShadow = null
             }
         }

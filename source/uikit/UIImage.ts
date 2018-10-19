@@ -26,7 +26,13 @@ export class UIImage extends EventEmitter {
             })
         }
         else if (options.name) {
-
+            this.imageElement.src = `./assets/images/${options.name}@2x.png`
+            this.imageElement.addEventListener("load", () => {
+                this.size = { width: this.imageElement.naturalWidth / 2.0, height: this.imageElement.naturalHeight / 2.0 }
+                this.scale = 2.0
+                this.loaded = true
+                this.emit("load")
+            })
         }
         if (options.renderingMode !== undefined) {
             this.renderingMode = options.renderingMode

@@ -4,7 +4,6 @@ import { UIViewContentMode } from "./UIEnums";
 import { currentAnimationTimeMillis } from "./helpers/Now";
 import { UISize, UISizeZero } from "./UISize";
 
-let cachingImages: { [key: string]: UIImage } = {}
 const svgFilterRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg")
 document.body.appendChild(svgFilterRoot)
 
@@ -78,17 +77,14 @@ export class UIImageView extends UIView {
     private currentURLString: string | undefined = undefined
 
     public loadImageWithURLString(URLString?: string, placeholder?: UIImage): void {
-        if (URLString !== undefined && cachingImages[URLString] === undefined) {
-            this.image = placeholder
-        }
+        this.image = placeholder ? placeholder.clone() : undefined
         this.currentURLString = URLString
         if (URLString) {
             setTimeout(() => {
                 if (this.currentURLString === URLString) {
-                    const image = cachingImages[URLString] || UIImage.fromURL(URLString)
+                    const image = UIImage.fromURL(URLString)
                     const startTime = currentAnimationTimeMillis()
                     image.fetchSize().then(() => {
-                        cachingImages[URLString] = image
                         if (this.currentURLString === URLString) {
                             const endTime = currentAnimationTimeMillis()
                             if (endTime - startTime < 1 || this.image === undefined) {
