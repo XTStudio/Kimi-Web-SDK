@@ -17,6 +17,8 @@ export enum ItemType {
 
 export const UICollectionElementKindCell = "UICollectionElementKindCell"
 
+let itemKeyCache: { [key: string]: UICollectionViewItemKey } = {}
+
 export class UICollectionViewItemKey {
 
     constructor(
@@ -26,19 +28,35 @@ export class UICollectionViewItemKey {
     ) { }
 
     static collectionItemKeyForCellWithIndexPath(indexPath: UIIndexPath): UICollectionViewItemKey {
-        return new UICollectionViewItemKey(
-            ItemType.cell,
-            indexPath,
-            UICollectionElementKindCell
-        )
+        const hashKey = `${0},${indexPath.mapKey()},UICollectionElementKindCell`
+        if (itemKeyCache[hashKey] !== undefined) {
+            return itemKeyCache[hashKey]
+        }
+        else {
+            let value = new UICollectionViewItemKey(
+                ItemType.cell,
+                indexPath,
+                UICollectionElementKindCell
+            )
+            itemKeyCache[hashKey] = value
+            return value
+        }
     }
 
     static collectionItemKeyForLayoutAttributes(layoutAttributes: UICollectionViewLayoutAttributes): UICollectionViewItemKey {
-        return new UICollectionViewItemKey(
-            layoutAttributes.representedElementCategory,
-            layoutAttributes.indexPath,
-            layoutAttributes.representedElementKind
-        )
+        const hashKey = `${layoutAttributes.representedElementCategory},${layoutAttributes.indexPath.mapKey()},${layoutAttributes.representedElementKind}`
+        if (itemKeyCache[hashKey] !== undefined) {
+            return itemKeyCache[hashKey]
+        }
+        else {
+            let value = new UICollectionViewItemKey(
+                layoutAttributes.representedElementCategory,
+                layoutAttributes.indexPath,
+                layoutAttributes.representedElementKind
+            )
+            itemKeyCache[hashKey] = value
+            return value
+        }
     }
 
 }

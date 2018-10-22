@@ -195,7 +195,13 @@ export class UIButton extends UIView {
     }
 
     setAttributedTitle(title: UIAttributedString | undefined, state: number) {
-
+        if (title) {
+            this.statedAttributedTitles[state] = title
+        }
+        else {
+            delete this.statedAttributedTitles[state]
+        }
+        this.reloadContents()
     }
 
     private _contentEdgeInsets: UIEdgeInsets = UIEdgeInsetsZero
@@ -258,6 +264,7 @@ export class UIButton extends UIView {
     // implements
 
     private statedTitles: { [key: number]: string } = {}
+    private statedAttributedTitles: { [key: number]: UIAttributedString } = {}
     private statedTitleColors: { [key: number]: UIColor } = {}
     private statedImages: { [key: number]: UIImage } = {}
 
@@ -318,8 +325,14 @@ export class UIButton extends UIView {
     }
 
     private reloadContents() {
-        this.titleLabel.text = this.titleForState(this.currentState())
-        this.titleLabel.textColor = this.titleColorForState(this.currentState())
+        const attributedText = this.attributedTitleForState(this.currentState())
+        if (attributedText) {
+            this.titleLabel.attributedText = attributedText
+        }
+        else {
+            this.titleLabel.text = this.titleForState(this.currentState())
+            this.titleLabel.textColor = this.titleColorForState(this.currentState())
+        }
         this.imageView.image = this.imageForState(this.currentState())
         if (!this.isCustom) {
             UIAnimator.linear(0.10, () => {
@@ -427,6 +440,13 @@ export class UIButton extends UIView {
             return this.statedTitles[state]
         }
         return this.statedTitles[0]
+    }
+
+    private attributedTitleForState(state: number): UIAttributedString | undefined {
+        if (this.statedAttributedTitles[state] !== undefined) {
+            return this.statedAttributedTitles[state]
+        }
+        return this.statedAttributedTitles[0]
     }
 
     private titleColorForState(state: number): UIColor | undefined {

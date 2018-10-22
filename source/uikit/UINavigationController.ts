@@ -20,8 +20,8 @@ export class UINavigationController extends UIViewController {
 
     viewDidLoad() {
         this.navigationBar.navigationController = this
-        this.view.backgroundColor = UIColor.clear
-        this.view.addSubview(this.navigationBar)
+        this.iView.backgroundColor = UIColor.clear
+        this.iView.addSubview(this.navigationBar)
         if (this.rootViewController) {
             this.pushViewController(this.rootViewController, false)
         }
@@ -35,12 +35,12 @@ export class UINavigationController extends UIViewController {
         }
         if (viewController.hidesBottomBarWhenPushed) {
             if (this.tabBarController) {
-                this.tabBarController.view.bringSubviewToFront(this.view)
+                this.tabBarController.iView.bringSubviewToFront(this.iView)
             }
         }
         this.addChildViewController(viewController)
-        this.view.addSubview(viewController.view)
-        viewController.view.frame = this.contentFrame(viewController)
+        this.iView.addSubview(viewController.iView)
+        viewController.iView.frame = this.contentFrame(viewController)
         const fromViewController = this.childViewControllers[this.childViewControllers.length - 2]
         const toViewController = this.childViewControllers[this.childViewControllers.length - 1]
         if (animated != false && fromViewController != undefined && toViewController != undefined) {
@@ -52,7 +52,7 @@ export class UINavigationController extends UIViewController {
                 toViewController.viewDidAppear(true)
                 this.childViewControllers.forEach(it => {
                     if (it == toViewController) { return }
-                    it.view.hidden = true
+                    it.iView.hidden = true
                 })
                 this.beingAnimating = false
             })
@@ -68,7 +68,7 @@ export class UINavigationController extends UIViewController {
             }
             this.childViewControllers.forEach(it => {
                 if (it == toViewController) { return }
-                it.view.hidden = true
+                it.iView.hidden = true
             })
         }
     }
@@ -80,19 +80,19 @@ export class UINavigationController extends UIViewController {
         if (fromViewController === undefined || toViewController === undefined) {
             return undefined
         }
-        toViewController.view.hidden = false
+        toViewController.iView.hidden = false
         fromViewController.viewWillDisappear(animated)
         toViewController.viewWillAppear(animated)
         if (animated != false) {
             this.beingAnimating = true
             this.doPopAnimation(fromViewController, toViewController, () => {
                 fromViewController.removeFromParentViewController()
-                fromViewController.view.removeFromSuperview()
+                fromViewController.iView.removeFromSuperview()
                 fromViewController.viewDidDisappear(true)
                 toViewController.viewDidAppear(true)
                 if (!toViewController.hidesBottomBarWhenPushed) {
                     if (this.tabBarController) {
-                        this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+                        this.tabBarController.iView.bringSubviewToFront(this.tabBarController.tabBar)
                     }
                 }
                 this.beingAnimating = false
@@ -100,13 +100,13 @@ export class UINavigationController extends UIViewController {
         }
         else {
             fromViewController.removeFromParentViewController()
-            fromViewController.view.removeFromSuperview()
-            toViewController.view.frame = this.contentFrame(toViewController)
+            fromViewController.iView.removeFromSuperview()
+            toViewController.iView.frame = this.contentFrame(toViewController)
             fromViewController.viewDidDisappear(true)
             toViewController.viewDidAppear(true)
             if (!toViewController.hidesBottomBarWhenPushed) {
                 if (this.tabBarController) {
-                    this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+                    this.tabBarController.iView.bringSubviewToFront(this.tabBarController.tabBar)
                 }
             }
         }
@@ -125,7 +125,7 @@ export class UINavigationController extends UIViewController {
             return []
         }
         const toViewController = viewController
-        toViewController.view.hidden = false
+        toViewController.iView.hidden = false
         fromViewControllers.forEach(it => { it.viewWillDisappear(animated) })
         toViewController.viewWillAppear(animated)
         if (animated != false) {
@@ -133,12 +133,12 @@ export class UINavigationController extends UIViewController {
             this.doPopAnimation(fromViewControllers[fromViewControllers.length - 1], toViewController, () => {
                 {
                     fromViewControllers.forEach(it => { it.removeFromParentViewController() })
-                    fromViewControllers.forEach(it => { it.view.removeFromSuperview() })
+                    fromViewControllers.forEach(it => { it.iView.removeFromSuperview() })
                     fromViewControllers.forEach(it => { it.viewDidDisappear(true) })
                     toViewController.viewDidAppear(true)
                     if (!toViewController.hidesBottomBarWhenPushed) {
                         if (this.tabBarController) {
-                            this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+                            this.tabBarController.iView.bringSubviewToFront(this.tabBarController.tabBar)
                         }
                     }
                     this.beingAnimating = false
@@ -147,13 +147,13 @@ export class UINavigationController extends UIViewController {
         }
         else {
             fromViewControllers.forEach(it => { it.removeFromParentViewController() })
-            fromViewControllers.forEach(it => { it.view.removeFromSuperview() })
-            toViewController.view.frame = this.contentFrame(toViewController)
+            fromViewControllers.forEach(it => { it.iView.removeFromSuperview() })
+            toViewController.iView.frame = this.contentFrame(toViewController)
             fromViewControllers.forEach(it => { it.viewDidDisappear(false) })
             toViewController.viewDidAppear(false)
             if (!toViewController.hidesBottomBarWhenPushed) {
                 if (this.tabBarController) {
-                    this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+                    this.tabBarController.iView.bringSubviewToFront(this.tabBarController.tabBar)
                 }
             }
         }
@@ -173,22 +173,22 @@ export class UINavigationController extends UIViewController {
         if (this.beingAnimating) { return }
         this.childViewControllers.forEach(it => {
             it.removeFromParentViewController()
-            it.view.removeFromSuperview()
+            it.iView.removeFromSuperview()
         })
         viewControllers.forEach(it => {
             this.addChildViewController(it)
-            this.view.addSubview(it.view)
-            it.view.frame = this.contentFrame(it)
+            this.iView.addSubview(it.iView)
+            it.iView.frame = this.contentFrame(it)
         })
         this.navigationBar.setItems(viewControllers.map(it => { return it.navigationItem }), animated != false)
         if (viewControllers[viewControllers.length - 1] && viewControllers[viewControllers.length - 1].hidesBottomBarWhenPushed == true) {
             if (this.tabBarController) {
-                this.tabBarController.view.bringSubviewToFront(this.view)
+                this.tabBarController.iView.bringSubviewToFront(this.iView)
             }
         }
         else {
             if (this.tabBarController) {
-                this.tabBarController.view.bringSubviewToFront(this.tabBarController.tabBar)
+                this.tabBarController.iView.bringSubviewToFront(this.tabBarController.tabBar)
             }
         }
     }
@@ -196,40 +196,40 @@ export class UINavigationController extends UIViewController {
     viewWillLayoutSubviews() {
         this.navigationBar.frame = this.barFrame
         this.childViewControllers.forEach(it => {
-            it.view.frame = this.contentFrame(it)
+            it.iView.frame = this.contentFrame(it)
         })
         super.viewWillLayoutSubviews()
     }
 
     public get barFrame(): UIRect {
         if (this.navigationBar.hidden) {
-            return { x: 0.0, y: 0.0, width: this.view.bounds.width, height: 0.0 }
+            return { x: 0.0, y: 0.0, width: this.iView.bounds.width, height: 0.0 }
         }
-        return { x: 0.0, y: 0.0, width: this.view.bounds.width, height: this.navigationBar.barHeight }
+        return { x: 0.0, y: 0.0, width: this.iView.bounds.width, height: this.navigationBar.barHeight }
     }
 
     private contentFrame(viewController: UIViewController): UIRect {
         if (viewController.hidesBottomBarWhenPushed) {
-            return { x: 0.0, y: this.barFrame.height, width: this.view.bounds.width, height: this.view.bounds.height - this.barFrame.height }
+            return { x: 0.0, y: this.barFrame.height, width: this.iView.bounds.width, height: this.iView.bounds.height - this.barFrame.height }
         }
         else {
             if (this.tabBarController !== undefined) {
-                return { x: 0.0, y: this.barFrame.height, width: this.view.bounds.width, height: this.view.bounds.height - this.barFrame.height - this.tabBarController.tabBar.barHeight }
+                return { x: 0.0, y: this.barFrame.height, width: this.iView.bounds.width, height: this.iView.bounds.height - this.barFrame.height - this.tabBarController.tabBar.barHeight }
             }
             else {
-                return { x: 0.0, y: this.barFrame.height, width: this.view.bounds.width, height: this.view.bounds.height - this.barFrame.height - 0.0 }
+                return { x: 0.0, y: this.barFrame.height, width: this.iView.bounds.width, height: this.iView.bounds.height - this.barFrame.height - 0.0 }
             }
         }
     }
 
     private doPushAnimation(fromViewController: UIViewController, toViewController: UIViewController, complete: () => void) {
-        fromViewController.view.frame = this.contentFrame(fromViewController)
+        fromViewController.iView.frame = this.contentFrame(fromViewController)
         const contentFrame = this.contentFrame(toViewController)
-        toViewController.view.frame = { x: contentFrame.width, y: contentFrame.y, width: contentFrame.width, height: contentFrame.height }
+        toViewController.iView.frame = { x: contentFrame.width, y: contentFrame.y, width: contentFrame.width, height: contentFrame.height }
         UIAnimator.bouncy(0.0, 16.0, () => {
             const contentFrame = this.contentFrame(fromViewController)
-            fromViewController.view.frame = { x: -contentFrame.width * 0.25, y: contentFrame.y, width: contentFrame.width, height: contentFrame.height }
-            toViewController.view.frame = this.contentFrame(toViewController)
+            fromViewController.iView.frame = { x: -contentFrame.width * 0.25, y: contentFrame.y, width: contentFrame.width, height: contentFrame.height }
+            toViewController.iView.frame = this.contentFrame(toViewController)
         }, () => {
             complete()
         })
@@ -237,31 +237,31 @@ export class UINavigationController extends UIViewController {
 
     private doPopAnimation(fromViewController: UIViewController, toViewController: UIViewController, complete: () => void) {
         if (fromViewController instanceof UINavigationBarViewController) {
-            fromViewController.view.frame = this.view.bounds
+            fromViewController.iView.frame = this.iView.bounds
         }
         else {
-            fromViewController.view.frame = this.contentFrame(fromViewController)
+            fromViewController.iView.frame = this.contentFrame(fromViewController)
         }
         {
             const contentFrame = this.contentFrame(toViewController)
-            toViewController.view.frame = { x: -contentFrame.width * 0.25, y: contentFrame.y, width: contentFrame.width, height: contentFrame.height }
+            toViewController.iView.frame = { x: -contentFrame.width * 0.25, y: contentFrame.y, width: contentFrame.width, height: contentFrame.height }
         }
         UIAnimator.bouncy(0.0, 16.0, () => {
             if (fromViewController instanceof UINavigationBarViewController) {
-                fromViewController.view.frame = { x: this.contentFrame(fromViewController).width, y: this.view.frame.y, width: this.view.frame.width, height: this.view.frame.height }
+                fromViewController.iView.frame = { x: this.contentFrame(fromViewController).width, y: this.iView.frame.y, width: this.iView.frame.width, height: this.iView.frame.height }
             }
             else {
                 const contentFrame = this.contentFrame(fromViewController)
-                fromViewController.view.frame = { x: contentFrame.width, y: contentFrame.y, width: contentFrame.width, height: contentFrame.height }
+                fromViewController.iView.frame = { x: contentFrame.width, y: contentFrame.y, width: contentFrame.width, height: contentFrame.height }
             }
-            toViewController.view.frame = this.contentFrame(toViewController)
+            toViewController.iView.frame = this.contentFrame(toViewController)
         }, () => {
             complete()
         })
     }
 
     didAddSubview(subview: UIView) {
-        this.view.bringSubviewToFront(this.navigationBar)
+        this.iView.bringSubviewToFront(this.navigationBar)
         super.didAddSubview(subview)
     }
 

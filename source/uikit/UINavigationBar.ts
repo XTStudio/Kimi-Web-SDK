@@ -225,7 +225,7 @@ export class UINavigationBar extends UIView {
         this._hidden = value;
         this.domElement.style.visibility = value ? 'hidden' : 'inherit'
         if (this.navigationController) {
-            this.navigationController.view.setNeedsDisplay()
+            this.navigationController.iView.setNeedsDisplay()
         }
     }
 

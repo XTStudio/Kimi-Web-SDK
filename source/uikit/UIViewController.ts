@@ -20,7 +20,7 @@ export class UIViewController extends EventEmitter {
         this.navigationItem.setNeedsUpdate()
     }
 
-    private _view: any = undefined
+    protected _view: any = undefined
 
     public set view(value: UIView) {
         if (this._view !== undefined) { return }
@@ -28,6 +28,15 @@ export class UIViewController extends EventEmitter {
     }
 
     public get view(): UIView {
+        return this.iView
+    }
+
+    public get iView(): UIView {
+        this.loadViewIfNeed()
+        return this._view
+    }
+
+    loadViewIfNeed() {
         if (this._view === undefined) {
             this.loadView()
             if (this._view) {
@@ -35,16 +44,15 @@ export class UIViewController extends EventEmitter {
             }
             this.viewDidLoad()
         }
-        return this._view
     }
 
     attachToElement(element: HTMLElement) {
-        this.view.attachToElement(element, this)
+        this.iView.attachToElement(element, this)
     }
 
     loadView() {
         this.view = new UIView
-        this.view.backgroundColor = UIColor.white
+        this.iView.backgroundColor = UIColor.white
     }
 
     viewDidLoad() {
@@ -224,5 +232,7 @@ export class UIViewController extends EventEmitter {
     //         it.selectedViewController?.goBack()
     //     }
     // }
+
+    setNeedsStatusBarAppearanceUpdate() { }
 
 }

@@ -134,13 +134,13 @@ export class UIPageViewController extends UIViewController {
         this.scrollView.bounces = false
         this.scrollView.showsHorizontalScrollIndicator = false
         this.scrollView.showsVerticalScrollIndicator = false
-        this.view.addSubview(this.scrollView)
+        this.iView.addSubview(this.scrollView)
         super.viewDidLoad()
     }
 
     viewWillLayoutSubviews() {
-        this.scrollView.frame = this.view.bounds
-        this.scrollView.contentSize = { width: this.view.bounds.width, height: this.view.bounds.height }
+        this.scrollView.frame = this.iView.bounds
+        this.scrollView.contentSize = { width: this.iView.bounds.width, height: this.iView.bounds.height }
         this.resetContents()
         super.viewWillLayoutSubviews()
     }
@@ -212,44 +212,44 @@ export class UIPageViewController extends UIViewController {
         const beforePage = this.beforeViewController(currentPage)
         const afterPage = this.afterViewController(currentPage)
         this.scrollView.subviews.forEach(it => {
-            if (it != currentPage.view && (beforePage === undefined || it != beforePage.view) && (afterPage === undefined || it != afterPage.view)) {
+            if (it != currentPage.iView && (beforePage === undefined || it != beforePage.iView) && (afterPage === undefined || it != afterPage.iView)) {
                 it.removeFromSuperview()
             }
         })
-        currentPage.view.frame = this.view.bounds
-        this.scrollView.addSubview(currentPage.view)
+        currentPage.iView.frame = this.iView.bounds
+        this.scrollView.addSubview(currentPage.iView)
         if (beforePage) {
-            this.scrollView.addSubview(beforePage.view)
+            this.scrollView.addSubview(beforePage.iView)
             if (this.isVertical == true) {
-                beforePage.view.frame = { x: 0.0, y: -this.view.bounds.height, width: this.view.bounds.width, height: this.view.bounds.height }
+                beforePage.iView.frame = { x: 0.0, y: -this.iView.bounds.height, width: this.iView.bounds.width, height: this.iView.bounds.height }
             }
             else {
-                beforePage.view.frame = { x: -this.view.bounds.width, y: 0.0, width: this.view.bounds.width, height: this.view.bounds.height }
+                beforePage.iView.frame = { x: -this.iView.bounds.width, y: 0.0, width: this.iView.bounds.width, height: this.iView.bounds.height }
             }
         }
         if (afterPage) {
-            this.scrollView.addSubview(afterPage.view)
+            this.scrollView.addSubview(afterPage.iView)
             if (this.isVertical == true) {
-                afterPage.view.frame = { x: 0.0, y: this.view.bounds.height, width: this.view.bounds.width, height: this.view.bounds.height }
+                afterPage.iView.frame = { x: 0.0, y: this.iView.bounds.height, width: this.iView.bounds.width, height: this.iView.bounds.height }
             }
             else {
-                afterPage.view.frame = { x: this.view.bounds.width, y: 0.0, width: this.view.bounds.width, height: this.view.bounds.height }
+                afterPage.iView.frame = { x: this.iView.bounds.width, y: 0.0, width: this.iView.bounds.width, height: this.iView.bounds.height }
             }
         }
         if (this.isVertical == true) {
             this.scrollView.contentInset = {
-                top: beforePage !== undefined ? Math.ceil(this.view.bounds.height) : 0.0,
+                top: beforePage !== undefined ? Math.ceil(this.iView.bounds.height) : 0.0,
                 left: 0.0,
-                bottom: afterPage !== undefined ? Math.ceil(this.view.bounds.height) : 0.0,
+                bottom: afterPage !== undefined ? Math.ceil(this.iView.bounds.height) : 0.0,
                 right: 0.0
             }
         }
         else {
             this.scrollView.contentInset = {
                 top: 0.0,
-                left: beforePage !== undefined ? Math.ceil(this.view.bounds.width) : 0.0,
+                left: beforePage !== undefined ? Math.ceil(this.iView.bounds.width) : 0.0,
                 bottom: 0.0,
-                right: afterPage !== undefined ? Math.ceil(this.view.bounds.width) : 0.0
+                right: afterPage !== undefined ? Math.ceil(this.iView.bounds.width) : 0.0
             }
         }
         this.scrollView.contentOffset = UIPointZero

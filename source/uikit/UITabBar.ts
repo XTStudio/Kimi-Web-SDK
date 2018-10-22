@@ -22,7 +22,7 @@ export class UITabBar extends UIView {
         this._hidden = value;
         this.domElement.style.visibility = value ? 'hidden' : 'inherit'
         if (this.tabBarController) {
-            this.tabBarController.view.setNeedsDisplay()
+            this.tabBarController.iView.setNeedsDisplay()
         }
     }
 

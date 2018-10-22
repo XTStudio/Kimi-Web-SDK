@@ -1049,12 +1049,12 @@ export class UIWindow extends UIView {
     public set rootViewController(value: any | undefined) {
         if (this._rootViewController) {
             (this._rootViewController as any).window = undefined
-            this._rootViewController.view.removeFromSuperview()
+            this._rootViewController.iView.removeFromSuperview()
         }
         this._rootViewController = value;
         if (this._rootViewController) {
             (this._rootViewController as any).window = this
-            this.addSubview((this._rootViewController as any).view)
+            this.addSubview((this._rootViewController as any).iView)
         }
     }
 
@@ -1063,24 +1063,24 @@ export class UIWindow extends UIView {
     presentViewController(viewController: any, animated: boolean, complete: (() => void) | undefined = undefined) {
         this.presentedViewControllers.push(viewController)
         viewController.window = this
-        this.addSubview(viewController.view)
+        this.addSubview(viewController.iView)
         if (animated) {
-            viewController.view.frame = { x: 0.0, y: this.bounds.height, width: this.bounds.width, height: this.bounds.height }
+            viewController.iView.frame = { x: 0.0, y: this.bounds.height, width: this.bounds.width, height: this.bounds.height }
             UIAnimator.bouncy(0.0, 24.0, () => {
-                viewController.view.frame = this.bounds
+                viewController.iView.frame = this.bounds
             }, () => {
                 this.presentedViewControllers.forEach(it => {
                     if (it == viewController) { return }
-                    it.view.hidden = true
+                    it.iView.hidden = true
                 })
                 complete && complete()
             })
         }
         else {
-            viewController.view.frame = this.bounds
+            viewController.iView.frame = this.bounds
             this.presentedViewControllers.forEach(it => {
                 if (it == viewController) { return }
-                it.view.hidden = true
+                it.iView.hidden = true
             })
             complete && complete()
         }
@@ -1091,7 +1091,7 @@ export class UIWindow extends UIView {
             const fromViewController = this.presentedViewControllers[this.presentedViewControllers.length - 1]
             const toViewController = fromViewController.presentingViewController
             if (toViewController === undefined) { return }
-            toViewController.view.hidden = false
+            toViewController.iView.hidden = false
             {
                 const idx = this.presentedViewControllers.indexOf(fromViewController)
                 if (idx >= 0) {
@@ -1107,16 +1107,16 @@ export class UIWindow extends UIView {
             fromViewController.window = undefined
             if (animated) {
                 UIAnimator.bouncy(0.0, 24.0, () => {
-                    fromViewController.view.frame = { x: 0.0, y: this.bounds.height, width: this.bounds.width, height: this.bounds.height }
+                    fromViewController.iView.frame = { x: 0.0, y: this.bounds.height, width: this.bounds.width, height: this.bounds.height }
                 }, () => {
-                    fromViewController.view.removeFromSuperview()
+                    fromViewController.iView.removeFromSuperview()
                     complete && complete()
                     fromViewController.viewDidDisappear(animated)
                     toViewController.viewDidAppear(animated)
                 })
             }
             else {
-                fromViewController.view.removeFromSuperview()
+                fromViewController.iView.removeFromSuperview()
                 complete && complete()
                 fromViewController.viewDidDisappear(animated)
                 toViewController.viewDidAppear(animated)
@@ -1127,7 +1127,7 @@ export class UIWindow extends UIView {
     layoutSubviews() {
         super.layoutSubviews()
         if (this.rootViewController) {
-            this.rootViewController.view.frame = this.bounds
+            this.rootViewController.iView.frame = this.bounds
         }
     }
 

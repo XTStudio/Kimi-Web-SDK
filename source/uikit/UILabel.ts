@@ -60,6 +60,7 @@ export class UILabel extends UIView {
     public set attributedText(value: UIAttributedString | undefined) {
         this._attributedText = value;
         if (value) {
+            this.textElement.innerText = ""
             const el = value.toHTMLText()
             this.textElement.appendChild(el)
             this.domElement.style.textAlign = el.style.textAlign
@@ -215,6 +216,9 @@ export class UILabel extends UIView {
     }
 
     intrinsicContentSize(): UISize {
+        if (this.attributedText) {
+            return TextMeasurer.measureAttributedText(this.attributedText, { width: Infinity, height: Infinity })
+        }
         if (this.text) {
             return TextMeasurer.measureText(this.text, {
                 font: this.font || new UIFont(14),

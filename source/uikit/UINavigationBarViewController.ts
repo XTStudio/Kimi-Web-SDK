@@ -1,6 +1,7 @@
 import { UIViewController } from "./UIViewController";
 import { UIView } from "./UIView";
 import { UIRect } from "./UIRect";
+import { UIColor } from "./UIColor";
 
 export class UINavigationBarViewController extends UIViewController {
 
@@ -14,11 +15,14 @@ export class UINavigationBarViewController extends UIViewController {
 
     public set navigationBarInFront(value: boolean) {
         this._navigationBarInFront = value;
-        if (value) {
-            this.view.bringSubviewToFront(this.navigationBar)
-        }
-        else {
-            this.view.bringSubviewToFront(this.contentView)
+        this.iView;
+        if (this._view) {
+            if (value) {
+                this._view.bringSubviewToFront(this.navigationBar)
+            }
+            else {
+                this._view.bringSubviewToFront(this.contentView)
+            }
         }
     }
 
@@ -26,7 +30,15 @@ export class UINavigationBarViewController extends UIViewController {
 
     contentView: UIView = new UIView
 
+    protected _view: any = undefined
+
+    public set view(value: UIView) {
+        if (this._view !== undefined) { return }
+        this._view = value
+    }
+
     public get view(): UIView {
+        this.loadViewIfNeed()
         return this.contentView
     }
 
@@ -34,8 +46,8 @@ export class UINavigationBarViewController extends UIViewController {
 
     loadView() {
         super.loadView()
-        this.view.addSubview(this.contentView)
-        this.view.addSubview(this.navigationBar)
+        this.iView.addSubview(this.contentView)
+        this.iView.addSubview(this.navigationBar)
     }
 
     viewWillAppear(animated: boolean) {
@@ -55,13 +67,13 @@ export class UINavigationBarViewController extends UIViewController {
 
     private get barFrame(): UIRect {
         if (this.navigationBar.hidden) {
-            return { x: 0.0, y: 0.0, width: this.view.bounds.width, height: 0.0 }
+            return { x: 0.0, y: 0.0, width: this.iView.bounds.width, height: 0.0 }
         }
-        return { x: 0.0, y: 0.0, width: this.view.bounds.width, height: this.navigationBarContentHeight }
+        return { x: 0.0, y: 0.0, width: this.iView.bounds.width, height: this.navigationBarContentHeight }
     }
 
     private get contentFrame(): UIRect {
-        return { x: 0.0, y: this.barFrame.height, width: this.view.bounds.width, height: this.view.bounds.height - this.barFrame.height }
+        return { x: 0.0, y: this.barFrame.height, width: this.iView.bounds.width, height: this.iView.bounds.height - this.barFrame.height }
     }
 
     viewWillLayoutSubviews() {
