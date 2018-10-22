@@ -141,9 +141,14 @@ export class UITabBarButton extends UIView {
     setNeedUpdate() {
         if (this.barItem) {
             this.iconImageView.image = this.itemSelected ? (this.barItem.selectedImage || this.barItem.image) : this.barItem.image
+            if (this.iconImageView.image && this.iconImageView.image.size.width === 0) {
+                this.iconImageView.image.on("load", () => {
+                    this.setNeedsLayout(true)
+                })
+            }
             this.titleLabel.text = this.barItem.title
         }
-        this.setNeedsLayout()
+        this.setNeedsLayout(true)
     }
 
     tintColorDidChange() {

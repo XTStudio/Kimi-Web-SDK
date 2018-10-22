@@ -19,7 +19,7 @@ enum UIAlertActionStyle {
 
 class UIAlertAction {
 
-    constructor(readonly title: string, readonly style: UIAlertActionStyle, readonly callback: () => void) { }
+    constructor(readonly title: string, readonly style: UIAlertActionStyle, readonly callback: (() => void) | undefined) { }
 
 }
 
@@ -80,7 +80,7 @@ class UIActionSheetController extends UIViewController {
             }
             const view = new UIButton().on("touchUpInside", () => {
                 this.dismiss(true, () => {
-                    it.callback()
+                    it.callback && it.callback()
                 })
             })
             view.backgroundColor = UIColor.white
@@ -105,7 +105,7 @@ class UIActionSheetController extends UIViewController {
             if (cancelAction) {
                 this.backgroundView.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
                     this.dismiss(true, () => {
-                        cancelAction.callback()
+                        cancelAction.callback && cancelAction.callback()
                     })
                 }))
             }

@@ -26,7 +26,9 @@ export class Data {
                 }
             }
             else if (value.base64EncodedData instanceof Data) {
-                var binaryString = window.atob(String.fromCharCode.apply(null, new Uint8Array(value.base64EncodedData._arrayBuffer)));
+                var binaryString = window.atob(new Uint8Array(value.base64EncodedData._arrayBuffer).reduce(function (data, byte) {
+                    return data + String.fromCharCode(byte);
+                }, ''));
                 var len = binaryString.length;
                 var bytes = new Uint8Array(len);
                 for (var i = 0; i < len; i++) {
@@ -54,7 +56,9 @@ export class Data {
         if (typeof TextDecoder === "function") {
             return new TextDecoder().decode(this._arrayBuffer)
         }
-        return decodeURIComponent(escape(String.fromCharCode.apply(null, new Uint8Array(this._arrayBuffer))))
+        return decodeURIComponent(escape(new Uint8Array(this._arrayBuffer).reduce(function (data, byte) {
+            return data + String.fromCharCode(byte);
+        }, '')))
     }
 
     base64EncodedData(): Data {
@@ -62,7 +66,9 @@ export class Data {
     }
 
     base64EncodedString(): string {
-        return window.btoa(String.fromCharCode.apply(null, new Uint8Array(this._arrayBuffer)));
+        return window.btoa(new Uint8Array(this._arrayBuffer).reduce(function (data, byte) {
+            return data + String.fromCharCode(byte);
+        }, ''));
     }
 
     mutable(): MutableData {

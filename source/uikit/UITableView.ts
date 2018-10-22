@@ -234,7 +234,7 @@ export class UITableView extends UIScrollView {
             else {
                 sectionRecord.headerHeight = 0.0
             }
-            const footerView = this.viewForHeader(section)
+            const footerView = this.viewForFooter(section)
             if (footerView) {
                 this.addSubview(footerView)
                 sectionRecord.footerView = footerView
@@ -402,7 +402,6 @@ export class UITableView extends UIScrollView {
         let offset = this.tableHeaderView ? this.tableHeaderView.frame.height : 0.0
         for (let it = 0; it < section; it++) {
             offset += this._sections[it].sectionHeight()
-
         }
         return offset
     }

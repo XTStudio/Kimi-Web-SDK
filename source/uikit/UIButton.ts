@@ -353,6 +353,8 @@ export class UIButton extends UIView {
         if (this.bounds.width <= 0.0 || this.bounds.height <= 0.0) {
             return
         }
+        const boxWidth = this.bounds.width - this.layer.borderWidth
+        const boxHeight = this.bounds.height - this.layer.borderWidth
         if (this.imageView.image) {
             await this.imageView.image.fetchSize()
         }
@@ -372,16 +374,16 @@ export class UIButton extends UIView {
                 titleX = imgX + imageViewSize.width + 0.0
                 break
             case UIControlContentHorizontalAlignment.center:
-                imgX = (this.bounds.width - (imageViewSize.width + titleLabelSize.width)) / 2.0
+                imgX = (boxWidth - (imageViewSize.width + titleLabelSize.width)) / 2.0
                 titleX = imgX + imageViewSize.width + 0.0
                 break
             case UIControlContentHorizontalAlignment.right:
-                imgX = this.bounds.width - (imageViewSize.width + titleLabelSize.width)
+                imgX = boxWidth - (imageViewSize.width + titleLabelSize.width)
                 titleX = imgX + imageViewSize.width + 0.0
                 break
             case UIControlContentHorizontalAlignment.fill:
-                imgWidth = this.bounds.width
-                titleWidth = this.bounds.width
+                imgWidth = boxWidth
+                titleWidth = boxWidth
                 break
         }
         switch (this.contentVerticalAlignment) {
@@ -390,16 +392,16 @@ export class UIButton extends UIView {
                 titleY = 0.0
                 break
             case UIControlContentVerticalAlignment.center:
-                imgY = (this.bounds.height - imageViewSize.height) / 2.0
-                titleY = (this.bounds.height - titleLabelSize.height) / 2.0
+                imgY = (boxHeight - imageViewSize.height) / 2.0
+                titleY = (boxHeight - titleLabelSize.height) / 2.0
                 break
             case UIControlContentVerticalAlignment.bottom:
-                imgY = this.bounds.height - imageViewSize.height
-                titleY = this.bounds.height - titleLabelSize.height
+                imgY = boxHeight - imageViewSize.height
+                titleY = boxHeight - titleLabelSize.height
                 break
             case UIControlContentVerticalAlignment.fill:
-                imgHeight = this.bounds.height
-                titleHeight = this.bounds.height
+                imgHeight = boxHeight
+                titleHeight = boxHeight
                 break
         }
         imgX += this.contentEdgeInsets.left + this.imageEdgeInsets.left

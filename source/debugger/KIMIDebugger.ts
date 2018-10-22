@@ -3,7 +3,7 @@ export class KIMIDebugger {
     private lastTag: string | undefined = undefined
     private closed: boolean = false
 
-    constructor(readonly remoteAddress: string = "127.0.0.1:8090") {
+    constructor(readonly remoteAddress: string = window.location.hostname + ":8090") {
         this.addConsoleHandler()
     }
 

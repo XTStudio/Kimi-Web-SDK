@@ -21,14 +21,14 @@ export class UINavigationBarViewController extends UIViewController {
                 this._view.bringSubviewToFront(this.navigationBar)
             }
             else {
-                this._view.bringSubviewToFront(this.contentView)
+                this._view.bringSubviewToFront(this._contentView)
             }
         }
     }
 
     navigationBar: UIView = new UIView
 
-    contentView: UIView = new UIView
+    _contentView: UIView = new UIView
 
     protected _view: any = undefined
 
@@ -39,14 +39,14 @@ export class UINavigationBarViewController extends UIViewController {
 
     public get view(): UIView {
         this.loadViewIfNeed()
-        return this.contentView
+        return this._contentView
     }
 
     navigationControllerState: { barHidden: boolean } | undefined = undefined
 
     loadView() {
         super.loadView()
-        this.iView.addSubview(this.contentView)
+        this.iView.addSubview(this._contentView)
         this.iView.addSubview(this.navigationBar)
     }
 
@@ -78,7 +78,7 @@ export class UINavigationBarViewController extends UIViewController {
 
     viewWillLayoutSubviews() {
         this.navigationBar.frame = this.barFrame
-        this.contentView.frame = this.contentFrame
+        this._contentView.frame = this.contentFrame
         super.viewWillLayoutSubviews()
     }
 
