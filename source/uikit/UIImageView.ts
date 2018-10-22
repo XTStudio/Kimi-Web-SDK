@@ -160,9 +160,9 @@ export class UIImageView extends UIView {
             filterElement.innerHTML = `
             <feColorMatrix in="SourceGraphic"
                         type="matrix"
-                        values="${this.tintColor.r} 0 0 0 0
-                                0 ${this.tintColor.g} 0 0 0
-                                0 0 ${this.tintColor.b} 0 0 
+                        values="0 0 0 0 ${this.tintColor.r}
+                                0 0 0 0 ${this.tintColor.g}
+                                0 0 0 0 ${this.tintColor.b} 
                                 0 0 0 ${this.tintColor.a} 0" />
             `
             svgFilterRoot.appendChild(filterElement)
