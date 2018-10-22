@@ -49,8 +49,8 @@ export class UITableView extends UIScrollView {
         this._layoutTableView()
     }
 
-    separatorColor: UIColor | undefined = new UIColor(0xbc / 255.0, 0xba / 255.0, 0xc1 / 255.0, 1.0)
-    separatorInset: UIEdgeInsets = UIEdgeInsetsZero
+    separatorColor: UIColor | undefined = new UIColor(0xbc / 255.0, 0xba / 255.0, 0xc1 / 255.0, 0.75)
+    separatorInset: UIEdgeInsets = { top: 0, left: 15, bottom: 0, right: 0 }
     allowsSelection: boolean = true
     allowsMultipleSelection: boolean = false
 
@@ -335,6 +335,7 @@ export class UITableView extends UIScrollView {
                             this.addSubview(cell)
                         }
                         cell.hidden = false
+                        cell.setSeparator(row === numberOfRows - 1, this.separatorColor, this.separatorInset)
                     }
                     else if (renderCount > 10) {
                         break
@@ -610,31 +611,33 @@ export class UITableViewCell extends UIView {
 
     contentView: UIView = new UIView()
 
+    separatorElement = document.createElement("div")
+
     reuseIdentifier: string | undefined = undefined
 
     hasSelectionStyle: boolean = true
 
     private _selected: boolean = false
 
-	public get selected(): boolean  {
-		return this._selected;
-	}
+    public get selected(): boolean {
+        return this._selected;
+    }
 
-	public set selected(value: boolean ) {
+    public set selected(value: boolean) {
         this._selected = value;
         this.onStateChanged()
-	}
+    }
 
     private _highlighted: boolean = false
 
-	public get highlighted(): boolean  {
-		return this._highlighted;
-	}
+    public get highlighted(): boolean {
+        return this._highlighted;
+    }
 
-	public set highlighted(value: boolean ) {
+    public set highlighted(value: boolean) {
         this._highlighted = value;
         this.onStateChanged()
-	}
+    }
 
     currentIndexPath: UIIndexPath | undefined = undefined
 
@@ -647,6 +650,7 @@ export class UITableViewCell extends UIView {
         this.contentView.backgroundColor = UIColor.white
         this.addSubview(this.selectionView)
         this.addSubview(this.contentView)
+        this.domElement.appendChild(this.separatorElement)
     }
 
     restoringContentViewBackgroundColor: UIColor | undefined = undefined
@@ -670,10 +674,26 @@ export class UITableViewCell extends UIView {
         }
     }
 
+    setSeparator(hidden: boolean, color: UIColor | undefined, insets: UIEdgeInsets) {
+        if (hidden || color === undefined) {
+            this.separatorElement.style.display = "none"
+        }
+        else {
+            this.separatorElement.style.position = "absolute"
+            this.separatorElement.style.borderTopStyle = "solid"
+            this.separatorElement.style.width = "100%"
+            this.separatorElement.style.borderTopWidth = (1 / devicePixelRatio).toFixed(2) + "px"
+            this.separatorElement.style.borderTopColor = color.toStyle()
+            this.separatorElement.style.marginLeft = insets.left.toFixed(2) + "px"
+            this.separatorElement.style.marginRight = insets.right.toFixed(2) + "px"
+        }
+    }
+
     layoutSubviews() {
         super.layoutSubviews()
         this.selectionView.frame = this.bounds
         this.contentView.frame = this.bounds
+        this.separatorElement.style.marginTop = (this.bounds.height - 1).toFixed(2) + "px"
     }
 
 }

@@ -10,10 +10,26 @@ export class UIActivityIndicatorView extends UIView {
 
     color: UIColor | undefined = undefined
 
-    largeStyle: boolean = false
+    private _largeStyle: boolean = false
+
+	public get largeStyle(): boolean  {
+		return this._largeStyle;
+	}
+
+	public set largeStyle(value: boolean ) {
+        this._largeStyle = value;
+        {
+            const size = this.largeStyle ? 88 : 36
+            this.frame = { x: this.frame.x, y: this.frame.y, width: size, height: size }
+        }
+	}
 
     constructor() {
         super()
+        {
+            const size = this.largeStyle ? 88 : 36
+            this.frame = { x: this.frame.x, y: this.frame.y, width: size, height: size }
+        }
         this.contentElement.style.position = "absolute"
         this.contentElement.style.width = "100%"
         this.contentElement.style.height = "100%"
