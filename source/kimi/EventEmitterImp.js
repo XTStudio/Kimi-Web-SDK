@@ -370,56 +370,64 @@
      * @return {Object} Current instance of EventEmitter for chaining.
      */
     proto.emitEvent = function emitEvent(evt, args) {
-        var listenersMap = this.getListenersAsObject(evt);
-        var listeners;
-        var listener;
-        var i;
-        var key;
-        var response;
+        try {
+            var listenersMap = this.getListenersAsObject(evt);
+            var listeners;
+            var listener;
+            var i;
+            var key;
+            var response;
 
-        for (key in listenersMap) {
-            if (listenersMap.hasOwnProperty(key)) {
-                listeners = listenersMap[key].slice(0);
+            for (key in listenersMap) {
+                if (listenersMap.hasOwnProperty(key)) {
+                    listeners = listenersMap[key].slice(0);
 
-                for (i = 0; i < listeners.length; i++) {
-                    // If the listener returns true then it shall be removed from the event
-                    // The function is executed either with a basic call or an apply if there is an args array
-                    listener = listeners[i];
+                    for (i = 0; i < listeners.length; i++) {
+                        // If the listener returns true then it shall be removed from the event
+                        // The function is executed either with a basic call or an apply if there is an args array
+                        listener = listeners[i];
 
-                    if (listener.once === true) {
-                        this.removeListener(evt, listener.listener);
-                    }
+                        if (listener.once === true) {
+                            this.removeListener(evt, listener.listener);
+                        }
 
-                    response = listener.listener.apply(this, args || []);
+                        response = listener.listener.apply(this, args || []);
 
-                    if (response === this._getOnceReturnValue()) {
-                        this.removeListener(evt, listener.listener);
+                        if (response === this._getOnceReturnValue()) {
+                            this.removeListener(evt, listener.listener);
+                        }
                     }
                 }
             }
+        } catch (error) {
+            console.error(error)
         }
 
         return this;
     };
 
     proto.val = function emitEventWithReturnValue(evt) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        var listenersMap = this.getListenersAsObject(evt);
-        var listeners;
-        var listener;
-        var i;
-        var key;
-        for (key in listenersMap) {
-            if (listenersMap.hasOwnProperty(key)) {
-                listeners = listenersMap[key].slice(0);
-                for (i = 0; i < listeners.length; i++) {
-                    listener = listeners[i];
-                    if (listener.once === true) {
-                        this.removeListener(evt, listener.listener);
+        try {
+            var args = Array.prototype.slice.call(arguments, 1);
+            var listenersMap = this.getListenersAsObject(evt);
+            var listeners;
+            var listener;
+            var i;
+            var key;
+            for (key in listenersMap) {
+                if (listenersMap.hasOwnProperty(key)) {
+                    listeners = listenersMap[key].slice(0);
+                    for (i = 0; i < listeners.length; i++) {
+                        listener = listeners[i];
+                        if (listener.once === true) {
+                            this.removeListener(evt, listener.listener);
+                        }
+                        return listener.listener.apply(this, args || []);
                     }
-                    return listener.listener.apply(this, args || []);
                 }
             }
+        } catch (error) {
+            console.error(error)
         }
         return undefined;
     };

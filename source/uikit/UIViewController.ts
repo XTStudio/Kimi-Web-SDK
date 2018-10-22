@@ -3,6 +3,7 @@ import { UIView, UIWindow } from "./UIView";
 import { UIColor } from "./UIColor";
 import { UINavigationItem } from "./UINavigationBar";
 import { UITabBarItem } from "./UITabBarItem";
+import { UIEdgeInsets, UIEdgeInsetsZero } from "./UIEdgeInsets";
 
 export class UIViewController extends EventEmitter {
 
@@ -45,6 +46,8 @@ export class UIViewController extends EventEmitter {
             this.viewDidLoad()
         }
     }
+
+    safeAreaInsets: UIEdgeInsets = UIEdgeInsetsZero
 
     attachToElement(element: HTMLElement) {
         this.iView.attachToElement(element, this)

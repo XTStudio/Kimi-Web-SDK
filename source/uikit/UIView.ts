@@ -518,10 +518,9 @@ export class UIView extends EventEmitter {
         if (UIRectEqualToRect(this._frame, value)) { return }
         const boundsChanged = this._frame.width != value.width || this._frame.height != value.height
         this._frame = value;
-        this.layer.frame = value
         if (boundsChanged) {
             this.bounds = { ...value, x: 0, y: 0 }
-            this.layer.frame = this.bounds
+            this.layer.frame = { ...this.bounds }
         }
         this.setNeedsLayout(boundsChanged)
         this.domElement.style.left = value.x.toString() + "px"

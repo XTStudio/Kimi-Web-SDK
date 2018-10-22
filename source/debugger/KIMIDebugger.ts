@@ -19,7 +19,9 @@ export class KIMIDebugger {
                 originMethod.apply(this, arguments)
                 let args = []
                 for (let index = 0; index < arguments.length; index++) {
-                    args.push(arguments[index])
+                    try {
+                        args.push(arguments[index])
+                    } catch (error) { }
                 }
                 const xmlRequest = new XMLHttpRequest
                 xmlRequest.open("POST", `http://${remoteAddress}/console`, false)

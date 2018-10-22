@@ -19,6 +19,10 @@ export class CAGradientLayer extends CALayer {
         this._bgElement.setAttribute("fill", `url(#filter.${this._uuid})`)
     }
 
+    public set backgroundColor(value: UIColor | undefined) {
+        this._bgElement.setAttribute("fill", `url(#filter.${this._uuid})`)
+    }
+
     private _colors: UIColor[] = []
 
     public get colors(): UIColor[] {
@@ -43,8 +47,18 @@ export class CAGradientLayer extends CALayer {
 
     private resetStops() {
         this.linearGradientElement.innerHTML = ''
-        if (this.colors.length === this.locations.length) {
-            this.locations.forEach((it, idx) => {
+        let colors = this.colors
+        let locations = this.locations.length === this.colors.length ? this.locations : undefined
+        if (locations === undefined) {
+            colors.forEach((it, idx) => {
+                const stop = document.createElementNS("http://www.w3.org/2000/svg", "stop")
+                stop.setAttribute("offset", ((idx / colors.length) * 100).toFixed(0) + "%")
+                stop.setAttribute("stop-color", this.colors[idx].toStyle())
+                this.linearGradientElement.appendChild(stop)
+            })
+        }
+        else if (colors.length === locations.length) {
+            locations.forEach((it, idx) => {
                 const stop = document.createElementNS("http://www.w3.org/2000/svg", "stop")
                 stop.setAttribute("offset", (it * 100).toFixed(0) + "%")
                 stop.setAttribute("stop-color", this.colors[idx].toStyle())

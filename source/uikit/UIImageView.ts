@@ -37,7 +37,11 @@ export class UIImageView extends UIView {
      * Setter image
      * @param {UIImage } value
      */
-    public set image(value: UIImage | undefined) {
+    public set image(aValue: UIImage | undefined) {
+        let value: UIImage | undefined = aValue
+        if (value && value.imageElement.parentElement instanceof HTMLElement) {
+            value = value.clone()
+        }
         this.currentURLString = undefined
         this._image = value;
         if (!this.duringSetImageWithAnimation || this.duringSetImageAnimating) {
@@ -57,15 +61,19 @@ export class UIImageView extends UIView {
                 value.imageElement.style.transition = "opacity 0.25s linear"
                 this.duringSetImageWithAnimation = true
                 setTimeout(() => {
-                    value.imageElement.style.opacity = "1.0"
+                    if (value) {
+                        value.imageElement.style.opacity = "1.0"
+                    }
                     setTimeout(() => {
-                        value.imageElement.style.webkitTransition = null
-                        value.imageElement.style.transition = null
-                        this.contentElement.childNodes.forEach(it => {
-                            if (it != value.imageElement) {
-                                this.contentElement.removeChild(it)
-                            }
-                        })
+                        if (value) {
+                            value.imageElement.style.webkitTransition = null
+                            value.imageElement.style.transition = null
+                            this.contentElement.childNodes.forEach(it => {
+                                if (value && it != value.imageElement) {
+                                    this.contentElement.removeChild(it)
+                                }
+                            })
+                        }
                         this.duringSetImageWithAnimation = false
                     }, 250)
                 }, 0)

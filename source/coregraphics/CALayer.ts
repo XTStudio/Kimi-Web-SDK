@@ -13,6 +13,10 @@ export class CALayer {
     protected _contentElement: SVGGElement = document.createElementNS("http://www.w3.org/2000/svg", "g")
     protected _borderElement: SVGGElement = document.createElementNS("http://www.w3.org/2000/svg", "g")
 
+    constructor() {
+        this._bgElement.setAttribute("fill", "transparent")
+    }
+
     private _view: UIView | undefined = undefined
 
     public get view(): UIView | undefined {
@@ -63,13 +67,23 @@ export class CALayer {
     private _hidden: boolean = false
 
     public get hidden(): boolean {
-        return this._hidden;
+        if (this._view) {
+            return this._view.hidden
+        }
+        else {
+            return this._hidden;
+        }
     }
 
     public set hidden(value: boolean) {
         this._hidden = value;
-        this._bgElement.style.display = value ? "none" : null
-        this._contentElement.style.display = value ? "none" : null
+        if (this._view) {
+            this._view.hidden = value
+        }
+        else {
+            this._bgElement.style.display = value ? "none" : null
+            this._contentElement.style.display = value ? "none" : null
+        }
     }
 
     private _cornerRadius: number = 0.0
@@ -80,7 +94,7 @@ export class CALayer {
 
     public set cornerRadius(value: number) {
         this._cornerRadius = value;
-        if (this._view !== undefined) {
+        if (this._view) {
             this._view.domElement.style.borderRadius = value.toFixed(2) + "px"
         }
         else {
@@ -112,34 +126,33 @@ export class CALayer {
     }
 
     private resetBorder() {
-        this.createSVGElement()
-        if (this._svgElement === undefined) {
-            if (this.borderWidth > 0 && this.borderColor && this._view) {
+        if (this._view) {
+            if (this.borderWidth > 0 && this.borderColor) {
                 this._view.domElement.style.borderWidth = this.borderWidth.toString() + "px"
                 this._view.domElement.style.borderColor = this.borderColor.toStyle()
                 this._view.domElement.style.borderStyle = this.borderWidth > 0 ? "solid" : "unset"
                 this._view.domElement.style.boxSizing = this.borderWidth > 0 ? "border-box" : "unset"
             }
-        }
-        else if (this.borderWidth > 0 && this.borderColor) {
-            this._borderElement.style.strokeWidth = this.borderWidth.toFixed(2) + "px"
-            this._borderElement.style.stroke = this.borderColor.toStyle()
-            this._borderElement.innerHTML = ""
-            const borderFillElement = this._bgElement.cloneNode(true)
-            if (borderFillElement instanceof SVGElement) {
-                borderFillElement.style.fillOpacity = "0"
-            }
-            this._borderElement.appendChild(borderFillElement)
-            this._borderElement.style.display = null
-            this._svgElement.appendChild(this._borderElement)
-            if (this._view) {
+            else {
                 this._view.domElement.style.borderStyle = "unset"
             }
         }
         else {
-            this._borderElement.style.display = "none"
-            if (this._view) {
-                this._view.domElement.style.borderStyle = "unset"
+            this.createSVGElement()
+            if (this.borderWidth > 0 && this.borderColor && this._svgElement) {
+                this._borderElement.style.strokeWidth = this.borderWidth.toFixed(2) + "px"
+                this._borderElement.style.stroke = this.borderColor.toStyle()
+                this._borderElement.innerHTML = ""
+                const borderFillElement = this._bgElement.cloneNode(true)
+                if (borderFillElement instanceof SVGElement) {
+                    borderFillElement.style.fillOpacity = "0"
+                }
+                this._borderElement.appendChild(borderFillElement)
+                this._borderElement.style.display = null
+                this._svgElement.appendChild(this._borderElement)
+            }
+            else {
+                this._borderElement.style.display = "none"
             }
         }
     }
@@ -186,11 +199,10 @@ export class CALayer {
     }
 
     protected createSVGElement() {
-        if (this.sublayers.length == 0) { return }
+        if (this.sublayers.length == 0 && this._view !== undefined) { return }
         if (this._svgElement !== undefined) { return }
-        if (this._view !== undefined) {
+        if (this._view) {
             this._svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-            this.backgroundColor = this.backgroundColor
             this._svgElement.appendChild(this._bgElement)
             this._svgElement.appendChild(this._contentElement)
             if (this._svgElement) {
@@ -206,7 +218,6 @@ export class CALayer {
         }
         else {
             this._svgElement = document.createElementNS("http://www.w3.org/2000/svg", "g")
-            this.backgroundColor = this.backgroundColor
             this._svgElement.appendChild(this._bgElement)
             this._svgElement.appendChild(this._contentElement)
         }
@@ -215,29 +226,44 @@ export class CALayer {
     private _backgroundColor: UIColor | undefined = undefined
 
     public get backgroundColor(): UIColor | undefined {
-        return this._backgroundColor;
+        if (this._view) {
+            return this._view.backgroundColor
+        }
+        else {
+            return this._backgroundColor;
+        }
     }
 
     public set backgroundColor(value: UIColor | undefined) {
         this._backgroundColor = value;
-        if (value) {
-            this._bgElement.setAttribute("fill", value.toStyle())
+        if (this._view) {
+            this._view.backgroundColor = value
         }
         else {
-            this._bgElement.setAttribute("fill", "transparent")
+            this._bgElement.setAttribute("fill", value ? value.toStyle() : "transparent")
         }
     }
 
     private _opacity: number = 1.0
 
     public get opacity(): number {
-        return this._opacity;
+        if (this._view) {
+            return this._view.alpha
+        }
+        else {
+            return this._opacity;
+        }
     }
 
     public set opacity(value: number) {
         this._opacity = value;
-        this._bgElement.style.opacity = value.toFixed(2)
-        this._contentElement.style.opacity = value.toFixed(2)
+        if (this._view) {
+            this._view.alpha = value
+        }
+        else {
+            this._bgElement.style.opacity = value.toFixed(2)
+            this._contentElement.style.opacity = value.toFixed(2)
+        }
     }
 
     private _masksToBounds: boolean = false
@@ -248,18 +274,21 @@ export class CALayer {
 
     public set masksToBounds(value: boolean) {
         this._masksToBounds = value;
-        if (value) {
+        if (this._view) {
+            this._view.clipsToBounds = value
+        }
+        else {
             this.createSVGElement()
-            if (this._svgElement) {
+            if (value && this._svgElement) {
                 this._clipPathElement.id = "clip." + this._uuid
                 this._clipPathElement.innerHTML = ""
                 this._clipPathElement.appendChild(this._bgElement.cloneNode(true))
                 this._svgElement.appendChild(this._clipPathElement)
                 this._svgElement.setAttribute("clip-path", `url(#clip.${this._uuid})`)
             }
-        }
-        else {
-
+            else if (this._svgElement) {
+                this._svgElement.setAttribute("clip-path", "")
+            }
         }
     }
 
@@ -308,7 +337,7 @@ export class CALayer {
     }
 
     private resetShadow() {
-        if (this._view !== undefined) {
+        if (this._view) {
             if (this.shadowOpacity > 0 && this.shadowColor && this.shadowColor.a > 0) {
                 if (this._view instanceof UILabel) {
                     this._view.domElement.style.textShadow = this.shadowOffset.width.toString() + "px " + this.shadowOffset.height.toString() + "px " + this.shadowRadius.toString() + "px " + this.shadowColor.colorWithAlphaComponent(this.shadowOpacity).toStyle()

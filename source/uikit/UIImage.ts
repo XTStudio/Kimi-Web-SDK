@@ -1,5 +1,6 @@
 import { UISize, UISizeZero } from "./UISize";
 import { EventEmitter } from "../kimi/EventEmitter";
+import { Data } from "../foundation/Data";
 
 export enum UIImageRenderingMode {
     automatic,
@@ -13,10 +14,20 @@ export class UIImage extends EventEmitter {
 
     readonly renderingMode: UIImageRenderingMode = UIImageRenderingMode.alwaysOriginal
 
-    constructor(readonly options: { name?: string, base64?: string, data?: any, renderingMode?: UIImageRenderingMode }) {
+    constructor(readonly options: { name?: string, base64?: string, data?: Data, renderingMode?: UIImageRenderingMode }) {
         super()
         if (options.base64) {
             this.imageElement.src = "data:image;base64," + options.base64
+            this.imageElement.addEventListener("load", () => {
+                const scale = options.name ? UIImage.scaleFromName(options.name) : 1.0
+                this.size = { width: this.imageElement.naturalWidth / scale, height: this.imageElement.naturalHeight / scale }
+                this.scale = scale
+                this.loaded = true
+                this.emit("load")
+            })
+        }
+        else if (options.data) {
+            this.imageElement.src = "data:image;base64," + options.data.base64EncodedString()
             this.imageElement.addEventListener("load", () => {
                 const scale = options.name ? UIImage.scaleFromName(options.name) : 1.0
                 this.size = { width: this.imageElement.naturalWidth / scale, height: this.imageElement.naturalHeight / scale }
@@ -84,6 +95,7 @@ export class UIImage extends EventEmitter {
 
     clone(): UIImage {
         const img = new UIImage(this.options)
+        img.size = this.size
         return img
     }
 
