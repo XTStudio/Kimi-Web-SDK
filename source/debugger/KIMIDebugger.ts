@@ -1,7 +1,61 @@
 export class KIMIDebugger {
 
+    private worker = new Worker(window.URL.createObjectURL(new Blob([`
+    onmessage = function(e){
+        if (e.data === "fetchUpdate") {
+            fetchUpdate()
+        }
+        else if (e.data.indexOf("sendLog:") === 0) {
+            sendLog(e.data)
+        }
+        else {
+            eval(e.data)
+        }
+    }
+
+    var lastTag = undefined
+
+    function sendLog(body) {
+        const xmlRequest = new XMLHttpRequest
+        xmlRequest.open("POST", 'http://${this.remoteAddress}/console', false)
+        xmlRequest.send(body.replace('sendLog:', ''))
+    }
+
+    function fetchUpdate() {
+        setTimeout(function() {
+            let xmlRequest = new XMLHttpRequest
+            xmlRequest.open("POST", 'http://${this.remoteAddress}/version', false)
+            xmlRequest.addEventListener("loadend", () => {
+                if (this.closed) {
+                    return
+                }
+                const tag = xmlRequest.responseText
+                if (tag === undefined || tag.length == 0) {
+                    fetchUpdate()
+                    return
+                }
+                if (this.lastTag === undefined) {
+                    this.lastTag = tag
+                    fetchUpdate()
+                }
+                else if (this.lastTag !== tag) {
+                    this.lastTag = tag
+                    postMessage('connect')
+                }
+                else {
+                    fetchUpdate()
+                }
+            })
+            xmlRequest.addEventListener("error", () => {
+                fetchUpdate()
+            })
+            xmlRequest.send()
+        }, 500)
+    }
+
+    `])))
+
     private lastTag: string | undefined = undefined
-    private closed: boolean = false
 
     constructor(readonly remoteAddress: string = window.location.hostname + ":8090") {
         this.addConsoleHandler()
@@ -9,8 +63,8 @@ export class KIMIDebugger {
 
     addConsoleHandler() {
         const debugging = window.location.href.indexOf("#debug") > 0 || window.location.href.indexOf("?debug") > 0
-        const remoteAddress = this.remoteAddress
         if (!debugging) { return }
+        const worker = this.worker
         const methods = ["log", "info", "debug", "error", "warn"]
         const console = window.console as any
         methods.forEach((it) => {
@@ -20,12 +74,15 @@ export class KIMIDebugger {
                 let args = []
                 for (let index = 0; index < arguments.length; index++) {
                     try {
-                        args.push(arguments[index])
+                        if (arguments[index].constructor === undefined || arguments[index].constructor.toString().indexOf("[native code]") >= 0) {
+                            args.push(arguments[index])
+                        }
+                        else {
+                            args.push(String(arguments[index]))
+                        }
                     } catch (error) { }
                 }
-                const xmlRequest = new XMLHttpRequest
-                xmlRequest.open("POST", `http://${remoteAddress}/console`, false)
-                xmlRequest.send(JSON.stringify({
+                worker.postMessage("sendLog:" + JSON.stringify({
                     type: it,
                     values: args
                 }))
@@ -62,35 +119,12 @@ export class KIMIDebugger {
     }
 
     fetchUpdate(callback: () => void) {
-        setTimeout(() => {
-            const xmlRequest = new XMLHttpRequest
-            xmlRequest.open("POST", `http://${this.remoteAddress}/version`, false)
-            xmlRequest.addEventListener("loadend", () => {
-                if (this.closed) {
-                    return
-                }
-                const tag = xmlRequest.responseText
-                if (tag === undefined || tag.length == 0) {
-                    this.fetchUpdate(callback)
-                    return
-                }
-                if (this.lastTag === undefined) {
-                    this.lastTag = tag
-                    this.fetchUpdate(callback)
-                }
-                else if (this.lastTag !== tag) {
-                    this.lastTag = tag
-                    this.connect(callback, () => { })
-                }
-                else {
-                    this.fetchUpdate(callback)
-                }
-            })
-            xmlRequest.addEventListener("error", () => {
-                this.fetchUpdate(callback)
-            })
-            xmlRequest.send()
-        }, 500)
+        this.worker.postMessage("fetchUpdate")
+        this.worker.addEventListener("message", (e) => {
+            if (e.data === "connect") {
+                this.connect(callback, () => { })
+            }
+        })
     }
 
 }

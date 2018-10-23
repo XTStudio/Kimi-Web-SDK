@@ -53,6 +53,7 @@ export class UIImageView extends UIView {
             value.imageElement.style.position = "absolute"
             value.imageElement.style.width = "100%"
             value.imageElement.style.height = "100%"
+            value.imageElement.style.borderRadius = this.domElement.style.borderRadius
             this.contentElement.appendChild(value.imageElement)
             this.resetContentObjectFit()
             if (this.duringSetImageWithAnimation) {
@@ -83,12 +84,14 @@ export class UIImageView extends UIView {
     }
 
     private currentURLString: string | undefined = undefined
+    private loadImageHandler: any = undefined
 
     public loadImageWithURLString(URLString?: string, placeholder?: UIImage): void {
         this.image = placeholder ? placeholder.clone() : undefined
         this.currentURLString = URLString
+        clearTimeout(this.loadImageHandler)
         if (URLString) {
-            setTimeout(() => {
+            this.loadImageHandler = setTimeout(() => {
                 if (this.currentURLString === URLString) {
                     const image = UIImage.fromURL(URLString)
                     const startTime = currentAnimationTimeMillis()
@@ -106,7 +109,7 @@ export class UIImageView extends UIView {
                         }
                     })
                 }
-            })
+            }, 150)
         }
     }
 

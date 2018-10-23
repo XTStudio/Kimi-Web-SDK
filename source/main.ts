@@ -200,7 +200,7 @@ import { Timer } from "./foundation/Timer";
 global.Timer = Timer
 
 import { URL } from "./foundation/URL";
-if (global.URL.toString() === "function URL() { [native code] }") {
+if (global.URL.toString().indexOf('[native code]') >= 0) {
     global.URL.URLWithString = URL.URLWithString
     global.URL.fileURLWithPath = URL.fileURLWithPath
 }
