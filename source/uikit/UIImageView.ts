@@ -109,7 +109,7 @@ export class UIImageView extends UIView {
                         }
                     })
                 }
-            }, 150)
+            }, 0)
         }
     }
 

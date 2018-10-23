@@ -181,6 +181,9 @@ global.UIWindow = UIWindow
 import { UIViewController } from "./uikit/UIViewController";
 global.UIViewController = UIViewController
 
+import { UIWebView } from "./uikit/UIWebView";
+global.UIWebView = UIWebView
+
 // Foundation
 
 import { Bundle } from "./foundation/Bundle";

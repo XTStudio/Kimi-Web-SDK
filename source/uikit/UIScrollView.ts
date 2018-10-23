@@ -491,14 +491,14 @@ export class UIScrollView extends UIView {
         this.loopScrollAnimation()
     }
 
-    private loopScrollAnimation(ignoreBoundes: boolean = false) {
+    private loopScrollAnimation(ignoreBounds: boolean = false) {
         const finished = !this.scroller.computeScrollOffset()
         if (!finished) {
             var minY = -this.contentInset.top
             if (this.refreshControl && this.refreshControl.refreshing === true) {
                 minY -= 44.0
             }
-            if (ignoreBoundes === true) {
+            if (ignoreBounds === true && this.contentSize.height !== 0.0) {
                 minY = -Infinity
             }
             this.contentOffset = {
@@ -517,7 +517,7 @@ export class UIScrollView extends UIView {
                 return
             }
             requestAnimationFrame(() => {
-                this.loopScrollAnimation(ignoreBoundes)
+                this.loopScrollAnimation(ignoreBounds)
             })
         }
         else if (this.decelerating) {
