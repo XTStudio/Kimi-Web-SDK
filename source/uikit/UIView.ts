@@ -27,7 +27,7 @@ export class UIView extends EventEmitter {
         this.layer.view = this
     }
 
-    attachToElement(element: HTMLElement, rootViewController: any = undefined) {
+    attachToElement(element: HTMLElement, rootViewController: any = undefined, insets: UIEdgeInsets = UIEdgeInsetsZero) {
         if (element == document.body) {
             document.body.style.width = "100%"
             document.body.style.height = "100%"
@@ -56,13 +56,13 @@ export class UIView extends EventEmitter {
         })()
         element.appendChild(rootWindow.domElement)
         window.addEventListener("resize", () => {
-            this.onResize(element, rootWindow)
+            this.onResize(element, rootWindow, insets)
         })
-        this.onResize(element, rootWindow)
+        this.onResize(element, rootWindow, insets)
     }
 
-    onResize(element: HTMLElement, window: UIWindow) {
-        window.frame = { x: 0, y: 0, width: element.clientWidth, height: element.clientHeight }
+    onResize(element: HTMLElement, window: UIWindow, insets: UIEdgeInsets) {
+        window.frame = { x: insets.left, y: insets.top, width: element.clientWidth - insets.left - insets.right, height: element.clientHeight - insets.top - insets.bottom }
     }
 
     private _layer: CALayer | undefined = undefined

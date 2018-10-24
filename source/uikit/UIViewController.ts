@@ -49,8 +49,8 @@ export class UIViewController extends EventEmitter {
 
     safeAreaInsets: UIEdgeInsets = UIEdgeInsetsZero
 
-    attachToElement(element: HTMLElement) {
-        this.iView.attachToElement(element, this)
+    attachToElement(element: HTMLElement, insets: UIEdgeInsets = UIEdgeInsetsZero) {
+        this.iView.attachToElement(element, this, insets)
     }
 
     loadView() {
