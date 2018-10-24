@@ -38,6 +38,9 @@ export class UIImageView extends UIView {
      * @param {UIImage } value
      */
     public set image(aValue: UIImage | undefined) {
+        if (this._image === aValue) {
+            return
+        }
         let value: UIImage | undefined = aValue
         if (value && value.imageElement.parentElement instanceof HTMLElement) {
             value = value.clone()
@@ -45,9 +48,7 @@ export class UIImageView extends UIView {
         this.currentURLString = undefined
         this._image = value;
         if (!this.duringSetImageWithAnimation || this.duringSetImageAnimating) {
-            this.contentElement.childNodes.forEach(it => {
-                this.contentElement.removeChild(it)
-            })
+            this.contentElement.innerHTML = ''
         }
         if (value) {
             value.imageElement.style.position = "absolute"
@@ -109,7 +110,7 @@ export class UIImageView extends UIView {
                         }
                     })
                 }
-            }, 0)
+            }, 150)
         }
     }
 

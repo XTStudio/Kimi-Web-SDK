@@ -681,10 +681,10 @@ export class UITableViewCell extends UIView {
             this.separatorElement.style.position = "absolute"
             this.separatorElement.style.borderTopStyle = "solid"
             this.separatorElement.style.width = "100%"
-            this.separatorElement.style.borderTopWidth = (1 / devicePixelRatio).toFixed(2) + "px"
+            this.separatorElement.style.borderTopWidth = (1 / devicePixelRatio).toString() + "px"
             this.separatorElement.style.borderTopColor = color.toStyle()
-            this.separatorElement.style.marginLeft = insets.left.toFixed(2) + "px"
-            this.separatorElement.style.marginRight = insets.right.toFixed(2) + "px"
+            this.separatorElement.style.marginLeft = insets.left.toString() + "px"
+            this.separatorElement.style.marginRight = insets.right.toString() + "px"
         }
     }
 
@@ -692,7 +692,7 @@ export class UITableViewCell extends UIView {
         super.layoutSubviews()
         this.selectionView.frame = this.bounds
         this.contentView.frame = this.bounds
-        this.separatorElement.style.marginTop = (this.bounds.height - 1).toFixed(2) + "px"
+        this.separatorElement.style.marginTop = (this.bounds.height - 1).toString() + "px"
     }
 
 }

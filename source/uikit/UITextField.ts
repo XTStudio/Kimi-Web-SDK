@@ -164,7 +164,16 @@ export class UITextField extends UIView {
 
     clearsOnBeginEditing: boolean = false
 
-    editing: boolean = false
+    private _editing: boolean = false
+
+    public get editing(): boolean {
+        return this._editing
+    }
+
+    public set editing(value: boolean) {
+        this._editing = value
+        this.reloadExtraContents()
+    }
 
     private _clearButtonMode: UITextFieldViewMode = UITextFieldViewMode.never
 

@@ -89,7 +89,7 @@ export class TextMeasurer {
                 }
                 const clampLines = Math.min(Math.floor(params.inRect.height / lineHeight), lines)
                 if (clampLines > 0) {
-                    measureSpan.style.setProperty("-webkit-line-clamp", clampLines.toFixed(0))
+                    measureSpan.style.setProperty("-webkit-line-clamp", clampLines.toString())
                 }
             }
             return { x: 0.0, y: 0.0, width: Math.min(params.inRect.width, Math.ceil(measureSpan.offsetWidth + 1)), height: Math.min(params.inRect.height, Math.ceil(measureSpan.offsetHeight)) }

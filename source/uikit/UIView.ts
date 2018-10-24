@@ -65,7 +65,14 @@ export class UIView extends EventEmitter {
         window.frame = { x: 0, y: 0, width: element.clientWidth, height: element.clientHeight }
     }
 
-    readonly layer = new CALayer
+    private _layer: CALayer | undefined = undefined
+
+    public get layer(): CALayer {
+        if (this._layer === undefined) {
+            this._layer = new CALayer()
+        }
+        return this._layer
+    }
 
     private _frame: UIRect = UIRectZero
 
@@ -301,6 +308,7 @@ export class UIView extends EventEmitter {
     }
 
     public set userInteractionEnabled(value: boolean) {
+        if (this._userInteractionEnabled === value) { return }
         this._userInteractionEnabled = value;
         this.domElement.style.pointerEvents = value ? "auto" : "none"
     }
@@ -639,6 +647,7 @@ export class UIView extends EventEmitter {
     }
 
     public set clipsToBounds(value: boolean) {
+        if (this._clipsToBounds === value) { return }
         this._clipsToBounds = value;
         this.domElement.style.overflow = value ? "hidden" : null
     }
@@ -648,8 +657,9 @@ export class UIView extends EventEmitter {
     }
 
     public set hidden(value: boolean) {
+        if (this._hidden === value) { return }
         this._hidden = value;
-        this.domElement.style.visibility = value ? 'hidden' : 'inherit'
+        this.domElement.style.display = value ? 'none' : null
     }
 
     public get opaque(): boolean {

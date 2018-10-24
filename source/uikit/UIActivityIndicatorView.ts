@@ -12,17 +12,17 @@ export class UIActivityIndicatorView extends UIView {
 
     private _largeStyle: boolean = false
 
-	public get largeStyle(): boolean  {
-		return this._largeStyle;
-	}
+    public get largeStyle(): boolean {
+        return this._largeStyle;
+    }
 
-	public set largeStyle(value: boolean ) {
+    public set largeStyle(value: boolean) {
         this._largeStyle = value;
         {
             const size = this.largeStyle ? 88 : 36
             this.frame = { x: this.frame.x, y: this.frame.y, width: size, height: size }
         }
-	}
+    }
 
     constructor() {
         super()
@@ -50,9 +50,7 @@ export class UIActivityIndicatorView extends UIView {
 
     stopAnimating(): void {
         this.animating = false
-        this.contentElement.childNodes.forEach(it => {
-            this.contentElement.removeChild(it)
-        })
+        this.contentElement.innerHTML = ''
     }
 
     layoutSubviews() {

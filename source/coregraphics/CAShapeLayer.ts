@@ -118,7 +118,7 @@ export class CAShapeLayer extends CALayer {
 
     public set lineDashPhase(value: number) {
         this._lineDashPhase = value;
-        this.pathElement.style.strokeDashoffset = value.toFixed(6)
+        this.pathElement.style.strokeDashoffset = value.toString()
     }
 
     private _lineJoin: CAShapeLineJoin = CAShapeLineJoin.miter
@@ -150,7 +150,7 @@ export class CAShapeLayer extends CALayer {
 
     public set lineWidth(value: number) {
         this._lineWidth = value;
-        this.pathElement.style.strokeWidth = value.toFixed(6)
+        this.pathElement.style.strokeWidth = value.toString()
     }
 
     private _miterLimit: number = 10.0
@@ -161,7 +161,7 @@ export class CAShapeLayer extends CALayer {
 
     public set miterLimit(value: number) {
         this._miterLimit = value;
-        this.pathElement.style.strokeMiterlimit = value.toFixed(6)
+        this.pathElement.style.strokeMiterlimit = value.toString()
     }
 
     private _strokeColor: UIColor | undefined = undefined

@@ -201,7 +201,7 @@ export class UILabel extends UIView {
             }
             const clampLines = Math.min(Math.floor(this.bounds.height / lineHeight), lines)
             if (clampLines > 0) {
-                this.textElement.style.setProperty("-webkit-line-clamp", clampLines.toFixed(0))
+                this.textElement.style.setProperty("-webkit-line-clamp", clampLines.toString())
                 this.textElement.style.visibility = null
             }
             else {

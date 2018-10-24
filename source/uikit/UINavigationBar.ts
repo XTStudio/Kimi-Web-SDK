@@ -255,7 +255,7 @@ export class UINavigationBar extends UIView {
         this.barTintColor = UIColor.white
         this.tintColor = UIColor.black
         this.domElement.style.borderBottom = "solid"
-        this.domElement.style.borderBottomWidth = (1.0 / devicePixelRatio).toFixed(2) + "px"
+        this.domElement.style.borderBottomWidth = (1.0 / devicePixelRatio).toString() + "px"
         this.domElement.style.borderBottomColor = new UIColor(0x98 / 255.0, 0x96 / 255.0, 0x9b / 255.0, 0.75).toStyle()
     }
 

@@ -52,7 +52,7 @@ export class UITabBar extends UIView {
         this.barTintColor = UIColor.white
         this.tintColor = UIColor.black
         this.domElement.style.borderTop = "solid"
-        this.domElement.style.borderTopWidth = (1.0 / devicePixelRatio).toFixed(2) + "px"
+        this.domElement.style.borderTopWidth = (1.0 / devicePixelRatio).toString() + "px"
         this.domElement.style.borderTopColor = new UIColor(0x98 / 255.0, 0x96 / 255.0, 0x9b / 255.0, 0.75).toStyle()
     }
 

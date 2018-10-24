@@ -52,7 +52,7 @@ export class CAGradientLayer extends CALayer {
         if (locations === undefined) {
             colors.forEach((it, idx) => {
                 const stop = document.createElementNS("http://www.w3.org/2000/svg", "stop")
-                stop.setAttribute("offset", ((idx / colors.length) * 100).toFixed(0) + "%")
+                stop.setAttribute("offset", ((idx / colors.length) * 100).toString() + "%")
                 stop.setAttribute("stop-color", this.colors[idx].toStyle())
                 this.linearGradientElement.appendChild(stop)
             })
@@ -60,7 +60,7 @@ export class CAGradientLayer extends CALayer {
         else if (colors.length === locations.length) {
             locations.forEach((it, idx) => {
                 const stop = document.createElementNS("http://www.w3.org/2000/svg", "stop")
-                stop.setAttribute("offset", (it * 100).toFixed(0) + "%")
+                stop.setAttribute("offset", (it * 100).toString() + "%")
                 stop.setAttribute("stop-color", this.colors[idx].toStyle())
                 this.linearGradientElement.appendChild(stop)
             })
@@ -75,8 +75,8 @@ export class CAGradientLayer extends CALayer {
 
     public set startPoint(value: UIPoint) {
         this._startPoint = value;
-        this.linearGradientElement.setAttribute("x1", value.x.toFixed(2))
-        this.linearGradientElement.setAttribute("y1", value.y.toFixed(2))
+        this.linearGradientElement.setAttribute("x1", value.x.toString())
+        this.linearGradientElement.setAttribute("y1", value.y.toString())
     }
 
     private _endPoint: UIPoint = { x: 1, y: 0 }
@@ -87,8 +87,8 @@ export class CAGradientLayer extends CALayer {
 
     public set endPoint(value: UIPoint) {
         this._endPoint = value;
-        this.linearGradientElement.setAttribute("x2", value.x.toFixed(2))
-        this.linearGradientElement.setAttribute("y2", value.y.toFixed(2))
+        this.linearGradientElement.setAttribute("x2", value.x.toString())
+        this.linearGradientElement.setAttribute("y2", value.y.toString())
     }
 
 }

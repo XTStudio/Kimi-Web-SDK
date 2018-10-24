@@ -42,12 +42,12 @@ export class CALayer {
             this.createSVGElement()
             if (this._svgElement) {
                 this._svgElement.style.position = "absolute"
-                this._svgElement.setAttribute("transform", `matrix(1.0, 0.0, 0.0, 1.0, ${value.x.toFixed()}, ${value.y.toFixed()})`)
-                this._svgElement.setAttribute("width", value.width.toFixed(2))
-                this._svgElement.setAttribute("height", value.height.toFixed(2))
+                this._svgElement.setAttribute("transform", `matrix(1.0, 0.0, 0.0, 1.0, ${value.x.toString()}, ${value.y.toString()})`)
+                this._svgElement.setAttribute("width", value.width.toString())
+                this._svgElement.setAttribute("height", value.height.toString())
             }
-            this._bgElement.setAttribute("width", value.width.toFixed(2))
-            this._bgElement.setAttribute("height", value.height.toFixed(2))
+            this._bgElement.setAttribute("width", value.width.toString())
+            this._bgElement.setAttribute("height", value.height.toString())
             {
                 this._clipPathElement.appendChild(this._bgElement.cloneNode(true))
             }
@@ -59,8 +59,8 @@ export class CALayer {
                 }
                 this._borderElement.appendChild(borderFillElement)
             }
-            this._contentElement.setAttribute("width", value.width.toFixed(2))
-            this._contentElement.setAttribute("height", value.height.toFixed(2))
+            this._contentElement.setAttribute("width", value.width.toString())
+            this._contentElement.setAttribute("height", value.height.toString())
         }
     }
 
@@ -95,11 +95,11 @@ export class CALayer {
     public set cornerRadius(value: number) {
         this._cornerRadius = value;
         if (this._view) {
-            this._view.domElement.style.borderRadius = value.toFixed(2) + "px"
+            this._view.domElement.style.borderRadius = value.toString() + "px"
         }
         else {
-            this._bgElement.setAttribute("rx", value.toFixed(2))
-            this._bgElement.setAttribute("ry", value.toFixed(2))
+            this._bgElement.setAttribute("rx", value.toString())
+            this._bgElement.setAttribute("ry", value.toString())
         }
     }
 
@@ -140,7 +140,7 @@ export class CALayer {
         else {
             this.createSVGElement()
             if (this.borderWidth > 0 && this.borderColor && this._svgElement) {
-                this._borderElement.style.strokeWidth = this.borderWidth.toFixed(2) + "px"
+                this._borderElement.style.strokeWidth = this.borderWidth.toString() + "px"
                 this._borderElement.style.stroke = this.borderColor.toStyle()
                 this._borderElement.innerHTML = ""
                 const borderFillElement = this._bgElement.cloneNode(true)
@@ -206,8 +206,8 @@ export class CALayer {
             this._svgElement.appendChild(this._bgElement)
             this._svgElement.appendChild(this._contentElement)
             if (this._svgElement) {
-                this._svgElement.setAttribute("width", this.frame.width.toFixed(2))
-                this._svgElement.setAttribute("height", this.frame.height.toFixed(2))
+                this._svgElement.setAttribute("width", this.frame.width.toString())
+                this._svgElement.setAttribute("height", this.frame.height.toString())
             }
             if (this._view.domElement.childElementCount == 0) {
                 this._view.domElement.appendChild(this._svgElement)
@@ -261,8 +261,8 @@ export class CALayer {
             this._view.alpha = value
         }
         else {
-            this._bgElement.style.opacity = value.toFixed(2)
-            this._contentElement.style.opacity = value.toFixed(2)
+            this._bgElement.style.opacity = value.toString()
+            this._contentElement.style.opacity = value.toString()
         }
     }
 

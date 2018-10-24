@@ -16,7 +16,7 @@ export class UIColor {
     }
 
     toStyle(): string {
-        return 'rgba(' + (this.r * 255).toFixed(0) + ', ' + (this.g * 255).toFixed(0) + ', ' + (this.b * 255).toFixed(0) + ', ' + this.a.toString() + ')'
+        return 'rgba(' + (this.r * 255).toString() + ', ' + (this.g * 255).toString() + ', ' + (this.b * 255).toString() + ', ' + this.a.toString() + ')'
     }
 
 }

@@ -12,12 +12,13 @@ export class UIImage extends EventEmitter {
 
     readonly imageElement = document.createElement("img")
 
-    readonly renderingMode: UIImageRenderingMode = UIImageRenderingMode.alwaysOriginal
+    renderingMode: UIImageRenderingMode = UIImageRenderingMode.alwaysOriginal
 
-    constructor(readonly options: { name?: string, base64?: string, data?: Data, renderingMode?: UIImageRenderingMode }) {
+    constructor(readonly options: { name?: string, base64?: string, data?: Data, renderingMode?: UIImageRenderingMode }, cloner: UIImage | undefined = undefined) {
         super()
         if (options.base64) {
             this.imageElement.src = "data:image;base64," + options.base64
+            if (cloner && cloner.loaded) { return }
             this.imageElement.addEventListener("load", () => {
                 const scale = options.name ? UIImage.scaleFromName(options.name) : 1.0
                 this.size = { width: this.imageElement.naturalWidth / scale, height: this.imageElement.naturalHeight / scale }
@@ -28,6 +29,7 @@ export class UIImage extends EventEmitter {
         }
         else if (options.data) {
             this.imageElement.src = "data:image;base64," + options.data.base64EncodedString()
+            if (cloner && cloner.loaded) { return }
             this.imageElement.addEventListener("load", () => {
                 const scale = options.name ? UIImage.scaleFromName(options.name) : 1.0
                 this.size = { width: this.imageElement.naturalWidth / scale, height: this.imageElement.naturalHeight / scale }
@@ -38,6 +40,7 @@ export class UIImage extends EventEmitter {
         }
         else if (options.name) {
             this.imageElement.src = `./assets/images/${options.name}@2x.png`
+            if (cloner && cloner.loaded) { return }
             this.imageElement.addEventListener("load", () => {
                 this.size = { width: this.imageElement.naturalWidth / 2.0, height: this.imageElement.naturalHeight / 2.0 }
                 this.scale = 2.0
@@ -94,8 +97,11 @@ export class UIImage extends EventEmitter {
     scale: number = 1.0
 
     clone(): UIImage {
-        const img = new UIImage(this.options)
+        const img = new UIImage(this.options, this)
         img.size = this.size
+        img.scale = this.scale
+        img.loaded = this.loaded
+        img.renderingMode = this.renderingMode
         return img
     }
 

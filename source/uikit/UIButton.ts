@@ -353,8 +353,8 @@ export class UIButton extends UIView {
         if (this.bounds.width <= 0.0 || this.bounds.height <= 0.0) {
             return
         }
-        const boxWidth = this.bounds.width - this.layer.borderWidth
-        const boxHeight = this.bounds.height - this.layer.borderWidth
+        const boxWidth = this.bounds.width - this.layer.borderWidth * 2
+        const boxHeight = this.bounds.height - this.layer.borderWidth * 2
         if (this.imageView.image) {
             await this.imageView.image.fetchSize()
         }
