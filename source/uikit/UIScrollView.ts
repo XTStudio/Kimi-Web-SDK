@@ -71,7 +71,10 @@ export class UIScrollView extends UIView {
      * @param {UIEdgeInsets } value
      */
     public set contentInset(value: UIEdgeInsets) {
+        const deltaX = value.left - this._contentInset.left
+        const deltaY = value.top - this._contentInset.top
         this._contentInset = value;
+        this.setContentOffset({ x: this.contentOffset.x - deltaX, y: this.contentOffset.y - deltaY }, false)
         this.resetLockedDirection()
     }
 
@@ -674,6 +677,12 @@ export class UIScrollView extends UIView {
 
     private createRefreshEffect(translation: UIPoint): number | undefined {
         if (this.refreshControl && this.refreshControl.enabled && this.contentSize.width <= this.bounds.width) {
+            {
+                const it = this.refreshControl.animationView
+                if (it.frame.y != this.contentInset.top) {
+                    it.frame = { x: it.frame.x, y: this.contentInset.top, width: it.frame.width, height: it.frame.height }
+                }
+            }
             if (this.contentOffset.y - translation.y < -this.contentInset.top) {
                 const progress = Math.max(0.0, Math.min(1.0, (-this.contentInset.top - (this.contentOffset.y - translation.y)) / 88.0))
                 this.refreshControl.animationView.alpha = progress
