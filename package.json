@@ -1,6 +1,6 @@
 {
   "name": "kimi-web-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Kimi helps you build mobile application easier and faster.",
   "main": "index.js",
   "scripts": {
