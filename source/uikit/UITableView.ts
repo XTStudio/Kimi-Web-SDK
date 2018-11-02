@@ -678,6 +678,7 @@ export class UITableViewCell extends UIView {
             this.separatorElement.style.display = "none"
         }
         else {
+            this.separatorElement.style.display = null
             this.separatorElement.style.position = "absolute"
             this.separatorElement.style.borderTopStyle = "solid"
             this.separatorElement.style.width = "100%"
@@ -692,7 +693,7 @@ export class UITableViewCell extends UIView {
         super.layoutSubviews()
         this.selectionView.frame = this.bounds
         this.contentView.frame = this.bounds
-        this.separatorElement.style.marginTop = (this.bounds.height - 1).toString() + "px"
+        this.separatorElement.style.marginTop = (Math.floor((this.bounds.height - 1.0))).toString() + "px"
     }
 
 }

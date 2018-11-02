@@ -17,6 +17,7 @@ export interface TextMeasureParams {
 export class TextMeasurer {
 
     static measureAttributedText(text: UIAttributedString, inSize: UISize): UIRect {
+        if (!(document.body instanceof HTMLBodyElement)) { return UIRectZero }
         if (measureSpan.parentNode === null) {
             measureSpan.style.opacity = "0.0"
             measureSpan.style.position = "absolute"
@@ -43,6 +44,7 @@ export class TextMeasurer {
     }
 
     static measureText(text: string, params: TextMeasureParams): UIRect {
+        if (!(document.body instanceof HTMLBodyElement)) { return UIRectZero }
         if (measureSpan.parentNode === null) {
             measureSpan.style.opacity = "0.0"
             measureSpan.style.position = "absolute"
@@ -70,7 +72,23 @@ export class TextMeasurer {
             measureSpan.style.display = "inline-block";
             measureSpan.style.setProperty("-webkit-line-clamp", null)
             measureSpan.style.whiteSpace = "nowrap";
-            measureSpan.innerText = text;
+            if (navigator.vendor === "Google Inc." && text.indexOf("\n") >= 0) {
+                measureSpan.innerHTML = ""
+                const spans = text.split("\n").map(it => {
+                    const span = document.createElement("span")
+                    span.innerText = it
+                    return span
+                })
+                spans.forEach((it, idx) => {
+                    if (idx > 0) {
+                        measureSpan.appendChild(document.createElement("br"))
+                    }
+                    measureSpan.appendChild(it)
+                })
+            }
+            else {
+                measureSpan.innerText = text;
+            }
             return { x: 0.0, y: 0.0, width: Math.min(params.inRect.width, Math.ceil(measureSpan.offsetWidth + 1)), height: Math.ceil(measureSpan.offsetHeight) }
         }
         else {
@@ -80,7 +98,23 @@ export class TextMeasurer {
             measureSpan.style.display = "-webkit-box";
             measureSpan.style.webkitBoxOrient = "vertical"
             measureSpan.style.maxWidth = params.inRect.width.toString() + "px";
-            measureSpan.innerText = text;
+            if (navigator.vendor === "Google Inc." && text.indexOf("\n") >= 0) {
+                measureSpan.innerHTML = ""
+                const spans = text.split("\n").map(it => {
+                    const span = document.createElement("span")
+                    span.innerText = it
+                    return span
+                })
+                spans.forEach((it, idx) => {
+                    if (idx > 0) {
+                        measureSpan.appendChild(document.createElement("br"))
+                    }
+                    measureSpan.appendChild(it)
+                })
+            }
+            else {
+                measureSpan.innerText = text;
+            }
             {
                 const lines = params.numberOfLines == 0 ? 99999 : params.numberOfLines
                 let lineHeight = 16

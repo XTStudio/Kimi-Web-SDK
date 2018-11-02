@@ -28,6 +28,7 @@ export class UIView extends EventEmitter {
     }
 
     attachToElement(element: HTMLElement, rootViewController: any = undefined, insets: UIEdgeInsets = UIEdgeInsetsZero) {
+        element.innerHTML = ""
         if (element == document.body) {
             document.body.style.width = "100%"
             document.body.style.height = "100%"
@@ -809,6 +810,12 @@ export class UIView extends EventEmitter {
         }
     }
 
+    touchesWheel(delta: UIPoint) {
+        if (this.superview) {
+            this.superview.touchesWheel(delta)
+        }
+    }
+
     intrinsicContentSize(): UISize | undefined {
         return undefined
     }
@@ -834,6 +841,23 @@ export class UIWindow extends UIView {
     private touches: { [key: number]: UITouch } = {}
     private upCount: Map<UIPoint, number> = new Map()
     private upTimestamp: Map<UIPoint, number> = new Map()
+
+    private handleMouseWheel(e: MouseWheelEvent) {
+        let shouldPreventDefault = true
+        const point: UIPoint = { x: e.pageX, y: e.pageY }
+        const deltaPoint: UIPoint = { x: -(e as any).deltaX, y: -(e as any).deltaY }
+        const target = this.hitTest(point)
+        if (target) {
+            if (target instanceof UINativeTouchView) {
+                shouldPreventDefault = false
+                return false
+            }
+            target.touchesWheel(deltaPoint)
+        }
+        if (shouldPreventDefault) {
+            e.preventDefault()
+        }
+    }
 
     private handleTouchStart(e: TouchEvent) {
         const changedTouches = this.standardlizeTouches(e)
@@ -1033,6 +1057,10 @@ export class UIWindow extends UIView {
         })
         this.domElement.addEventListener("mouseup", (e) => {
             this.handleTouchEnd(e as any)
+            this.mouseDowned = false
+        })
+        this.domElement.addEventListener("mousewheel", (e) => {
+            this.handleMouseWheel(e as any)
             this.mouseDowned = false
         })
         this.domElement.addEventListener("touchstart", (e) => {

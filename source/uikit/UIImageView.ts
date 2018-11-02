@@ -5,7 +5,9 @@ import { currentAnimationTimeMillis } from "./helpers/Now";
 import { UISize, UISizeZero } from "./UISize";
 
 const svgFilterRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-document.body.appendChild(svgFilterRoot)
+const templateElement = document.createElement("template")
+document.getElementsByTagName("html")[0].appendChild(templateElement)
+templateElement.appendChild(svgFilterRoot)
 
 export class UIImageView extends UIView {
 

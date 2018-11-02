@@ -81,6 +81,9 @@ export class CALayer {
             this._view.hidden = value
         }
         else {
+            if (this._svgElement) {
+                this._svgElement.style.display = value ? "none" : null
+            }
             this._bgElement.style.display = value ? "none" : null
             this._contentElement.style.display = value ? "none" : null
         }

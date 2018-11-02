@@ -409,6 +409,18 @@ export class UIScrollView extends UIView {
         }
     }
 
+    touchesWheel(delta: UIPoint) {
+        if (!this.userInteractionEnabled || this.hidden || this.alpha <= 0.0 || !this.scrollEnabled) {
+            super.touchesWheel(delta)
+            return
+        }
+        this.contentOffset = {
+            x: Math.max(-this.contentInset.left, Math.min(Math.max(0.0, this.contentSize.width + this.contentInset.right - this.bounds.width), this.contentOffset.x - delta.x)),
+            y: Math.max(-this.contentInset.top, Math.min(Math.max(0.0, this.contentSize.height + this.contentInset.bottom - this.bounds.height), this.contentOffset.y - delta.y))
+        }
+        this.didScroll()
+    }
+
     didScroll() {
         this.emit("didScroll", this)
     }

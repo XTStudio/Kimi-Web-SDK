@@ -40,7 +40,28 @@ export class UILabel extends UIView {
      */
     public set text(value: string | undefined) {
         this._text = value;
-        this.textElement.innerText = typeof value === "string" ? value : ""
+        if (value) {
+            if (navigator.vendor === "Google Inc." && value.indexOf("\n") >= 0) {
+                this.textElement.innerHTML = ""
+                const spans = value.split("\n").map(it => {
+                    const span = document.createElement("span")
+                    span.innerText = it
+                    return span
+                })
+                spans.forEach((it, idx) => {
+                    if (idx > 0) {
+                        this.textElement.appendChild(document.createElement("br"))
+                    }
+                    this.textElement.appendChild(it)
+                })
+            }
+            else {
+                this.textElement.innerText = value
+            }            
+        }
+        else {
+            this.textElement.innerText = ""
+        }
     }
 
     private _attributedText: UIAttributedString | undefined = undefined
@@ -200,7 +221,27 @@ export class UILabel extends UIView {
                 lineHeight = Math.max(this.font.pointSize * 1.5, this.font.pointSize + 12)
             }
             const clampLines = Math.min(Math.floor(this.bounds.height / lineHeight), lines)
-            if (clampLines > 0) {
+            if (clampLines < lines || this.numberOfLines === 0) {
+                let realHeight: number = 0.0
+                if (this.text) {
+                    realHeight = TextMeasurer.measureText(this.text, {
+                        font: this.font || new UIFont(14),
+                        inRect: { x: 0, y: 0, width: this.bounds.width, height: Infinity },
+                    }).height
+                }
+                else if (this.attributedText) {
+                    realHeight = TextMeasurer.measureAttributedText(this.attributedText, { width: this.bounds.width, height: Infinity }).height
+                }
+                if (realHeight <= this.bounds.height) {
+                    this.textElement.style.setProperty("-webkit-line-clamp", null)
+                    this.textElement.style.visibility = null
+                }
+                else {
+                    this.textElement.style.setProperty("-webkit-line-clamp", clampLines.toString())
+                    this.textElement.style.visibility = null
+                }
+            }
+            else if (clampLines > 0) {
                 this.textElement.style.setProperty("-webkit-line-clamp", clampLines.toString())
                 this.textElement.style.visibility = null
             }
