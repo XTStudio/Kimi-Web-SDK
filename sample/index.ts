@@ -27,6 +27,7 @@ class FooViewController extends UIViewController {
                 s.backgroundColor = UIColor.green
             })
         }))
+
         // if (s.viewController) {
         //     s.viewController.view.backgroundColor = UIColor.yellow
         // }

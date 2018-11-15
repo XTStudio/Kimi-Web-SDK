@@ -52,6 +52,18 @@ export class Data {
         return this._arrayBuffer
     }
 
+    json(): any | undefined {
+        const utf8String = this.utf8String()
+        if (utf8String !== undefined) {
+            try {
+                return JSON.parse(utf8String)
+            } catch (error) {
+                return undefined
+            }
+        }
+        return undefined
+    }
+
     utf8String(): string | undefined {
         if (typeof TextDecoder === "function") {
             return new TextDecoder().decode(this._arrayBuffer)
