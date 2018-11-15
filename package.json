@@ -1,6 +1,6 @@
 {
-  "name": "kimi-web-sdk",
-  "version": "0.2.0",
+  "name": "xt-framework",
+  "version": "0.7.0",
   "description": "Kimi helps you build mobile application easier and faster.",
   "main": "index.js",
   "scripts": {
@@ -26,6 +26,6 @@
     "tsify": "^4.0.0",
     "typescript": "^3.0.1",
     "watchify": "^3.11.0",
-    "xtstudio": "git+https://github.com/XTStudio/XTStudio.git"
+    "xt-studio": "git+https://github.com/XTStudio/XTStudio.git"
   }
 }
