@@ -7,6 +7,19 @@ export class URLSession {
 
     static readonly shared: URLSession = new URLSession
 
+    fetch(request: string | URL | URLRequest): Promise<Data> {
+        return new Promise<Data>((resolver, rejector) => {
+            this.dataTask(request, (data, response, error) => {
+                if (error && data !== undefined) {
+                    rejector(error)
+                }
+                else {
+                    resolver(data)
+                }
+            }).resume()
+        })
+    }
+
     dataTask(req: string | URL | URLRequest, complete: (data?: Data, response?: URLResponse, error?: Error) => void): URLSessionTask {
         if (req instanceof URLRequest) {
             return new URLSessionTask(req, complete)

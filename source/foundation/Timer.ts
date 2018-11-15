@@ -3,6 +3,14 @@ export class Timer {
     private handler: any
     private cancelled = false
 
+    static sleep(timeInterval: number): Promise<any> {
+        return new Promise<any>((resolver) => {
+            new Timer(timeInterval, () => {
+                resolver()
+            }, false)
+        })
+    }
+
     constructor(timeInterval: number, block: () => void, readonly repeats: boolean) {
         if (repeats) {
             this.handler = setInterval(() => {

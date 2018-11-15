@@ -16,7 +16,7 @@ class FooViewController extends UIViewController {
 
     aView = new UIView
 
-    viewDidLoad() {
+    async viewDidLoad() {
         super.viewDidLoad()
         const s = new UIView
         s.frame = UIRectMake(44, 44, 88, 88)
@@ -27,11 +27,10 @@ class FooViewController extends UIViewController {
                 s.backgroundColor = UIColor.green
             })
         }))
-        this.view.addSubview(s)
-        if (s.viewController) {
-            s.viewController.view.backgroundColor = UIColor.yellow
-        }
-
+        // if (s.viewController) {
+        //     s.viewController.view.backgroundColor = UIColor.yellow
+        // }
+        
         // this.vv()
         // this.tt()
     }
