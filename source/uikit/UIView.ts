@@ -2,7 +2,7 @@ import { UIRect, UIRectZero, UIRectEqualToRect } from "./UIRect";
 import { UIColor } from "./UIColor";
 import { CALayer } from "../coregraphics/CALayer";
 import { UIPoint, UIPointZero } from "./UIPoint";
-import { UIAffineTransform, UIAffineTransformIdentity, UIAffineTransformIsIdentity, UIAffineTransformEqualTo } from "./UIAffineTransform";
+import { UIAffineTransform, UIAffineTransformIdentity, UIAffineTransformIsIdentity, UIAffineTransformEqualToTransform } from "./UIAffineTransform";
 import { UIViewContentMode } from "./UIEnums";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { EventEmitter } from "../kimi/EventEmitter";
@@ -35,9 +35,11 @@ export class UIView extends EventEmitter {
             document.body.style.overflow = "hidden"
             document.body.style.margin = "0"
             document.addEventListener("contextmenu", (e) => e.preventDefault())
-            document.documentElement.style.userSelect = 'none';
-            document.documentElement.style.webkitUserSelect = 'none';
-            document.documentElement.style.setProperty("webkitTouchCallout", "none");
+            if (document.documentElement) {
+                document.documentElement.style.userSelect = 'none';
+                document.documentElement.style.webkitUserSelect = 'none';
+                document.documentElement.style.setProperty("webkitTouchCallout", "none");
+            }
             document.getElementsByTagName('html')[0].style.height = "100%"
             document.getElementsByTagName('html')[0].style.overflow = "hidden"
         }
@@ -635,7 +637,7 @@ export class UIView extends EventEmitter {
                 return
             }
         }
-        if (UIAffineTransformEqualTo(this._transform, value)) {
+        if (UIAffineTransformEqualToTransform(this._transform, value)) {
             return
         }
         this._transform = value;

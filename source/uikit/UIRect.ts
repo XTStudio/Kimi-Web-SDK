@@ -1,3 +1,5 @@
+import { UIPoint } from "./UIPoint";
+
 export interface UIRect {
     readonly x: number,
     readonly y: number,
@@ -7,8 +9,44 @@ export interface UIRect {
 
 export const UIRectZero = { x: 0, y: 0, width: 0, height: 0 }
 
+export const UIRectMake = function (x: number, y: number, width: number, height: number): UIRect {
+    return { x, y, width, height }
+}
+
 export const UIRectEqualToRect = function (a: UIRect, b: UIRect): boolean {
-    return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height
+    return Math.abs(a.x - b.x) < 0.001 &&
+        Math.abs(a.y - b.y) < 0.001 &&
+        Math.abs(a.width - b.width) < 0.001 &&
+        Math.abs(a.height - b.height) < 0.001
+}
+
+export const UIRectInset = function (rect: UIRect, dx: number, dy: number): UIRect {
+    return {
+        x: rect.x + dx,
+        y: rect.y + dy,
+        width: rect.width - 2 * dx,
+        height: rect.height - 2 * dy,
+    }
+}
+
+export const UIRectOffset = function (rect: UIRect, dx: number, dy: number): UIRect {
+    return {
+        x: rect.x + dx,
+        y: rect.y + dy,
+        width: rect.width,
+        height: rect.height,
+    }
+}
+
+export const UIRectContainsPoint = function (rect: UIRect, point: UIPoint): boolean {
+    return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.x + rect.height
+}
+
+export const UIRectContainsRect = function (rect1: UIRect, rect2: UIRect): boolean {
+    return UIRectContainsPoint(rect1, { x: rect2.x, y: rect2.y }) &&
+        UIRectContainsPoint(rect1, { x: rect2.x + rect2.width, y: rect2.y }) &&
+        UIRectContainsPoint(rect1, { x: rect2.x, y: rect2.y + rect2.height }) &&
+        UIRectContainsPoint(rect1, { x: rect2.x + rect2.width, y: rect2.y + rect2.height })
 }
 
 export const UIRectIntersectsRect = function (a: UIRect, b: UIRect): boolean {
@@ -29,6 +67,6 @@ export const UIRectUnion = function (r1: UIRect, r2: UIRect): UIRect {
     return { x, y, width, height }
 }
 
-export const UIRectIsEmpty = function(rect: UIRect): boolean {
+export const UIRectIsEmpty = function (rect: UIRect): boolean {
     return rect.width == 0.0 || rect.height == 0.0
 }

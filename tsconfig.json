@@ -14,7 +14,7 @@
     "alwaysStrict": true,
     "downlevelIteration": true,
     "types": [
-      "xtstudio"
+      "xt-studio"
     ]
   },
   "files": [

@@ -42,6 +42,39 @@ global.UIStackViewDistribution = UIStackViewDistribution
 global.UIStackViewAlignment = UIStackViewAlignment
 global.UIStatusBarStyle = UIStatusBarStyle
 
+// Interface Helpers
+global.UIRectZero = UIRectZero
+global.UIRectMake = UIRectMake
+global.UIRectEqualToRect = UIRectEqualToRect
+global.UIRectInset = UIRectInset
+global.UIRectOffset = UIRectOffset
+global.UIRectContainsPoint = UIRectContainsPoint
+global.UIRectContainsRect = UIRectContainsRect
+global.UIRectIntersectsRect = UIRectIntersectsRect
+global.UIPointZero = UIPointZero
+global.UIPointMake = UIPointMake
+global.UIPointEqualToPoint = UIPointEqualToPoint
+global.UISizeZero = UISizeZero
+global.UISizeMake = UISizeMake
+global.UISizeEqualToSize = UISizeEqualToSize
+global.UIAffineTransformIdentity = UIAffineTransformIdentity
+global.UIAffineTransformMake = UIAffineTransformMake
+global.UIAffineTransformMakeTranslation = UIAffineTransformMakeTranslation
+global.UIAffineTransformMakeScale = UIAffineTransformMakeScale
+global.UIAffineTransformMakeRotation = UIAffineTransformMakeRotation
+global.UIAffineTransformIsIdentity = UIAffineTransformIsIdentity
+global.UIAffineTransformTranslate = UIAffineTransformTranslate
+global.UIAffineTransformScale = UIAffineTransformScale
+global.UIAffineTransformRotate = UIAffineTransformRotate
+global.UIAffineTransformInvert = UIAffineTransformInvert
+global.UIAffineTransformConcat = UIAffineTransformConcat
+global.UIAffineTransformEqualToTransform = UIAffineTransformEqualToTransform
+global.UIEdgeInsetsZero = UIEdgeInsetsZero
+global.UIEdgeInsetsMake = UIEdgeInsetsMake
+global.UIEdgeInsetsInsetRect = UIEdgeInsetsInsetRect
+global.UIEdgeInsetsEqualToEdgeInsets = UIEdgeInsetsEqualToEdgeInsets
+global.UIRangeMake = UIRangeMake
+
 import { UIActionSheet } from "./uikit/UIActionSheet";
 global.UIActionSheet = UIActionSheet
 
@@ -238,4 +271,10 @@ global.KMCore = KMCore
 // Debugger
 
 import { KIMIDebugger } from "./debugger/KIMIDebugger";
+import { UIRectZero, UIRectMake, UIRectEqualToRect, UIRectInset, UIRectOffset, UIRectContainsPoint, UIRectContainsRect, UIRectIntersectsRect } from "./uikit/UIRect";
+import { UIPointZero, UIPointMake, UIPointEqualToPoint } from "./uikit/UIPoint";
+import { UISizeZero, UISizeMake, UISizeEqualToSize } from "./uikit/UISize";
+import { UIAffineTransformIdentity, UIAffineTransformMake, UIAffineTransformMakeTranslation, UIAffineTransformMakeScale, UIAffineTransformMakeRotation, UIAffineTransformIsIdentity, UIAffineTransformTranslate, UIAffineTransformScale, UIAffineTransformRotate, UIAffineTransformInvert, UIAffineTransformConcat, UIAffineTransformEqualToTransform } from "./uikit/UIAffineTransform";
+import { UIEdgeInsetsZero, UIEdgeInsetsMake, UIEdgeInsetsInsetRect, UIEdgeInsetsEqualToEdgeInsets } from "./uikit/UIEdgeInsets";
+import { UIRangeMake } from "./uikit/UIRange";
 global.KIMIDebugger = KIMIDebugger

@@ -1,4 +1,4 @@
-/// <reference path="../node_modules/xtstudio/types/index.d.ts" />
+/// <reference path="../node_modules/xt-studio/types/index.d.ts" />
 
 class BarViewController extends UIViewController {
 

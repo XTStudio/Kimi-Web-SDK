@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/XTStudio/Kimi-Web-SDK.git"
+    "url": "git+https://github.com/XTStudio/xt-framework-web.git"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/XTStudio/Kimi-Web-SDK/issues"
+    "url": "https://github.com/XTStudio/xt-framework-web/issues"
   },
-  "homepage": "https://github.com/XTStudio/Kimi-Web-SDK#readme",
+  "homepage": "https://github.com/XTStudio/xt-framework-web",
   "dependencies": {
     "browserify": "^16.2.2",
     "d3-path": "^1.0.7",
