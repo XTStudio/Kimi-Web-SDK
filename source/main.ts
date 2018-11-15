@@ -43,6 +43,12 @@ global.UIStackViewAlignment = UIStackViewAlignment
 global.UIStatusBarStyle = UIStatusBarStyle
 
 // Interface Helpers
+import { UIRectZero, UIRectMake, UIRectEqualToRect, UIRectInset, UIRectOffset, UIRectContainsPoint, UIRectContainsRect, UIRectIntersectsRect } from "./uikit/UIRect";
+import { UIPointZero, UIPointMake, UIPointEqualToPoint } from "./uikit/UIPoint";
+import { UISizeZero, UISizeMake, UISizeEqualToSize } from "./uikit/UISize";
+import { UIAffineTransformIdentity, UIAffineTransformMake, UIAffineTransformMakeTranslation, UIAffineTransformMakeScale, UIAffineTransformMakeRotation, UIAffineTransformIsIdentity, UIAffineTransformTranslate, UIAffineTransformScale, UIAffineTransformRotate, UIAffineTransformInvert, UIAffineTransformConcat, UIAffineTransformEqualToTransform } from "./uikit/UIAffineTransform";
+import { UIEdgeInsetsZero, UIEdgeInsetsMake, UIEdgeInsetsInsetRect, UIEdgeInsetsEqualToEdgeInsets } from "./uikit/UIEdgeInsets";
+import { UIRangeMake } from "./uikit/UIRange";
 global.UIRectZero = UIRectZero
 global.UIRectMake = UIRectMake
 global.UIRectEqualToRect = UIRectEqualToRect
@@ -271,10 +277,4 @@ global.KMCore = KMCore
 // Debugger
 
 import { KIMIDebugger } from "./debugger/KIMIDebugger";
-import { UIRectZero, UIRectMake, UIRectEqualToRect, UIRectInset, UIRectOffset, UIRectContainsPoint, UIRectContainsRect, UIRectIntersectsRect } from "./uikit/UIRect";
-import { UIPointZero, UIPointMake, UIPointEqualToPoint } from "./uikit/UIPoint";
-import { UISizeZero, UISizeMake, UISizeEqualToSize } from "./uikit/UISize";
-import { UIAffineTransformIdentity, UIAffineTransformMake, UIAffineTransformMakeTranslation, UIAffineTransformMakeScale, UIAffineTransformMakeRotation, UIAffineTransformIsIdentity, UIAffineTransformTranslate, UIAffineTransformScale, UIAffineTransformRotate, UIAffineTransformInvert, UIAffineTransformConcat, UIAffineTransformEqualToTransform } from "./uikit/UIAffineTransform";
-import { UIEdgeInsetsZero, UIEdgeInsetsMake, UIEdgeInsetsInsetRect, UIEdgeInsetsEqualToEdgeInsets } from "./uikit/UIEdgeInsets";
-import { UIRangeMake } from "./uikit/UIRange";
 global.KIMIDebugger = KIMIDebugger

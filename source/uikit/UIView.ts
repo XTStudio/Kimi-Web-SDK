@@ -119,6 +119,16 @@ export class UIView extends EventEmitter {
         return undefined
     }
 
+    public get viewController(): any {
+        if (this.viewDelegate !== undefined) {
+            return this.viewDelegate
+        }
+        else if (this.superview) {
+            return this.superview.viewController
+        }
+        return undefined
+    }
+
     removeFromSuperview() {
         if (this.superview !== undefined) {
             const superview = this.superview

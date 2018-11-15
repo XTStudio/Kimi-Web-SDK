@@ -1,8 +1,8 @@
 {
   "name": "xt-framework",
   "version": "0.7.0",
-  "description": "Kimi helps you build mobile application easier and faster.",
-  "main": "index.js",
+  "description": "XT Framework helps you build mobile application easier and faster.",
+  "main": "build/dist.min.js",
   "scripts": {
     "build": "node complier.js build",
     "watch": "node complier.js watch"
