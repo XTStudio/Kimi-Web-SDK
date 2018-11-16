@@ -702,11 +702,6 @@ export class UIView extends EventEmitter {
 
     static recognizedGesture: any
 
-    // convertPointToView(point: UIPoint, toView: UIView): UIPoint
-    // convertPointFromView(point: UIPoint, toView: UIView): UIPoint
-    // convertRectToView(point: UIRect, toView: UIView): UIRect
-    // convertRectFromView(point: UIRect, toView: UIView): UIRect
-
     convertPointToView(point: UIPoint, toView: UIView): UIPoint {
         const fromPoint = this.convertPointToWindow(point)
         if (!fromPoint) {
