@@ -714,59 +714,65 @@ export class UIView extends EventEmitter {
         if (this.window === undefined) {
             return undefined
         }
-        var matrix = new Matrix()
         var current: UIView | undefined = this
-        var routes: UIView[] = []
+        let currentPoint = { ...point }
         while (current != null) {
             if (current instanceof UIWindow) { break }
-            routes.push(current)
-            current = current.superview
-        }
-        routes.forEach((it) => {
-            matrix.postTranslate(it.frame.x, it.frame.y)
-            if (!UIAffineTransformIsIdentity(it.transform)) {
-                const unmatrix = Matrix.unmatrix(it.transform as Matrix)
+            if (!UIAffineTransformIsIdentity(current.transform)) {
+                const unmatrix = Matrix.unmatrix(current.transform as Matrix)
                 const matrix2 = new Matrix()
-                matrix2.postTranslate(-(it.frame.width / 2.0), -(it.frame.height / 2.0))
-                matrix2.postRotate(unmatrix.degree)
+                matrix2.postTranslate(-(current.frame.width / 2.0), -(current.frame.height / 2.0))
+                matrix2.postRotate(unmatrix.degree / (180.0 / Math.PI))
                 matrix2.postScale(unmatrix.scale.x, unmatrix.scale.y)
                 matrix2.postTranslate(unmatrix.translate.x, unmatrix.translate.y)
-                matrix2.postTranslate((it.frame.width / 2.0), (it.frame.height / 2.0))
-                matrix.concat(matrix2)
+                matrix2.postTranslate((current.frame.width / 2.0), (current.frame.height / 2.0))
+                const newPos = { ...currentPoint }
+                const x = currentPoint.x;
+                const y = currentPoint.y;
+                newPos.x = x * matrix2.a + y * matrix2.c + matrix2.tx;
+                newPos.y = x * matrix2.b + y * matrix2.d + matrix2.ty;
+                currentPoint = { ...newPos }
             }
-        })
-        return { x: point.x * matrix.a + point.x * matrix.c + matrix.tx, y: point.y * matrix.b + point.y * matrix.d + matrix.ty }
+            currentPoint.x += current.frame.x
+            currentPoint.y += current.frame.y
+            current = current.superview
+        }
+        return currentPoint
     }
 
     convertPointFromWindow(point: UIPoint): UIPoint | undefined {
         if (this.window == undefined) {
             return undefined
         }
-        var matrix = new Matrix()
         var current: UIView | undefined = this
         var routes: UIView[] = []
         while (current != undefined) {
             if (current instanceof UIWindow) { break }
-            routes.push(current)
+            routes.unshift(current)
             current = current.superview
         }
+        let currentPoint = { ...point }
         routes.forEach((it) => {
-            matrix.postTranslate(it.frame.x, it.frame.y)
+            currentPoint.x -= it.frame.x
+            currentPoint.y -= it.frame.y
             if (!UIAffineTransformIsIdentity(it.transform)) {
                 const unmatrix = Matrix.unmatrix(it.transform as Matrix)
                 const matrix2 = new Matrix()
                 matrix2.postTranslate(-(it.frame.width / 2.0), -(it.frame.height / 2.0))
-                matrix2.postRotate(unmatrix.degree)
+                matrix2.postRotate(unmatrix.degree / (180.0 / Math.PI))
                 matrix2.postScale(unmatrix.scale.x, unmatrix.scale.y)
                 matrix2.postTranslate(unmatrix.translate.x, unmatrix.translate.y)
                 matrix2.postTranslate((it.frame.width / 2.0), (it.frame.height / 2.0))
-                matrix.preConcat(matrix2)
+                const newPos = { ...currentPoint }
+                const id = 1 / ((matrix2.a * matrix2.d) + (matrix2.c * -matrix2.b));
+                const x = currentPoint.x;
+                const y = currentPoint.y;
+                newPos.x = (matrix2.d * id * x) + (-matrix2.c * id * y) + (((matrix2.ty * matrix2.c) - (matrix2.tx * matrix2.d)) * id);
+                newPos.y = (matrix2.a * id * y) + (-matrix2.b * id * x) + (((-matrix2.ty * matrix2.a) + (matrix2.tx * matrix2.b)) * id);
+                currentPoint = { ...newPos }
             }
         })
-        return {
-            x: (point.x - matrix.tx) / (matrix.a + matrix.b),
-            y: (point.y - matrix.ty) / (matrix.d + matrix.c),
-        }
+        return currentPoint
     }
 
     // Touches

@@ -20,20 +20,22 @@ class FooViewController extends UIViewController {
         super.viewDidLoad()
         const s = new UIView
         s.frame = UIRectMake(44, 44, 88, 88)
-        s.transform = UIAffineTransformMakeRotation(40.0 * Math.PI / 180.0)
+        s.transform = UIAffineTransformMakeRotation(45.0 * Math.PI / 180.0)
         s.backgroundColor = UIColor.hexColor("#ff008000")
         s.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
             UIAnimator.bouncy(10.0, 40.0, () => {
-                s.backgroundColor = UIColor.green
+                s.backgroundColor = UIColor.red
             })
         }))
-
-        // if (s.viewController) {
-        //     s.viewController.view.backgroundColor = UIColor.yellow
-        // }
-        
-        // this.vv()
-        // this.tt()
+        this.view.addSubview(s)
+        const e = new UIView
+        e.frame = UIRectMake(22, 22, 44, 44)
+        e.transform = UIAffineTransformMakeRotation(-45 * Math.PI / 180.0)
+        e.backgroundColor = UIColor.yellow
+        s.addSubview(e)
+        DispatchQueue.main.asyncAfter(2.0, () => {
+            console.log((e as any).convertPointToWindow({ x: 0, y: 0 }))
+        })
     }
 
     vv() {
