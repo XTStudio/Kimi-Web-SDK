@@ -30,11 +30,11 @@ class FooViewController extends UIViewController {
         this.view.addSubview(s)
         const e = new UIView
         e.frame = UIRectMake(22, 22, 44, 44)
-        e.transform = UIAffineTransformMakeRotation(-45 * Math.PI / 180.0)
+        e.transform = UIAffineTransformMakeRotation(45 * Math.PI / 180.0)
         e.backgroundColor = UIColor.yellow
-        s.addSubview(e)
+        this.view.addSubview(e)
         DispatchQueue.main.asyncAfter(2.0, () => {
-            console.log((e as any).convertPointToWindow({ x: 0, y: 0 }))
+            console.log(s.convertPointToView({ x: 44, y: 0 }, e))
         })
     }
 

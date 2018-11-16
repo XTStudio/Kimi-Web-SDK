@@ -702,12 +702,38 @@ export class UIView extends EventEmitter {
 
     static recognizedGesture: any
 
-    convertPointFromView(point: UIPoint, fromView: UIView): UIPoint {
-        const fromPoint = fromView.convertPointToWindow(point)
+    // convertPointToView(point: UIPoint, toView: UIView): UIPoint
+    // convertPointFromView(point: UIPoint, toView: UIView): UIPoint
+    // convertRectToView(point: UIRect, toView: UIView): UIRect
+    // convertRectFromView(point: UIRect, toView: UIView): UIRect
+
+    convertPointToView(point: UIPoint, toView: UIView): UIPoint {
+        const fromPoint = this.convertPointToWindow(point)
         if (!fromPoint) {
             return point
         }
-        return this.convertPointFromWindow(fromPoint) || point
+        return toView.convertPointFromWindow(fromPoint) || point
+    }
+
+    convertPointFromView(point: UIPoint, fromView: UIView): UIPoint {
+        return fromView.convertPointToView(point, this)
+    }
+
+    convertRectToView(rect: UIRect, toView: UIView): UIRect {
+        let lt = this.convertPointToView({ x: rect.x, y: rect.y }, toView)
+        let rt = this.convertPointToView({ x: rect.x + rect.width, y: rect.y }, toView)
+        let lb = this.convertPointToView({ x: rect.x, y: rect.y + rect.height }, toView)
+        let rb = this.convertPointToView({ x: rect.x + rect.width, y: rect.y + rect.height }, toView)
+        return {
+            x: Math.min(lt.x, rt.x, lb.x, rb.x),
+            y: Math.min(lt.y, rt.y, lb.y, rb.y),
+            width: Math.max(lt.x, rt.x, lb.x, rb.x) - Math.min(lt.x, rt.x, lb.x, rb.x),
+            height: Math.max(lt.y, rt.y, lb.y, rb.y) - Math.min(lt.y, rt.y, lb.y, rb.y),
+        }
+    }
+
+    convertRectFromView(rect: UIRect, fromView: UIView): UIRect {
+        return fromView.convertRectToView(rect, this)
     }
 
     convertPointToWindow(point: UIPoint): UIPoint | undefined {
