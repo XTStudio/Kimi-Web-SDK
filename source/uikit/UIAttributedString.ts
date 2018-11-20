@@ -65,12 +65,9 @@ export class UIAttributedString {
         let currentAttributes = ""
         this.charSequences.forEach(it => {
             const attributes = JSON.stringify(it.attributes)
-            if (currentAttributes !== attributes || it.letter === "\n") {
+            if (currentAttributes !== attributes) {
                 if (currentElement.innerText.length > 0) {
                     spanElement.appendChild(currentElement)
-                }
-                if (navigator.vendor === "Google Inc." && it.letter === "\n") {
-                    spanElement.appendChild(document.createElement("br"))
                 }
                 currentElement = document.createElement("span")
                 currentAttributes = attributes

@@ -41,23 +41,7 @@ export class UILabel extends UIView {
     public set text(value: string | undefined) {
         this._text = value;
         if (value) {
-            if (navigator.vendor === "Google Inc." && value.indexOf("\n") >= 0) {
-                this.textElement.innerHTML = ""
-                const spans = value.split("\n").map(it => {
-                    const span = document.createElement("span")
-                    span.innerText = it
-                    return span
-                })
-                spans.forEach((it, idx) => {
-                    if (idx > 0) {
-                        this.textElement.appendChild(document.createElement("br"))
-                    }
-                    this.textElement.appendChild(it)
-                })
-            }
-            else {
-                this.textElement.innerText = value
-            }            
+            this.textElement.innerText = value
         }
         else {
             this.textElement.innerText = ""
