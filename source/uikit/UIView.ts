@@ -27,8 +27,10 @@ export class UIView extends EventEmitter {
         this.layer.view = this
     }
 
-    attachToElement(element: HTMLElement, rootViewController: any = undefined, insets: UIEdgeInsets = UIEdgeInsetsZero) {
-        element.innerHTML = ""
+    attachToElement(element: HTMLElement, rootViewController: any = undefined, insets: UIEdgeInsets = UIEdgeInsetsZero, appending: boolean = false) {
+        if (appending !== true) {
+            element.innerHTML = ""
+        }
         if (element == document.body) {
             document.body.style.width = "100%"
             document.body.style.height = "100%"
@@ -63,6 +65,8 @@ export class UIView extends EventEmitter {
         })
         this.onResize(element, rootWindow, insets)
     }
+
+
 
     onResize(element: HTMLElement, window: UIWindow, insets: UIEdgeInsets) {
         window.frame = { x: insets.left, y: insets.top, width: element.clientWidth - insets.left - insets.right, height: element.clientHeight - insets.top - insets.bottom }

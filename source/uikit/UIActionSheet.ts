@@ -187,7 +187,7 @@ export class UIActionSheet {
         }
         const view = new UIActionSheetController()
         UIActionSheet.currentActionSheet = view
-        view.attachToElement(document.body)
+        view.appendToElement(document.body)
         view.message = this.message
         view.actions = this.actions
         view.show(true)

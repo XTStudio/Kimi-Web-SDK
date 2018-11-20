@@ -53,6 +53,10 @@ export class UIViewController extends EventEmitter {
         this.iView.attachToElement(element, this, insets)
     }
 
+    appendToElement(element: HTMLElement, insets: UIEdgeInsets = UIEdgeInsetsZero) {
+        this.iView.attachToElement(element, this, insets, true)
+    }
+
     loadView() {
         this.view = new UIView
         this.iView.backgroundColor = UIColor.white
