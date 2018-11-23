@@ -374,16 +374,15 @@ export class UITableView extends UIScrollView {
     }
 
     _layoutSectionHeaders() {
-        let lastHeight = 0.0
-        let nextHeight = 0.0
-        this._sections.forEach((sectionRecord) => {
-            nextHeight += sectionRecord.sectionHeight()
-            const footerHeight = sectionRecord.footerView ? sectionRecord.footerView.frame.height : 0.0
-            const boxHeight = nextHeight - footerHeight
-            if (this.contentOffset.y >= lastHeight && this.contentOffset.y <= boxHeight) {
+        this._sections.forEach((sectionRecord, idx) => {
+            const rect = this._rectForSection(idx)
+            const topY = rect.y
+            const bottomY = rect.y + rect.height
+            const boxY = bottomY - sectionRecord.footerHeight
+            if (this.contentOffset.y >= topY && this.contentOffset.y <= boxY) {
                 if (sectionRecord.headerView) {
-                    if (this.contentOffset.y >= boxHeight - sectionRecord.headerView.frame.height) {
-                        sectionRecord.headerView.frame = UIRectMake(0.0, this.contentOffset.y - (this.contentOffset.y - (boxHeight - sectionRecord.headerView.frame.height)), sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
+                    if (this.contentOffset.y >= boxY - sectionRecord.headerView.frame.height) {
+                        sectionRecord.headerView.frame = UIRectMake(0.0, this.contentOffset.y - (this.contentOffset.y - (boxY - sectionRecord.headerView.frame.height)), sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
                     }
                     else {
                         sectionRecord.headerView.frame = UIRectMake(0.0, this.contentOffset.y, sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
@@ -392,24 +391,22 @@ export class UITableView extends UIScrollView {
             }
             else {
                 if (sectionRecord.headerView) {
-                    sectionRecord.headerView.frame = UIRectMake(0.0, lastHeight, sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
+                    sectionRecord.headerView.frame = UIRectMake(0.0, topY, sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
                 }
             }
-            lastHeight += sectionRecord.sectionHeight()
         })
     }
 
     _layoutSectionFooters() {
-        let lastHeight = 0.0
-        let nextHeight = 0.0
-        this._sections.forEach((sectionRecord) => {
-            nextHeight += sectionRecord.sectionHeight()
-            const headerHeight = sectionRecord.headerView ? sectionRecord.headerView.frame.height : 0.0
-            const boxHeight = lastHeight + headerHeight
-            if (this.contentOffset.y + this.bounds.height >= boxHeight && this.contentOffset.y + this.bounds.height <= nextHeight) {
+        this._sections.forEach((sectionRecord, idx) => {
+            const rect = this._rectForSection(idx)
+            const topY = rect.y
+            const bottomY = rect.y + rect.height
+            const boxY = topY + sectionRecord.headerHeight
+            if (this.contentOffset.y + this.bounds.height >= boxY && this.contentOffset.y + this.bounds.height <= bottomY) {
                 if (sectionRecord.footerView) {
-                    if (sectionRecord.footerView.frame.height > this.contentOffset.y + this.bounds.height - boxHeight) {
-                        sectionRecord.footerView.frame = UIRectMake(0.0, (this.contentOffset.y + this.bounds.height - sectionRecord.footerView.frame.height) - ((this.contentOffset.y + this.bounds.height - boxHeight) - sectionRecord.footerView.frame.height), sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
+                    if (sectionRecord.footerView.frame.height > this.contentOffset.y + this.bounds.height - boxY) {
+                        sectionRecord.footerView.frame = UIRectMake(0.0, (this.contentOffset.y + this.bounds.height - sectionRecord.footerView.frame.height) - ((this.contentOffset.y + this.bounds.height - boxY) - sectionRecord.footerView.frame.height), sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
                     }
                     else {
                         sectionRecord.footerView.frame = UIRectMake(0.0, this.contentOffset.y + this.bounds.height - sectionRecord.footerView.frame.height, sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
@@ -418,10 +415,9 @@ export class UITableView extends UIScrollView {
             }
             else {
                 if (sectionRecord.footerView) {
-                    sectionRecord.footerView.frame = UIRectMake(0.0, nextHeight - sectionRecord.footerView.frame.height, sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
+                    sectionRecord.footerView.frame = UIRectMake(0.0, bottomY - sectionRecord.footerView.frame.height, sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
                 }
             }
-            lastHeight += sectionRecord.sectionHeight()
         })
     }
 
