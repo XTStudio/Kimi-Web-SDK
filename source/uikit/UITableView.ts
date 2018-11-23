@@ -3,7 +3,7 @@ import { UIScrollView } from "./UIScrollView";
 import { UIColor } from "./UIColor";
 import { UIEdgeInsets, UIEdgeInsetsZero } from "./UIEdgeInsets";
 import { UIIndexPath } from "./UIIndexPath";
-import { UIRectIntersectsRect, UIRect, UIRectZero } from "./UIRect";
+import { UIRectIntersectsRect, UIRect, UIRectZero, UIRectMake } from "./UIRect";
 import { UIAnimator } from "./UIAnimator";
 import { UIPoint } from "./UIPoint";
 import { UITouch, UITouchPhase } from "./UITouch";
@@ -29,6 +29,8 @@ export class UITableView extends UIScrollView {
             this.addSubview(value)
         }
         this._layoutTableView()
+        this._layoutSectionHeaders()
+        this._layoutSectionFooters()
     }
 
     private _tableFooterView: UIView | undefined = undefined
@@ -47,6 +49,8 @@ export class UITableView extends UIScrollView {
             this.addSubview(value)
         }
         this._layoutTableView()
+        this._layoutSectionHeaders()
+        this._layoutSectionFooters()
     }
 
     separatorColor: UIColor | undefined = new UIColor(0xbc / 255.0, 0xba / 255.0, 0xc1 / 255.0, 0.75)
@@ -82,6 +86,8 @@ export class UITableView extends UIScrollView {
         this._setContentSize()
         this._needsReload = false
         this._layoutTableView()
+        this._layoutSectionHeaders()
+        this._layoutSectionFooters()
     }
 
     selectRow(indexPath: UIIndexPath, animated: boolean) {
@@ -204,11 +210,15 @@ export class UITableView extends UIScrollView {
 
     contentOffsetDidChanged() {
         this._layoutTableView()
+        this._layoutSectionHeaders()
+        this._layoutSectionFooters()
     }
 
     layoutSubviews() {
         super.layoutSubviews()
         this._layoutTableView()
+        this._layoutSectionHeaders()
+        this._layoutSectionFooters()
     }
 
     _updateSectionsCache() {
@@ -332,7 +342,7 @@ export class UITableView extends UIScrollView {
                         cell.frame = rowRect
                         cell.backgroundColor = this.backgroundColor
                         if (cell.superview == undefined) {
-                            this.addSubview(cell)
+                            this.insertSubviewAtIndex(cell, 0)
                         }
                         cell.hidden = false
                         cell.setSeparator(row === numberOfRows - 1, this.separatorColor, this.separatorInset)
@@ -361,6 +371,58 @@ export class UITableView extends UIScrollView {
         if (this.tableFooterView) {
             this.tableFooterView.frame = { x: 0.0, y: tableHeight, width: boundsSize.width, height: this.tableFooterView.frame.height }
         }
+    }
+
+    _layoutSectionHeaders() {
+        let lastHeight = 0.0
+        let nextHeight = 0.0
+        this._sections.forEach((sectionRecord) => {
+            nextHeight += sectionRecord.sectionHeight()
+            const footerHeight = sectionRecord.footerView ? sectionRecord.footerView.frame.height : 0.0
+            const boxHeight = nextHeight - footerHeight
+            if (this.contentOffset.y >= lastHeight && this.contentOffset.y <= boxHeight) {
+                if (sectionRecord.headerView) {
+                    if (this.contentOffset.y >= boxHeight - sectionRecord.headerView.frame.height) {
+                        sectionRecord.headerView.frame = UIRectMake(0.0, this.contentOffset.y - (this.contentOffset.y - (boxHeight - sectionRecord.headerView.frame.height)), sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
+                    }
+                    else {
+                        sectionRecord.headerView.frame = UIRectMake(0.0, this.contentOffset.y, sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
+                    }
+                }
+            }
+            else {
+                if (sectionRecord.headerView) {
+                    sectionRecord.headerView.frame = UIRectMake(0.0, lastHeight, sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
+                }
+            }
+            lastHeight += sectionRecord.sectionHeight()
+        })
+    }
+
+    _layoutSectionFooters() {
+        let lastHeight = 0.0
+        let nextHeight = 0.0
+        this._sections.forEach((sectionRecord) => {
+            nextHeight += sectionRecord.sectionHeight()
+            const headerHeight = sectionRecord.headerView ? sectionRecord.headerView.frame.height : 0.0
+            const boxHeight = lastHeight + headerHeight
+            if (this.contentOffset.y + this.bounds.height >= boxHeight && this.contentOffset.y + this.bounds.height <= nextHeight) {
+                if (sectionRecord.footerView) {
+                    if (sectionRecord.footerView.frame.height > this.contentOffset.y + this.bounds.height - boxHeight) {
+                        sectionRecord.footerView.frame = UIRectMake(0.0, (this.contentOffset.y + this.bounds.height - sectionRecord.footerView.frame.height) - ((this.contentOffset.y + this.bounds.height - boxHeight) - sectionRecord.footerView.frame.height), sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
+                    }
+                    else {
+                        sectionRecord.footerView.frame = UIRectMake(0.0, this.contentOffset.y + this.bounds.height - sectionRecord.footerView.frame.height, sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
+                    }
+                }
+            }
+            else {
+                if (sectionRecord.footerView) {
+                    sectionRecord.footerView.frame = UIRectMake(0.0, nextHeight - sectionRecord.footerView.frame.height, sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
+                }
+            }
+            lastHeight += sectionRecord.sectionHeight()
+        })
     }
 
     _rectForSection(section: number): UIRect {

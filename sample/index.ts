@@ -1,96 +1,139 @@
 /// <reference path="../node_modules/xt-studio/types/index.d.ts" />
 
-class BarViewController extends UIViewController {
-
+const names = [
+    {
+      letter: "A",
+      items: [
+        "Apple Inc.",
+      ],
+    },
+    {
+      letter: "B",
+      items: [
+        "Benji",
+        "Bob",
+      ],
+    },
+    {
+      letter: "D",
+      items: [
+        "Dad",
+      ],
+    },
+    {
+      letter: "G",
+      items: [
+        "Gill",
+        "God B",
+        "Google Inc.",
+      ],
+    },
+    {
+      letter: "J",
+      items: [
+        "Jack",
+        "Jiwa",
+      ],
+    },
+    {
+      letter: "K",
+      items: [
+        "Kate",
+      ],
+    },
+    {
+      letter: "M",
+      items: [
+        "Mary",
+        "Max",
+        "Mother",
+      ],
+    },
+    {
+      letter: "P",
+      items: [
+        "Penny",
+        "Pony",
+      ],
+    },
+    {
+      letter: "S",
+      items: [
+        "Soso",
+        "Son",
+        "Susu",
+      ],
+    },
+  ]
+  
+  class ItemCell extends UITableViewCell {
+    
+    nameLabel = new UILabel
+    
+    constructor(context: any) {
+       super(context)
+       this.contentView.addSubview(this.nameLabel)
+    }
+  
+    layoutSubviews() {
+       super.layoutSubviews()
+       this.nameLabel.frame = {x: 16, y: 0, width: this.bounds.width - 16, height: this.bounds.height}
+    }
+    
+  }
+  
+  class SectionHeaderView extends UIView {
+    
+    titleLabel = new UILabel
+    
+    constructor(title: string) {
+       super()
+       this.backgroundColor = new UIColor(0.9, 0.9, 0.9, 1.0)
+       this.titleLabel.text = title
+       this.addSubview(this.titleLabel)
+    }
+       
+    layoutSubviews() {
+      super.layoutSubviews()
+      this.titleLabel.frame = {x: 16, y: 0, width: this.bounds.width - 16, height: this.bounds.height}
+    }
+    
+  }
+  
+  class MainViewController extends UIViewController {
+  
+    tableView = new UITableView
+    
     viewDidLoad() {
-        super.viewDidLoad()
-        this.view.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
-            this.dismissViewController()
-        }))
-        this.view.backgroundColor = UIColor.green
+      super.viewDidLoad()
+      this.setupTableView()
     }
-
-}
-
-class FooViewController extends UIViewController {
-
-    aView = new UIView
-
-    async viewDidLoad() {
-        super.viewDidLoad()
-        const s = new UIView
-        s.frame = UIRectMake(44, 44, 88, 88)
-        s.transform = UIAffineTransformMakeRotation(45.0 * Math.PI / 180.0)
-        s.backgroundColor = UIColor.hexColor("#ff008000")
-        s.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
-            UIAnimator.bouncy(10.0, 40.0, () => {
-                s.backgroundColor = UIColor.red
-            })
-        }))
-        this.view.addSubview(s)
-        const e = new UIView
-        e.frame = UIRectMake(22, 22, 44, 44)
-        e.transform = UIAffineTransformMakeRotation(45 * Math.PI / 180.0)
-        e.backgroundColor = UIColor.yellow
-        this.view.addSubview(e)
-        DispatchQueue.main.asyncAfter(2.0, () => {
-            console.log(s.convertPointToView({ x: 44, y: 0 }, e))
-        })
+  
+    setupTableView() {
+      this.tableView.layer.borderWidth = 1
+      this.tableView.layer.borderColor = UIColor.black
+      this.tableView.frame = {x: 0, y: 0, width: 200, height: 300}
+      this.tableView.register((context: any) => {
+        return new ItemCell(context)
+      }, "Cell")
+      // setup data source
+      this.tableView.on("numberOfSections", () => names.length)
+      this.tableView.on("numberOfRows", (inSection: number) => names[inSection].items.length)
+      this.tableView.on("heightForRow", () => 44)
+      this.tableView.on("cellForRow", (indexPath: UIIndexPath) => {
+        const cell = this.tableView.dequeueReusableCell("Cell", indexPath) as ItemCell
+        cell.nameLabel.text = names[indexPath.section].items[indexPath.row]
+        return cell
+      })
+      // setup section header
+      this.tableView.on("heightForHeader", () => 22)
+      this.tableView.on("viewForHeader", (inSection: number) => {
+        return new SectionHeaderView(names[inSection].letter)
+      })
+      this.tableView.reloadData()
+      this.view.addSubview(this.tableView)
     }
-
-    vv() {
-        const fooLayer = new CAShapeLayer
-        fooLayer.frame = { x: 44, y: 44, width: 300, height: 300 }
-        const path = new UIBezierPath
-        path.moveTo({ x: 20, y: 20 })
-        path.addLineTo({ x: 80, y: 20 })
-        path.addLineTo({ x: 40, y: 40 })
-        path.addLineTo({ x: 20, y: 40 })
-        path.closePath()
-        // {
-        //     const path2 = new UIBezierPath
-        //     path2.moveTo({ x: 90, y: 90 })
-        //     path2.addLineTo({ x: 100, y: 90 })
-        //     path2.addLineTo({ x: 40, y: 200 })
-        //     path2.addLineTo({ x: 20, y: 200 })
-        //     path2.closePath()
-        //     path.appendPath(path2)
-        // }
-        fooLayer.path = path
-        fooLayer.fillColor = UIColor.clear
-        fooLayer.lineWidth = 6
-        fooLayer.lineJoin = CAShapeLineJoin.round
-        fooLayer.strokeColor = UIColor.red
-        this.view.layer.addSublayer(fooLayer)
-        DispatchQueue.main.asyncAfter(2.0, () => {
-            fooLayer.frame = { x: 44, y: 44, width: 88, height: 200 }
-        })
-    }
-
-    tt() {
-        this.aView.backgroundColor = UIColor.white
-        this.aView.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
-            const alert = new UIActionSheet
-            alert.message = "退出后不会删除任何历史数据，下次登录依然可以使用本帐号。"
-            alert.addDangerAction("退出登录", () => {
-                console.log("vvv")
-            })
-            alert.addCancelAction("取消", () => {
-                console.log("ccc")
-            })
-            alert.show()
-            // this.presentViewController(new BarViewController)
-        }))
-        this.view.addSubview(this.aView)
-    }
-
-    viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        this.aView.frame = this.view.bounds
-    }
-
-}
-
-const fooWindow = new UIWindow
-fooWindow.rootViewController = new FooViewController
-global.fooWindow = fooWindow
+  
+  }
+  
+  global.main = new MainViewController
