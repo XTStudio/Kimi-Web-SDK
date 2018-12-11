@@ -41,7 +41,7 @@ export class UIImageView extends UIView {
      * @param {UIImage } value
      */
     public set image(aValue: UIImage | undefined) {
-        if (this._image === aValue || (this._image && aValue && this._image.imageKey === aValue.imageKey)) {
+        if (this._image === aValue || (this._image && aValue && this._image.imageKey === aValue.imageKey && this._image.renderingMode === aValue.renderingMode)) {
             return
         }
         let value: UIImage | undefined = aValue
@@ -168,6 +168,7 @@ export class UIImageView extends UIView {
             svgFilterRoot.appendChild(filterElement)
             this.filterElement = filterElement
             this.image.imageElement.style.filter = `url(#${filterUUID})`
+            console.log(this.image.imageElement)
         }
     }
 

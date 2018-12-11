@@ -679,6 +679,8 @@ export class UIView extends EventEmitter {
 
     private resetOriginAndTransform() {
         if (UIAffineTransformIsIdentity(this._transform)) {
+            this.domElement.style.left = null
+            this.domElement.style.top = null
             this.domElement.style.transform = `translate(${this.frame.x}px, ${this.frame.y}px)`
         }
         else {
