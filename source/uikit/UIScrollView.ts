@@ -719,6 +719,10 @@ export class UIScrollView extends UIView {
         }
     }
 
+    didMoveToWindow() {
+        this.contentView.setContentOffset(this.contentOffset)
+    }
+
     // RefreshControl
     private _refreshControl: UIRefreshControl | undefined = undefined
 

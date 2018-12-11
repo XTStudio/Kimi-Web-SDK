@@ -193,12 +193,16 @@ export class UIView extends EventEmitter {
             view.removeFromSuperview()
         }
         view.willMoveToSuperview(this)
+        if (this.window) {
+            view.willMoveToWindow(this.window)
+        }
         view.superview = this
         this._subviews.push(view)
         this.domElement.appendChild(view.domElement)
         this.setNeedsDisplay()
         view.didMoveToSuperview()
         this.didAddSubview(view)
+        view.didMoveToWindow()
     }
 
     insertSubviewBelowSubview(view: UIView, belowSubview: UIView): void {
@@ -271,6 +275,12 @@ export class UIView extends EventEmitter {
     willMoveToSuperview(newSuperview: UIView | undefined): void { }
     didMoveToSuperview(): void {
         this.tintColorDidChange()
+    }
+    willMoveToWindow(window: UIWindow | undefined): void {
+        this.subviews.forEach(it => it.willMoveToWindow(window))
+    }
+    didMoveToWindow(): void {
+        this.subviews.forEach(it => it.didMoveToWindow())
     }
 
     private _layoutTimer: any
