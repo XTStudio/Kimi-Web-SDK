@@ -41,7 +41,7 @@ export class UIImageView extends UIView {
      * @param {UIImage } value
      */
     public set image(aValue: UIImage | undefined) {
-        if (this._image === aValue || (this._image && aValue && this._image.imageKey === aValue.imageKey && this._image.renderingMode === aValue.renderingMode)) {
+        if (this._image === aValue || (this._image && aValue && this._image.imageKey !== undefined && this._image.imageKey === aValue.imageKey && this._image.renderingMode === aValue.renderingMode)) {
             return
         }
         let value: UIImage | undefined = aValue

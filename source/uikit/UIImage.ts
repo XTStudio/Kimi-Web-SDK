@@ -13,7 +13,7 @@ const imageQueue: { [key: string]: UIImage[] } = {}
 export class UIImage extends EventEmitter {
 
     readonly imageElement = document.createElement("img")
-    readonly imageKey: string | undefined
+    imageKey: string | undefined
 
     renderingMode: UIImageRenderingMode = UIImageRenderingMode.alwaysOriginal
 
@@ -62,6 +62,7 @@ export class UIImage extends EventEmitter {
     static fromURL(url: string): UIImage {
         const image = new UIImage({})
         image.imageElement.src = url
+        image.imageKey = url
         image.imageElement.addEventListener("load", () => {
             image.size = { width: image.imageElement.naturalWidth, height: image.imageElement.naturalHeight }
             image.loaded = true
