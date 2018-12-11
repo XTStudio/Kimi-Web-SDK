@@ -3,6 +3,7 @@ import { UIImage, UIImageRenderingMode } from "./UIImage";
 import { UIViewContentMode } from "./UIEnums";
 import { currentAnimationTimeMillis } from "./helpers/Now";
 import { UISize, UISizeZero } from "./UISize";
+import { IdelQueue } from "./helpers/IdelQueue";
 
 const svgFilterRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg")
 const templateElement = document.createElement("template")
@@ -40,12 +41,12 @@ export class UIImageView extends UIView {
      * @param {UIImage } value
      */
     public set image(aValue: UIImage | undefined) {
-        if (this._image === aValue) {
+        if (this._image === aValue || (this._image && aValue && this._image.imageKey === aValue.imageKey)) {
             return
         }
         let value: UIImage | undefined = aValue
         if (value && value.imageElement.parentElement instanceof HTMLElement) {
-            value = value.clone()
+            value = value.dequeue()
         }
         this.currentURLString = undefined
         this._image = value;
@@ -80,7 +81,7 @@ export class UIImageView extends UIView {
                         }
                         this.duringSetImageWithAnimation = false
                     }, 250)
-                }, 0)
+                }, 32)
             }
         }
         this.createTintFilter()
@@ -90,29 +91,22 @@ export class UIImageView extends UIView {
     private loadImageHandler: any = undefined
 
     public loadImageWithURLString(URLString?: string, placeholder?: UIImage): void {
-        this.image = placeholder ? placeholder.clone() : undefined
+        this.image = placeholder
         this.currentURLString = URLString
-        clearTimeout(this.loadImageHandler)
+        IdelQueue.shared.cancel(this.loadImageHandler)
         if (URLString) {
-            this.loadImageHandler = setTimeout(() => {
+            this.loadImageHandler = IdelQueue.shared.add(() => {
                 if (this.currentURLString === URLString) {
                     const image = UIImage.fromURL(URLString)
-                    const startTime = currentAnimationTimeMillis()
                     image.fetchSize().then(() => {
                         if (this.currentURLString === URLString) {
-                            const endTime = currentAnimationTimeMillis()
-                            if (endTime - startTime < 1 || this.image === undefined) {
-                                this.image = image
-                            }
-                            else {
-                                this.duringSetImageWithAnimation = true
-                                this.image = image
-                                this.duringSetImageWithAnimation = false
-                            }
+                            this.duringSetImageWithAnimation = true
+                            this.image = image
+                            this.duringSetImageWithAnimation = false
                         }
                     })
                 }
-            }, 150)
+            })
         }
     }
 

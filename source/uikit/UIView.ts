@@ -1,4 +1,4 @@
-import { UIRect, UIRectZero, UIRectEqualToRect } from "./UIRect";
+import { UIRect, UIRectZero, UIRectEqualToRect, UIRectIntersectsRect } from "./UIRect";
 import { UIColor } from "./UIColor";
 import { CALayer } from "../coregraphics/CALayer";
 import { UIPoint, UIPointZero } from "./UIPoint";
@@ -277,10 +277,7 @@ export class UIView extends EventEmitter {
 
     setNeedsLayout(layoutSubviews = false): void {
         if (!layoutSubviews) { return }
-        clearTimeout(this._layoutTimer)
-        this._layoutTimer = setTimeout(() => {
-            this.layoutIfNeeded()
-        }, 0)
+        this.layoutIfNeeded()
     }
 
     layoutIfNeeded(): void {
@@ -392,6 +389,7 @@ export class UIView extends EventEmitter {
             return
         }
         this._alpha = value;
+        this.resetDisplayStyle()
         this.domElement.style.opacity = value.toString()
     }
 
@@ -475,7 +473,12 @@ export class UIView extends EventEmitter {
             return
         }
         this._backgroundColor = value;
-        this.domElement.style.backgroundColor = value ? value.toStyle() : null
+        if (value && value.a <= 0.0) {
+            this.domElement.style.backgroundColor = null
+        }
+        else {
+            this.domElement.style.backgroundColor = value ? value.toStyle() : null
+        }
     }
 
     public get frame(): UIRect {
@@ -541,17 +544,23 @@ export class UIView extends EventEmitter {
             }
         }
         if (UIRectEqualToRect(this._frame, value)) { return }
+        const oldValue = this._frame
         const boundsChanged = this._frame.width != value.width || this._frame.height != value.height
         this._frame = value;
         if (boundsChanged) {
-            this.bounds = { ...value, x: 0, y: 0 }
-            this.layer.frame = { ...this.bounds }
+            this.bounds = { x: 0, y: 0, width: value.width, height: value.height }
+            this.layer.frame = { x: 0, y: 0, width: value.width, height: value.height }
         }
         this.setNeedsLayout(boundsChanged)
-        this.domElement.style.left = value.x.toString() + "px"
-        this.domElement.style.top = value.y.toString() + "px"
-        this.domElement.style.width = value.width.toString() + "px"
-        this.domElement.style.height = value.height.toString() + "px"
+        if (Math.abs(oldValue.x - value.x) > 0.001 || Math.abs(oldValue.y - value.y) > 0.001) {
+            this.resetOriginAndTransform()
+        }
+        if (Math.abs(oldValue.width - value.width) > 0.001) {
+            this.domElement.style.width = value.width.toString() + "px"
+        }
+        if (Math.abs(oldValue.height - value.height) > 0.001) {
+            this.domElement.style.height = value.height.toString() + "px" // 140
+        }
     }
 
     public get center(): UIPoint {
@@ -655,7 +664,18 @@ export class UIView extends EventEmitter {
             return
         }
         this._transform = value;
-        this.domElement.style.transform = 'matrix(' + value.a + ', ' + value.b + ', ' + value.c + ', ' + value.d + ', ' + value.tx + ', ' + value.ty + ')'
+        this.resetOriginAndTransform()
+    }
+
+    private resetOriginAndTransform() {
+        if (UIAffineTransformIsIdentity(this._transform)) {
+            this.domElement.style.transform = `translate(${this.frame.x}px, ${this.frame.y}px)`
+        }
+        else {
+            this.domElement.style.left = this.frame.x + "px"
+            this.domElement.style.top = this.frame.y + "px"
+            this.domElement.style.transform = 'matrix(' + this.transform.a + ', ' + this.transform.b + ', ' + this.transform.c + ', ' + this.transform.d + ', ' + this.transform.tx + ', ' + this.transform.ty + ')'
+        }
         this.domElement.style.webkitTransform = this.domElement.style.transform
     }
 
@@ -676,7 +696,26 @@ export class UIView extends EventEmitter {
     public set hidden(value: boolean) {
         if (this._hidden === value) { return }
         this._hidden = value;
-        this.domElement.style.display = value ? 'none' : null
+        this.resetDisplayStyle()
+    }
+
+    private isRectVisible: boolean = true
+
+    private measureRectVisibility() {
+        if (this.window === undefined) { return }
+        const rect = this.convertRectToView(this.bounds, this.window)
+        const newValue = UIRectIntersectsRect(rect, this.window.bounds)
+        if (this.isRectVisible !== newValue) {
+            this.isRectVisible = newValue
+            this.resetDisplayStyle()
+        }
+        if (newValue) {
+            this.subviews.forEach((it, idx) => it.measureRectVisibility())
+        }
+    }
+
+    private resetDisplayStyle() {
+        this.domElement.style.display = (this.hidden || this.alpha <= 0.0 || !this.isRectVisible) ? 'none' : null
     }
 
     public get opaque(): boolean {
@@ -711,6 +750,9 @@ export class UIView extends EventEmitter {
         if (!fromPoint) {
             return point
         }
+        if (toView instanceof UIWindow) {
+            return fromPoint
+        }
         return toView.convertPointFromWindow(fromPoint) || point
     }
 
@@ -740,8 +782,8 @@ export class UIView extends EventEmitter {
             return undefined
         }
         var current: UIView | undefined = this
-        let currentPoint = { ...point }
-        while (current != null) {
+        let currentPoint = { x: point.x, y: point.y }
+        while (current !== undefined) {
             if (current instanceof UIWindow) { break }
             if (!UIAffineTransformIsIdentity(current.transform)) {
                 const unmatrix = Matrix.unmatrix(current.transform as Matrix)
@@ -751,12 +793,14 @@ export class UIView extends EventEmitter {
                 matrix2.postScale(unmatrix.scale.x, unmatrix.scale.y)
                 matrix2.postTranslate(unmatrix.translate.x, unmatrix.translate.y)
                 matrix2.postTranslate((current.frame.width / 2.0), (current.frame.height / 2.0))
-                const newPos = { ...currentPoint }
                 const x = currentPoint.x;
                 const y = currentPoint.y;
-                newPos.x = x * matrix2.a + y * matrix2.c + matrix2.tx;
-                newPos.y = x * matrix2.b + y * matrix2.d + matrix2.ty;
-                currentPoint = { ...newPos }
+                currentPoint.x = x * matrix2.a + y * matrix2.c + matrix2.tx;
+                currentPoint.y = x * matrix2.b + y * matrix2.d + matrix2.ty;
+            }
+            if (current.superview !== undefined && (current.superview as any).isScrollerView === true) {
+                currentPoint.x += -(current.superview as any).domElement.scrollLeft
+                currentPoint.y += -(current.superview as any).domElement.scrollTop
             }
             currentPoint.x += current.frame.x
             currentPoint.y += current.frame.y
@@ -771,13 +815,17 @@ export class UIView extends EventEmitter {
         }
         var current: UIView | undefined = this
         var routes: UIView[] = []
-        while (current != undefined) {
+        while (current !== undefined) {
             if (current instanceof UIWindow) { break }
             routes.unshift(current)
             current = current.superview
         }
-        let currentPoint = { ...point }
+        let currentPoint = { x: point.x, y: point.y }
         routes.forEach((it) => {
+            if (it.superview !== undefined && (it.superview as any).isScrollerView === true) {
+                currentPoint.x -= -(it.superview as any).domElement.scrollLeft
+                currentPoint.y -= -(it.superview as any).domElement.scrollTop
+            }
             currentPoint.x -= it.frame.x
             currentPoint.y -= it.frame.y
             if (!UIAffineTransformIsIdentity(it.transform)) {
@@ -788,13 +836,11 @@ export class UIView extends EventEmitter {
                 matrix2.postScale(unmatrix.scale.x, unmatrix.scale.y)
                 matrix2.postTranslate(unmatrix.translate.x, unmatrix.translate.y)
                 matrix2.postTranslate((it.frame.width / 2.0), (it.frame.height / 2.0))
-                const newPos = { ...currentPoint }
                 const id = 1 / ((matrix2.a * matrix2.d) + (matrix2.c * -matrix2.b));
                 const x = currentPoint.x;
                 const y = currentPoint.y;
-                newPos.x = (matrix2.d * id * x) + (-matrix2.c * id * y) + (((matrix2.ty * matrix2.c) - (matrix2.tx * matrix2.d)) * id);
-                newPos.y = (matrix2.a * id * y) + (-matrix2.b * id * x) + (((-matrix2.ty * matrix2.a) + (matrix2.tx * matrix2.b)) * id);
-                currentPoint = { ...newPos }
+                currentPoint.x = (matrix2.d * id * x) + (-matrix2.c * id * y) + (((matrix2.ty * matrix2.c) - (matrix2.tx * matrix2.d)) * id);
+                currentPoint.y = (matrix2.a * id * y) + (-matrix2.b * id * x) + (((-matrix2.ty * matrix2.a) + (matrix2.tx * matrix2.b)) * id);
             }
         })
         return currentPoint
@@ -1090,34 +1136,40 @@ export class UIWindow extends UIView {
     private mouseDowned = false
 
     setupTouches() {
-        this.domElement.addEventListener("mousedown", (e) => {
-            this.mouseDowned = true
-            this.handleTouchStart(e as any)
-        })
-        this.domElement.addEventListener("mousemove", (e) => {
-            if (!this.mouseDowned) { return }
-            this.handleTouchMove(e as any)
-        })
-        this.domElement.addEventListener("mouseup", (e) => {
-            this.handleTouchEnd(e as any)
-            this.mouseDowned = false
-        })
-        this.domElement.addEventListener("mousewheel", (e) => {
-            this.handleMouseWheel(e as any)
-            this.mouseDowned = false
-        })
-        this.domElement.addEventListener("touchstart", (e) => {
-            this.handleTouchStart(e)
-        })
-        this.domElement.addEventListener("touchmove", (e) => {
-            this.handleTouchMove(e)
-        })
-        this.domElement.addEventListener("touchend", (e) => {
-            this.handleTouchEnd(e)
-        })
-        this.domElement.addEventListener("touchcancel", (e) => {
-            this.handleTouchCancel(e)
-        })
+        if ("ontouchend" in document) {
+            this.domElement.addEventListener("touchstart", (e) => {
+                this.handleTouchStart(e)
+            })
+            this.domElement.addEventListener("touchmove", (e) => {
+                this.handleTouchMove(e)
+            })
+            this.domElement.addEventListener("touchend", (e) => {
+                this.handleTouchEnd(e)
+            })
+            this.domElement.addEventListener("touchcancel", (e) => {
+                this.handleTouchCancel(e)
+            })
+        }
+        else {
+            this.domElement.addEventListener("mousedown", (e) => {
+                this.mouseDowned = true
+                this.handleTouchStart(e as any)
+            })
+            this.domElement.addEventListener("mousemove", (e) => {
+                if (!this.mouseDowned) { return }
+                this.handleTouchMove(e as any)
+            })
+            this.domElement.addEventListener("mouseup", (e) => {
+                this.handleTouchEnd(e as any)
+                this.mouseDowned = false
+            })
+        }
+        if ("onmousewheel" in document) {
+            this.domElement.addEventListener("mousewheel", (e) => {
+                this.handleMouseWheel(e as any)
+                this.mouseDowned = false
+            })
+        }
     }
 
     private _rootViewController: any | undefined = undefined

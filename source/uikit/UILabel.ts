@@ -39,7 +39,9 @@ export class UILabel extends UIView {
      * @param {string } value
      */
     public set text(value: string | undefined) {
+        if (this._text === value) { return }
         this._text = value;
+        this.cachedSize = undefined
         if (value) {
             this.textElement.innerText = value
         }
@@ -63,7 +65,9 @@ export class UILabel extends UIView {
      * @param {UIAttributedString } value
      */
     public set attributedText(value: UIAttributedString | undefined) {
+        if (this._attributedText === value) { return }
         this._attributedText = value;
+        this.cachedSize = undefined
         if (value) {
             this.textElement.innerText = ""
             const el = value.toHTMLText()
@@ -90,7 +94,9 @@ export class UILabel extends UIView {
      * @param {UIFont } value
      */
     public set font(value: UIFont | undefined) {
+        if (this._font === value) { return }
         this._font = value;
+        this.cachedSize = undefined
         if (value) {
             this.textElement.style.fontSize = value.pointSize.toString() + "px"
             this.textElement.style.fontFamily = typeof value.fontName === "string" ? value.fontName : null;
@@ -119,6 +125,7 @@ export class UILabel extends UIView {
      * @param {UIColor } value
      */
     public set textColor(value: UIColor | undefined) {
+        if (this._textColor === value) { return }
         this._textColor = value;
         if (value) {
             this.textElement.style.color = value.toStyle()
@@ -143,6 +150,7 @@ export class UILabel extends UIView {
      * @param {UITextAlignment } value
      */
     public set textAlignment(value: UITextAlignment) {
+        if (this._textAlignment === value) { return }
         this._textAlignment = value;
         switch (value) {
             case UITextAlignment.left:
@@ -174,6 +182,7 @@ export class UILabel extends UIView {
      * @param {number } value
      */
     public set numberOfLines(value: number) {
+        if (this._numberOfLines === value) { return }
         this._numberOfLines = value;
         if (value === 1) {
             this.textElement.style.overflow = "hidden"
@@ -240,18 +249,27 @@ export class UILabel extends UIView {
         this.resetLineClamp()
     }
 
+    private cachedSize: UISize | undefined = undefined
+
     intrinsicContentSize(): UISize {
-        if (this.attributedText) {
-            return TextMeasurer.measureAttributedText(this.attributedText, { width: Infinity, height: Infinity })
+        if (this.cachedSize !== undefined) {
+            return this.cachedSize
         }
-        if (this.text) {
-            return TextMeasurer.measureText(this.text, {
+        else if (this.attributedText) {
+            this.cachedSize = TextMeasurer.measureAttributedText(this.attributedText, { width: Infinity, height: Infinity })
+            return this.cachedSize
+        }
+        else if (this.text) {
+            this.cachedSize = TextMeasurer.measureText(this.text, {
                 font: this.font || new UIFont(14),
                 inRect: { x: 0, y: 0, width: Infinity, height: Infinity },
                 numberOfLines: this.numberOfLines
             })
+            return this.cachedSize
         }
-        return { width: 0, height: 0 }
+        else {
+            return { width: 0, height: 0 }
+        }
     }
 
 }

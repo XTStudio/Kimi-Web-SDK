@@ -1,5 +1,5 @@
 import { UIView } from "./UIView";
-import { UIEdgeInsets, UIEdgeInsetsZero } from "./UIEdgeInsets";
+import { UIEdgeInsets, UIEdgeInsetsZero, UIEdgeInsetsEqualToEdgeInsets } from "./UIEdgeInsets";
 import { UILabel } from "./UILabel";
 import { UIImageView } from "./UIImageView";
 import { UIFont } from "./UIFont";
@@ -41,6 +41,7 @@ export class UIButton extends UIView {
      * @param {boolean } value
      */
     public set enabled(value: boolean) {
+        if (this._enabled === value) { return }
         this._enabled = value;
         this.reloadContents()
     }
@@ -60,6 +61,7 @@ export class UIButton extends UIView {
      * @param {boolean } value
      */
     public set selected(value: boolean) {
+        if (this._selected === value) { return }
         this._selected = value;
         this.reloadContents()
     }
@@ -79,6 +81,7 @@ export class UIButton extends UIView {
      * @param {boolean } value
      */
     public set highlighted(value: boolean) {
+        if (this._highlighted === value) { return }
         this._highlighted = value;
         this.reloadContents()
     }
@@ -98,6 +101,7 @@ export class UIButton extends UIView {
      * @param {boolean } value
      */
     public set tracking(value: boolean) {
+        if (this._tracking === value) { return }
         this._tracking = value;
         this.reloadContents()
     }
@@ -117,6 +121,7 @@ export class UIButton extends UIView {
      * @param {boolean } value
      */
     public set touchInside(value: boolean) {
+        if (this._touchInside === value) { return }
         this._touchInside = value;
         this.reloadContents()
     }
@@ -136,6 +141,7 @@ export class UIButton extends UIView {
      * @param {UIControlContentVerticalAlignment } value
      */
     public set contentVerticalAlignment(value: UIControlContentVerticalAlignment) {
+        if (this._contentVerticalAlignment === value) { return }
         this._contentVerticalAlignment = value;
         this.reloadContents()
     }
@@ -155,11 +161,13 @@ export class UIButton extends UIView {
      * @param {UIControlContentHorizontalAlignment } value
      */
     public set contentHorizontalAlignment(value: UIControlContentHorizontalAlignment) {
+        if (this._contentHorizontalAlignment === value) { return }
         this._contentHorizontalAlignment = value;
         this.reloadContents()
     }
 
     setTitle(title: string | undefined, state: number) {
+        if (this.statedTitles[state] === title) { return }
         if (title) {
             this.statedTitles[state] = title
         }
@@ -170,6 +178,7 @@ export class UIButton extends UIView {
     }
 
     setTitleColor(color: UIColor | undefined, state: number) {
+        if (this.statedTitleColors[state] === color) { return }
         if (color) {
             this.statedTitleColors[state] = color
         }
@@ -185,6 +194,7 @@ export class UIButton extends UIView {
     }
 
     setImage(image: UIImage | undefined, state: number) {
+        if (this.statedImages[state] === image) { return }
         if (image) {
             this.statedImages[state] = image
         }
@@ -195,6 +205,7 @@ export class UIButton extends UIView {
     }
 
     setAttributedTitle(title: UIAttributedString | undefined, state: number) {
+        if (this.statedAttributedTitles[state] === title) { return }
         if (title) {
             this.statedAttributedTitles[state] = title
         }
@@ -219,6 +230,7 @@ export class UIButton extends UIView {
      * @param {UIEdgeInsets } value
      */
     public set contentEdgeInsets(value: UIEdgeInsets) {
+        if (UIEdgeInsetsEqualToEdgeInsets(this._contentEdgeInsets, value)) { return }
         this._contentEdgeInsets = value;
         this.reloadContents()
     }
@@ -238,6 +250,7 @@ export class UIButton extends UIView {
      * @param {UIEdgeInsets } value
      */
     public set titleEdgeInsets(value: UIEdgeInsets) {
+        if (UIEdgeInsetsEqualToEdgeInsets(this._titleEdgeInsets, value)) { return }
         this._titleEdgeInsets = value;
         this.reloadContents()
     }
@@ -257,6 +270,7 @@ export class UIButton extends UIView {
      * @param {UIEdgeInsets } value
      */
     public set imageEdgeInsets(value: UIEdgeInsets) {
+        if (UIEdgeInsetsEqualToEdgeInsets(this._imageEdgeInsets, value)) { return }
         this._imageEdgeInsets = value;
         this.reloadContents()
     }
@@ -334,6 +348,11 @@ export class UIButton extends UIView {
             this.titleLabel.textColor = this.titleColorForState(this.currentState())
         }
         this.imageView.image = this.imageForState(this.currentState())
+        if (this.imageView.image && !this.imageView.image.loaded) {
+            this.imageView.image.fetchSize().then(() => {
+                this.reloadLayouts()
+            })
+        }
         if (!this.isCustom) {
             UIAnimator.linear(0.10, () => {
                 if (this.highlighted) {
@@ -349,15 +368,12 @@ export class UIButton extends UIView {
         this.reloadLayouts()
     }
 
-    private async reloadLayouts() {
+    private reloadLayouts() {
         if (this.bounds.width <= 0.0 || this.bounds.height <= 0.0) {
             return
         }
         const boxWidth = this.bounds.width - this.layer.borderWidth * 2
         const boxHeight = this.bounds.height - this.layer.borderWidth * 2
-        if (this.imageView.image) {
-            await this.imageView.image.fetchSize()
-        }
         const imageViewSize = this.imageView.intrinsicContentSize() || UISizeZero
         var imgX = 0.0
         var imgY = 0.0

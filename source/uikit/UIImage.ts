@@ -8,9 +8,12 @@ export enum UIImageRenderingMode {
     alwaysTemplate,
 }
 
+const imageQueue: { [key: string]: UIImage[] } = {}
+
 export class UIImage extends EventEmitter {
 
     readonly imageElement = document.createElement("img")
+    readonly imageKey: string | undefined
 
     renderingMode: UIImageRenderingMode = UIImageRenderingMode.alwaysOriginal
 
@@ -18,6 +21,7 @@ export class UIImage extends EventEmitter {
         super()
         if (options.base64) {
             this.imageElement.src = "data:image;base64," + options.base64
+            this.imageKey = options.name
             if (cloner && cloner.loaded) { return }
             this.imageElement.addEventListener("load", () => {
                 const scale = options.name ? UIImage.scaleFromName(options.name) : 1.0
@@ -29,6 +33,7 @@ export class UIImage extends EventEmitter {
         }
         else if (options.data) {
             this.imageElement.src = "data:image;base64," + options.data.base64EncodedString()
+            this.imageKey = options.name
             if (cloner && cloner.loaded) { return }
             this.imageElement.addEventListener("load", () => {
                 const scale = options.name ? UIImage.scaleFromName(options.name) : 1.0
@@ -40,6 +45,7 @@ export class UIImage extends EventEmitter {
         }
         else if (options.name) {
             this.imageElement.src = `./assets/images/${options.name}@2x.png`
+            this.imageKey = options.name
             if (cloner && cloner.loaded) { return }
             this.imageElement.addEventListener("load", () => {
                 this.size = { width: this.imageElement.naturalWidth / 2.0, height: this.imageElement.naturalHeight / 2.0 }
@@ -90,7 +96,7 @@ export class UIImage extends EventEmitter {
         }
     }
 
-    private loaded = false
+    loaded = false
 
     size: UISize = UISizeZero
 
@@ -103,6 +109,24 @@ export class UIImage extends EventEmitter {
         img.loaded = this.loaded
         img.renderingMode = this.renderingMode
         return img
+    }
+
+    dequeue(): UIImage {
+        if (this.imageKey) {
+            if (imageQueue[this.imageKey] === undefined) {
+                imageQueue[this.imageKey] = []
+            }
+            for (let index = 0; index < imageQueue[this.imageKey].length; index++) {
+                const element = imageQueue[this.imageKey][index];
+                if (element.imageElement.parentElement === null) {
+                    return element
+                }
+            }
+            const newNode = this.clone()
+            imageQueue[this.imageKey].push(newNode)
+            return newNode
+        }
+        return this.clone()
     }
 
 }

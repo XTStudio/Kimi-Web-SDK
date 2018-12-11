@@ -740,7 +740,7 @@ export class UITableViewCell extends UIView {
             this.separatorElement.style.position = "absolute"
             this.separatorElement.style.borderTopStyle = "solid"
             this.separatorElement.style.width = "100%"
-            this.separatorElement.style.borderTopWidth = (1 / devicePixelRatio).toString() + "px"
+            this.separatorElement.style.borderTopWidth = "1px"
             this.separatorElement.style.borderTopColor = color.toStyle()
             this.separatorElement.style.marginLeft = insets.left.toString() + "px"
             this.separatorElement.style.marginRight = insets.right.toString() + "px"

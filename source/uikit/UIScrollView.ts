@@ -10,6 +10,26 @@ import { Scroller } from "./helpers/Scroller";
 import { UIColor } from "./UIColor";
 import { UIRefreshControl } from "./UIRefreshControl";
 import { UIFetchMoreControl } from "./UIFetchMoreControl";
+import { IdelQueue } from "./helpers/IdelQueue";
+
+class ScrollerView extends UIView {
+
+    private isScrollerView = true
+    
+    placeholderElement = document.createElement("div")
+
+    constructor() {
+        super()
+        this.domElement.style.overflow = "scroll"
+        this.domElement.style.paddingRight = "44px"
+        this.domElement.style.paddingBottom = "44px"
+        this.placeholderElement.style.position = "absolute"
+        this.placeholderElement.style.width = "44px"
+        this.placeholderElement.style.height = "44px"
+        this.domElement.appendChild(this.placeholderElement)
+    }
+
+}
 
 export class UIScrollView extends UIView {
 
@@ -52,6 +72,8 @@ export class UIScrollView extends UIView {
      */
     public set contentSize(value: UISize) {
         this._contentSize = value;
+        this.contentView.placeholderElement.style.left = (value.width - 1) + "px"
+        this.contentView.placeholderElement.style.top = (value.height - 1) + "px"
         this.resetContentViewFrame()
         this.resetLockedDirection()
     }
@@ -248,7 +270,7 @@ export class UIScrollView extends UIView {
 
     private panGestureRecognizer = new UIPanGestureRecognizer
 
-    private contentView = new UIView
+    private contentView = new ScrollerView
 
     private scroller = new Scroller
 
@@ -345,12 +367,15 @@ export class UIScrollView extends UIView {
     }
 
     private resetContentViewFrame() {
-        this.contentView.frame = {
-            x: -this.contentOffset.x,
-            y: -this.contentOffset.y,
-            width: Math.max(this.bounds.width, this.contentSize.width),
-            height: Math.max(this.bounds.height, this.contentSize.height),
-        }
+        this.contentView.frame = this.bounds
+        this.contentView.domElement.scrollLeft = this.contentOffset.x
+        this.contentView.domElement.scrollTop = this.contentOffset.y
+        // this.contentView.frame = {
+        //     x: -this.contentOffset.x,
+        //     y: -this.contentOffset.y,
+        //     width: Math.max(this.bounds.width, this.contentSize.width),
+        //     height: Math.max(this.bounds.height, this.contentSize.height),
+        // }
     }
 
     private resetLockedDirection() {
@@ -429,6 +454,7 @@ export class UIScrollView extends UIView {
         this.emit("willBeginDragging", this)
         this.tracking = true
         this.dragging = true
+        IdelQueue.shared.markBusy()
     }
 
     willEndDragging(velocity: UIPoint) {
@@ -449,6 +475,7 @@ export class UIScrollView extends UIView {
     didEndDecelerating() {
         this.decelerating = false
         this.emit("didEndDecelerating", this)
+        IdelQueue.shared.markIdel()
     }
 
     didEndScrollingAnimation() {
