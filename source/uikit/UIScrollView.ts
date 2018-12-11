@@ -15,7 +15,7 @@ import { IdelQueue } from "./helpers/IdelQueue";
 class ScrollerView extends UIView {
 
     private isScrollerView = true
-    
+
     placeholderElement = document.createElement("div")
 
     constructor() {
@@ -27,6 +27,41 @@ class ScrollerView extends UIView {
         this.placeholderElement.style.width = "44px"
         this.placeholderElement.style.height = "44px"
         this.domElement.appendChild(this.placeholderElement)
+    }
+
+    private isOverBoundsX = false
+    private isOverBoundsY = false
+
+    setContentOffset(contentOffset: UIPoint) {
+        if (contentOffset.x < 0) {
+            this.domElement.style.left = -contentOffset.x + "px"
+            this.domElement.scrollLeft = contentOffset.x
+            this.isOverBoundsX = true
+        }
+        else {
+            if (this.isOverBoundsX) {
+                this.domElement.style.left = null
+                this.isOverBoundsX = false
+            }
+            this.domElement.scrollLeft = contentOffset.x
+        }
+        if (contentOffset.y < 0) {
+            this.domElement.style.top = -contentOffset.y + "px"
+            this.domElement.scrollTop = contentOffset.y
+            this.isOverBoundsY = true
+        }
+        else {
+            if (this.isOverBoundsY) {
+                this.domElement.style.top = null
+                this.isOverBoundsY = false
+            }
+            this.domElement.scrollTop = contentOffset.y
+        }
+    }
+
+    setContentSizeAndContentInset(contentSize: UISize, contentInset: UIEdgeInsets) {
+        this.placeholderElement.style.left = ((contentSize.width + contentInset.right) - 1) + "px"
+        this.placeholderElement.style.top = ((contentSize.height + contentInset.bottom) - 1) + "px"
     }
 
 }
@@ -49,7 +84,7 @@ export class UIScrollView extends UIView {
      */
     public set contentOffset(value: UIPoint) {
         this._contentOffset = value;
-        this.resetContentViewFrame()
+        this.contentView.setContentOffset(value)
         this.resetScrollIndicators()
         this.contentOffsetDidChanged()
     }
@@ -72,9 +107,7 @@ export class UIScrollView extends UIView {
      */
     public set contentSize(value: UISize) {
         this._contentSize = value;
-        this.contentView.placeholderElement.style.left = (value.width - 1) + "px"
-        this.contentView.placeholderElement.style.top = (value.height - 1) + "px"
-        this.resetContentViewFrame()
+        this.contentView.setContentSizeAndContentInset(this._contentSize, this._contentInset)
         this.resetLockedDirection()
     }
 
@@ -364,18 +397,6 @@ export class UIScrollView extends UIView {
         super.addSubview(this.contentView)
         this.setupScrollIndicators()
         this.clipsToBounds = true
-    }
-
-    private resetContentViewFrame() {
-        this.contentView.frame = this.bounds
-        this.contentView.domElement.scrollLeft = this.contentOffset.x
-        this.contentView.domElement.scrollTop = this.contentOffset.y
-        // this.contentView.frame = {
-        //     x: -this.contentOffset.x,
-        //     y: -this.contentOffset.y,
-        //     width: Math.max(this.bounds.width, this.contentSize.width),
-        //     height: Math.max(this.bounds.height, this.contentSize.height),
-        // }
     }
 
     private resetLockedDirection() {
@@ -691,7 +712,7 @@ export class UIScrollView extends UIView {
 
     layoutSubviews() {
         super.layoutSubviews()
-        this.resetContentViewFrame()
+        this.contentView.frame = this.bounds
         this.resetLockedDirection()
         if (this.refreshControl) {
             this.refreshControl.animationView.frame = { x: 0.0, y: 0.0, width: this.bounds.width, height: 44.0 }
