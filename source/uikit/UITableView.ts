@@ -385,7 +385,7 @@ export class UITableView extends UIScrollView {
                         sectionRecord.headerView.frame = UIRectMake(0.0, this.contentOffset.y - (this.contentOffset.y - (boxY - sectionRecord.headerView.frame.height)), sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
                     }
                     else {
-                        sectionRecord.headerView.frame = UIRectMake(0.0, this.contentOffset.y, sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
+                        sectionRecord.headerView.frame = UIRectMake(0.0, Math.floor(this.contentOffset.y), sectionRecord.headerView.frame.width, sectionRecord.headerView.frame.height)
                     }
                 }
             }
@@ -409,7 +409,7 @@ export class UITableView extends UIScrollView {
                         sectionRecord.footerView.frame = UIRectMake(0.0, (this.contentOffset.y + this.bounds.height - sectionRecord.footerView.frame.height) - ((this.contentOffset.y + this.bounds.height - boxY) - sectionRecord.footerView.frame.height), sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
                     }
                     else {
-                        sectionRecord.footerView.frame = UIRectMake(0.0, this.contentOffset.y + this.bounds.height - sectionRecord.footerView.frame.height, sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
+                        sectionRecord.footerView.frame = UIRectMake(0.0, Math.ceil(this.contentOffset.y + this.bounds.height - sectionRecord.footerView.frame.height), sectionRecord.footerView.frame.width, sectionRecord.footerView.frame.height)
                     }
                 }
             }

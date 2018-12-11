@@ -168,7 +168,6 @@ export class UIImageView extends UIView {
             svgFilterRoot.appendChild(filterElement)
             this.filterElement = filterElement
             this.image.imageElement.style.filter = `url(#${filterUUID})`
-            console.log(this.image.imageElement)
         }
     }
 

@@ -167,7 +167,7 @@ export class UILabel extends UIView {
 
     lineBreakMode: UILineBreakMode = UILineBreakMode.truncatingTail
 
-    private _numberOfLines: number = 1
+    private _numberOfLines: number = -1
 
     /**
      * Getter numberOfLines
