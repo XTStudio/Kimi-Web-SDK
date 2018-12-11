@@ -707,6 +707,11 @@ export class UIView extends EventEmitter {
         if (this._hidden === value) { return }
         this._hidden = value;
         this.resetDisplayStyle()
+        this.visibilityChanged()
+    }
+
+    protected visibilityChanged() {
+        this.subviews.forEach(it => it.visibilityChanged())
     }
 
     private resetDisplayStyle() {

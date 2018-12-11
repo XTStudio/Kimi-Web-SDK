@@ -34,25 +34,25 @@ class ScrollerView extends UIView {
 
     setContentOffset(contentOffset: UIPoint) {
         if (contentOffset.x < 0) {
-            this.domElement.style.left = -contentOffset.x + "px"
+            this.domElement.style.paddingLeft = -contentOffset.x + "px"
             this.domElement.scrollLeft = contentOffset.x
             this.isOverBoundsX = true
         }
         else {
             if (this.isOverBoundsX) {
-                this.domElement.style.left = null
+                this.domElement.style.paddingLeft = null
                 this.isOverBoundsX = false
             }
             this.domElement.scrollLeft = contentOffset.x
         }
         if (contentOffset.y < 0) {
-            this.domElement.style.top = -contentOffset.y + "px"
+            this.domElement.style.paddingTop = -contentOffset.y + "px"
             this.domElement.scrollTop = contentOffset.y
             this.isOverBoundsY = true
         }
         else {
             if (this.isOverBoundsY) {
-                this.domElement.style.top = null
+                this.domElement.style.paddingTop = null
                 this.isOverBoundsY = false
             }
             this.domElement.scrollTop = contentOffset.y
@@ -129,6 +129,7 @@ export class UIScrollView extends UIView {
         const deltaX = value.left - this._contentInset.left
         const deltaY = value.top - this._contentInset.top
         this._contentInset = value;
+        this.contentView.setContentSizeAndContentInset(this._contentSize, this._contentInset)
         this.setContentOffset({ x: this.contentOffset.x - deltaX, y: this.contentOffset.y - deltaY }, false)
         this.resetLockedDirection()
     }
@@ -719,7 +720,13 @@ export class UIScrollView extends UIView {
         }
     }
 
+    visibilityChanged() {
+        super.visibilityChanged()
+        this.contentView.setContentOffset(this.contentOffset)
+    }
+
     didMoveToWindow() {
+        super.didMoveToWindow()
         this.contentView.setContentOffset(this.contentOffset)
     }
 

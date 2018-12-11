@@ -31,7 +31,6 @@ export class UIPageViewController extends UIViewController {
     }
 
     public set currentPage(value: UIViewController | undefined) {
-        if (this._currentPage) { this._currentPage.removeFromParentViewController() }
         this._currentPage = value;
         if (value) {
             if (value.parentViewController != this) {
@@ -122,6 +121,9 @@ export class UIPageViewController extends UIViewController {
     // Implementation
 
     private scrollView = new UIScrollView()
+        .on("didScroll", () => {
+            this.scrollView.subviews.forEach(it => it.hidden = false)
+        })
         .on("didEndDecelerating", () => {
             this.changeContents()
         })
@@ -219,6 +221,7 @@ export class UIPageViewController extends UIViewController {
         currentPage.iView.frame = this.iView.bounds
         this.scrollView.addSubview(currentPage.iView)
         if (beforePage) {
+            this.addChildViewController(beforePage)
             this.scrollView.addSubview(beforePage.iView)
             if (this.isVertical == true) {
                 beforePage.iView.frame = { x: 0.0, y: -this.iView.bounds.height, width: this.iView.bounds.width, height: this.iView.bounds.height }
@@ -228,6 +231,7 @@ export class UIPageViewController extends UIViewController {
             }
         }
         if (afterPage) {
+            this.addChildViewController(afterPage)
             this.scrollView.addSubview(afterPage.iView)
             if (this.isVertical == true) {
                 afterPage.iView.frame = { x: 0.0, y: this.iView.bounds.height, width: this.iView.bounds.width, height: this.iView.bounds.height }
@@ -253,6 +257,13 @@ export class UIPageViewController extends UIViewController {
             }
         }
         this.scrollView.contentOffset = UIPointZero
+        this.childViewControllers.forEach(it => {
+            if (it !== this.currentPage && it !== beforePage && it !== afterPage) {
+                it.iView.removeFromSuperview()
+                it.removeFromParentViewController()
+            }
+            it.iView.hidden = it !== this.currentPage
+        })
     }
 
 }
