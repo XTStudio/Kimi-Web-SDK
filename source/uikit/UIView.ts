@@ -699,23 +699,8 @@ export class UIView extends EventEmitter {
         this.resetDisplayStyle()
     }
 
-    private isRectVisible: boolean = true
-
-    private measureRectVisibility() {
-        if (this.window === undefined) { return }
-        const rect = this.convertRectToView(this.bounds, this.window)
-        const newValue = UIRectIntersectsRect(rect, this.window.bounds)
-        if (this.isRectVisible !== newValue) {
-            this.isRectVisible = newValue
-            this.resetDisplayStyle()
-        }
-        if (newValue) {
-            this.subviews.forEach((it, idx) => it.measureRectVisibility())
-        }
-    }
-
     private resetDisplayStyle() {
-        this.domElement.style.display = (this.hidden || this.alpha <= 0.0 || !this.isRectVisible) ? 'none' : null
+        this.domElement.style.display = (this.hidden || this.alpha <= 0.0) ? 'none' : null
     }
 
     public get opaque(): boolean {
