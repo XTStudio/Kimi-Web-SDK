@@ -11,6 +11,7 @@ import { UITouch, UITouchPhase, VelocityTracker } from "./UITouch";
 import { UIEdgeInsets, UIEdgeInsetsZero } from "./UIEdgeInsets";
 import { UIAnimator, UIAnimation } from "./UIAnimator";
 import { UISize } from "./UISize";
+import { Router } from "./helpers/Router";
 
 export const sharedVelocityTracker = new VelocityTracker
 
@@ -65,8 +66,6 @@ export class UIView extends EventEmitter {
         })
         this.onResize(element, rootWindow, insets)
     }
-
-
 
     onResize(element: HTMLElement, window: UIWindow, insets: UIEdgeInsets) {
         window.frame = { x: insets.left, y: insets.top, width: element.clientWidth - insets.left - insets.right, height: element.clientHeight - insets.top - insets.bottom }
@@ -1198,6 +1197,9 @@ export class UIWindow extends UIView {
         this.presentedViewControllers.push(viewController)
         viewController.window = this
         this.addSubview(viewController.iView)
+        Router.shared.addRoute(viewController, () => {
+            viewController.dismissViewController(false)
+        })
         if (animated) {
             viewController.iView.frame = { x: 0.0, y: this.bounds.height, width: this.bounds.width, height: this.bounds.height }
             UIAnimator.bouncy(0.0, 24.0, () => {
@@ -1239,6 +1241,7 @@ export class UIWindow extends UIView {
             }
             fromViewController.presentingViewController = undefined
             fromViewController.window = undefined
+            Router.shared.popToRoute(toViewController)
             if (animated) {
                 UIAnimator.bouncy(0.0, 24.0, () => {
                     fromViewController.iView.frame = { x: 0.0, y: this.bounds.height, width: this.bounds.width, height: this.bounds.height }

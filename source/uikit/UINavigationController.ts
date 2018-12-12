@@ -5,6 +5,7 @@ import { UIRect } from "./UIRect";
 import { UIView } from "./UIView";
 import { UIAnimator } from "./UIAnimator";
 import { UINavigationBarViewController } from "./UINavigationBarViewController";
+import { Router } from "./helpers/Router";
 
 export class UINavigationController extends UIViewController {
 
@@ -55,6 +56,12 @@ export class UINavigationController extends UIViewController {
                     it.iView.hidden = true
                 })
                 this.beingAnimating = false
+                if (this.childViewControllers.length > 1) {
+                    Router.shared.addRoute(toViewController, () => {
+                        this.popToViewController(fromViewController, false)
+                    })
+                }
+                this.updateBrowserTitle()
             })
             this.navigationBar.pushNavigationItem(toViewController.navigationItem, true)
         }
@@ -70,6 +77,12 @@ export class UINavigationController extends UIViewController {
                 if (it == toViewController) { return }
                 it.iView.hidden = true
             })
+            if (this.childViewControllers.length > 1) {
+                Router.shared.addRoute(toViewController, () => {
+                    this.popToViewController(fromViewController, false)
+                })
+            }
+            this.updateBrowserTitle()
         }
     }
 
@@ -96,6 +109,8 @@ export class UINavigationController extends UIViewController {
                     }
                 }
                 this.beingAnimating = false
+                Router.shared.popToRoute(toViewController)
+                this.updateBrowserTitle()
             })
         }
         else {
@@ -109,6 +124,8 @@ export class UINavigationController extends UIViewController {
                     this.tabBarController.iView.bringSubviewToFront(this.tabBarController.tabBar)
                 }
             }
+            Router.shared.popToRoute(toViewController)
+            this.updateBrowserTitle()
         }
         this.navigationBar.popNavigationItem(animated != false)
         return fromViewController
@@ -143,6 +160,8 @@ export class UINavigationController extends UIViewController {
                     }
                     this.beingAnimating = false
                 }
+                Router.shared.popToRoute(toViewController)
+                this.updateBrowserTitle()
             })
         }
         else {
@@ -156,6 +175,8 @@ export class UINavigationController extends UIViewController {
                     this.tabBarController.iView.bringSubviewToFront(this.tabBarController.tabBar)
                 }
             }
+            Router.shared.popToRoute(toViewController)
+            this.updateBrowserTitle()
         }
         this.navigationBar.popToNavigationItem(toViewController.navigationItem, animated != false)
         return fromViewControllers
@@ -191,6 +212,7 @@ export class UINavigationController extends UIViewController {
                 this.tabBarController.iView.bringSubviewToFront(this.tabBarController.tabBar)
             }
         }
+        this.updateBrowserTitle()
     }
 
     viewWillLayoutSubviews() {
@@ -258,6 +280,14 @@ export class UINavigationController extends UIViewController {
         }, () => {
             complete()
         })
+    }
+
+    private updateBrowserTitle() {
+        if (this.presentedViewController !== undefined) { return }
+        let activeViewController = this.childViewControllers[this.childViewControllers.length - 1]
+        if (activeViewController && activeViewController.title) {
+            document.title = activeViewController.title
+        }
     }
 
     didAddSubview(subview: UIView) {

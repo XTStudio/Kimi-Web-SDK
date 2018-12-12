@@ -4,6 +4,7 @@ import { UIColor } from "./UIColor";
 import { UINavigationItem } from "./UINavigationBar";
 import { UITabBarItem } from "./UITabBarItem";
 import { UIEdgeInsets, UIEdgeInsetsZero } from "./UIEdgeInsets";
+import { Router } from "./helpers/Router";
 
 export class UIViewController extends EventEmitter {
 
@@ -19,6 +20,9 @@ export class UIViewController extends EventEmitter {
         this._title = value;
         this.navigationItem.viewController = this
         this.navigationItem.setNeedsUpdate()
+        if (this.navigationController) {
+            this.navigationController.updateBrowserTitle()
+        }
     }
 
     protected _view: any = undefined
@@ -50,6 +54,8 @@ export class UIViewController extends EventEmitter {
     safeAreaInsets: UIEdgeInsets = UIEdgeInsetsZero
 
     attachToElement(element: HTMLElement, insets: UIEdgeInsets = UIEdgeInsetsZero) {
+        element.setAttribute("xt_key_element", "true")
+        Router.shared.addListenter()
         this.iView.attachToElement(element, this, insets)
     }
 
@@ -93,8 +99,8 @@ export class UIViewController extends EventEmitter {
     presentingViewController: UIViewController | undefined = undefined
 
     presentViewController(viewController: UIViewController, animated: boolean = true, completion: (() => void) | undefined = undefined) {
-        const window = this.window
-        if (window === undefined) { return }
+        const appWindow = this.window
+        if (appWindow === undefined) { return }
         const visibleViewController = this.visibleViewController
         if (visibleViewController === undefined) { return }
         if (visibleViewController.presentedViewController !== undefined || viewController.presentingViewController !== undefined || viewController.parentViewController !== undefined) {
@@ -104,7 +110,7 @@ export class UIViewController extends EventEmitter {
         viewController.viewWillAppear(animated != false)
         viewController.presentingViewController = visibleViewController
         visibleViewController.presentedViewController = viewController
-        window.presentViewController(viewController, animated != false, () => {
+        appWindow.presentViewController(viewController, animated != false, () => {
             completion && completion()
             visibleViewController.viewDidDisappear(animated != false)
             viewController.viewDidAppear(animated != false)
