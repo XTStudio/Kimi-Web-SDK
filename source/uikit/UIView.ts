@@ -568,7 +568,7 @@ export class UIView extends EventEmitter {
             this.domElement.style.width = value.width.toString() + "px"
         }
         if (Math.abs(oldValue.height - value.height) > 0.001) {
-            this.domElement.style.height = value.height.toString() + "px" // 140
+            this.domElement.style.height = value.height.toString() + "px"
         }
     }
 
