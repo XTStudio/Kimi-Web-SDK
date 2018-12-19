@@ -42,7 +42,10 @@ export class UIButton extends UIView {
      */
     public set enabled(value: boolean) {
         if (this._enabled === value) { return }
-        this._enabled = value;
+        this._enabled = value
+        this.gestureRecognizers.forEach(it => {
+            it.enabled = value
+        })
         this.reloadContents()
     }
 
