@@ -31,6 +31,7 @@ export class UIProgressView extends UIView {
             }, undefined)
         }
         else {
+            this.progress = value
             this.layoutIfNeeded()
         }
     }
