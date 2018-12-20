@@ -165,8 +165,6 @@ export class UIAttributedString {
 
 export class UIMutableAttributedString extends UIAttributedString {
 
-    charSequences: Character[] = []
-
     constructor(readonly str: string, readonly attributes: { [key: string]: any }) {
         super(str, attributes)
     }
