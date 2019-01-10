@@ -19,7 +19,7 @@ export class KIMIDebugger {
 
     function sendLog(body) {
         const xmlRequest = new XMLHttpRequest
-        xmlRequest.open("POST", 'http://${this.remoteAddress}/console', false)
+        xmlRequest.open("POST", 'http://${this.remoteAddress}/console', true)
         xmlRequest.send(body.replace('sendLog:', ''))
     }
 
@@ -74,7 +74,12 @@ export class KIMIDebugger {
         methods.forEach((it) => {
             const originMethod = console[it]
             console[it] = function () {
-                originMethod.apply(this, arguments)
+                let originArguments = []
+                for (let index = 0; index < arguments.length; index++) {
+                    if (typeof arguments[index] === "string" && arguments[index].indexOf("<<<") === 0) { continue }
+                    originArguments.push(arguments[index])
+                }
+                originMethod.apply(this, originArguments)
                 let args = []
                 for (let index = 0; index < arguments.length; index++) {
                     try {
