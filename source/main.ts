@@ -223,6 +223,9 @@ global.UIViewController = UIViewController
 import { UIWebView } from "./uikit/UIWebView";
 global.UIWebView = UIWebView
 
+import { UIReload } from "./uikit/UIReload";
+global.UIReload = UIReload
+
 // Foundation
 
 import { Bundle } from "./foundation/Bundle";

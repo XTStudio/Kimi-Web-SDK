@@ -24,7 +24,7 @@ export class KIMIDebugger {
     function fetchUpdate() {
         setTimeout(function() {
             let xmlRequest = new XMLHttpRequest
-            xmlRequest.open("POST", 'http://${this.remoteAddress}/version', false)
+            xmlRequest.open("POST", 'http://${this.remoteAddress}/version', true)
             xmlRequest.addEventListener("loadend", () => {
                 if (this.closed) {
                     return
@@ -40,14 +40,16 @@ export class KIMIDebugger {
                 }
                 else if (this.lastTag !== tag) {
                     this.lastTag = tag
-                    postMessage('connect')
+                    if (this.lastTag.indexOf(".reload") >= 0) {
+                        postMessage('livereload')
+                    }
+                    else {
+                        postMessage('connect')
+                    }
                 }
                 else {
                     fetchUpdate()
                 }
-            })
-            xmlRequest.addEventListener("error", () => {
-                fetchUpdate()
             })
             xmlRequest.send()
         }, 500)
@@ -94,7 +96,7 @@ export class KIMIDebugger {
         const debugging = window.location.href.indexOf("#debug") > 0 || window.location.href.indexOf("?debug") > 0
         if (debugging === true) {
             const xmlRequest = new XMLHttpRequest
-            xmlRequest.open("POST", `http://${this.remoteAddress}/source`, false)
+            xmlRequest.open("POST", `http://${this.remoteAddress}/source`, true)
             xmlRequest.addEventListener("loadend", () => {
                 const script = xmlRequest.responseText
                 try {
@@ -107,9 +109,9 @@ export class KIMIDebugger {
             })
             xmlRequest.addEventListener("error", () => {
                 if (this.lastTag === undefined) {
+                    fallback()
                     return
                 }
-                fallback()
             })
             xmlRequest.send()
         }
@@ -118,13 +120,39 @@ export class KIMIDebugger {
         }
     }
 
+    liveReload(callback: () => void) {
+        const xmlRequest = new XMLHttpRequest
+        xmlRequest.open("POST", `http://${this.remoteAddress}/livereload`, false)
+        xmlRequest.addEventListener("loadend", () => {
+            const script = xmlRequest.responseText
+            try {
+                eval(script)
+            } catch (error) {
+                console.error(error)
+            }
+            this.fetchUpdate(callback)
+        })
+        xmlRequest.addEventListener("error", () => {
+            this.fetchUpdate(callback)
+        })
+        xmlRequest.send()
+    }
+
+    private isAddedWorkerMessageHandler = false
+
     fetchUpdate(callback: () => void) {
         this.worker.postMessage("fetchUpdate")
-        this.worker.addEventListener("message", (e) => {
-            if (e.data === "connect") {
-                this.connect(callback, () => { })
-            }
-        })
+        if (!this.isAddedWorkerMessageHandler) {
+            this.isAddedWorkerMessageHandler = true
+            this.worker.addEventListener("message", (e) => {
+                if (e.data === "livereload") {
+                    this.liveReload(callback)
+                }
+                else if (e.data === "connect") {
+                    this.connect(callback, () => { })
+                }
+            })
+        }
     }
 
 }
