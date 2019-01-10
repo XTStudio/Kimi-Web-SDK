@@ -1,3 +1,5 @@
+import { UIReloader } from "../uikit/UIReload";
+
 export class KIMIDebugger {
 
     private worker = new Worker(window.URL.createObjectURL(new Blob([`
@@ -98,6 +100,8 @@ export class KIMIDebugger {
             const xmlRequest = new XMLHttpRequest
             xmlRequest.open("POST", `http://${this.remoteAddress}/source`, true)
             xmlRequest.addEventListener("loadend", () => {
+                UIReloader.shared.items = {}
+                UIReloader.shared.instances = {}
                 const script = xmlRequest.responseText
                 try {
                     eval(script)
