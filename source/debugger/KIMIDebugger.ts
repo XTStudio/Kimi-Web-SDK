@@ -27,6 +27,7 @@ export class KIMIDebugger {
         setTimeout(function() {
             let xmlRequest = new XMLHttpRequest
             xmlRequest.open("POST", 'http://${this.remoteAddress}/version', true)
+            xmlRequest.setRequestHeader('code-version', this.lastTag)
             xmlRequest.addEventListener("loadend", () => {
                 if (this.closed) {
                     return
