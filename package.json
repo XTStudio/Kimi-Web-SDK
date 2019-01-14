@@ -1,6 +1,6 @@
 {
   "name": "xt-framework",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "XT Framework helps you build mobile application easier and faster.",
   "main": "build/dist.min.js",
   "scripts": {
