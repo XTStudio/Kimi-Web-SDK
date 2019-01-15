@@ -92,7 +92,7 @@ class UIActionSheetController extends UIViewController {
             else if (it.style == UIAlertActionStyle.cancel) {
                 view.setTitleFont(new UIFont(18.0))
             }
-            view.frame = { x: 0.0, y: height, width: 0.0, height: 55.0 }
+            view.frame = { x: 0.0, y: height, width: UIScreen.main.bounds.width, height: 55.0 }
             view.domElement.style.borderBottom = "solid"
             view.domElement.style.borderBottomColor = new UIColor(0.9, 0.9, 0.9, 1.0).toStyle()
             view.domElement.style.borderBottomWidth = (1.0 / devicePixelRatio) + "px"
