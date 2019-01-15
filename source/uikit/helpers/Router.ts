@@ -3,23 +3,27 @@ export class Router {
     static shared = new Router
 
     private routes: { [key: string]: () => void } = {}
+
     private locked = false
 
+    private hashChangeListener = (e: any) => {
+        if (this.locked) {
+            this.locked = false
+            return
+        }
+        const hash = e.oldURL.split("#")[1]
+        if (this.routes[hash] !== undefined) {
+            this.routes[hash]()
+            delete this.routes[hash]
+        }
+    }
+
     addListenter() {
+        this.clear()
         if (!(window.location.hash === "#" || window.location.hash === "")) {
             window.location.hash = ""
         }
-        window.addEventListener("hashchange", (e) => {
-            if (this.locked) {
-                this.locked = false
-                return
-            }
-            const hash = e.oldURL.split("#")[1]
-            if (this.routes[hash] !== undefined) {
-                this.routes[hash]()
-                delete this.routes[hash]
-            }
-        })
+        window.addEventListener("hashchange", this.hashChangeListener)
     }
 
     addRoute(element: any, backface: () => void) {
@@ -34,6 +38,12 @@ export class Router {
         if (element.__hash) {
             window.location.hash = element.__hash
         }
+    }
+
+    clear() {
+        this.routes = {}
+        this.locked = false
+        window.removeEventListener("hashchange", this.hashChangeListener)
     }
 
     private createHash() {

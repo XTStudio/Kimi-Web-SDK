@@ -1,4 +1,5 @@
 import { UIReloader } from "../uikit/UIReload";
+import { Router } from "../uikit/helpers/Router";
 
 export class KIMIDebugger {
 
