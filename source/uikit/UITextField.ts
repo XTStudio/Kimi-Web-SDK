@@ -81,9 +81,9 @@ export class UITextField extends UIView {
             this._oldValue = this.editText.inputElement.value
             this.reloadExtraContents()
         })
-        this.editText.inputElement.addEventListener("keypress", (e) => {
+        this.editText.inputElement.addEventListener("keyup", (e) => {
             if (e.keyCode === 13) {
-                this.emit("shouldReturn", this)
+                this.val("shouldReturn", this)
                 e.preventDefault()
             }
         })

@@ -3,17 +3,21 @@ declare var KIMIDebugger: any;
 
 class Foo extends UIViewController {
 
-  redView = new UIView()
+  textField = new UITextField
 
   viewDidLoad() {
     super.viewDidLoad()
-    this.redView.backgroundColor = UIColor.red
-    this.view.addSubview(this.redView)
+    this.textField.on("shouldReturn", (sender: UITextField) => {
+      sender.blur()
+      return false
+    })
+    this.textField.backgroundColor = UIColor.yellow
+    this.view.addSubview(this.textField)
   }
 
   viewWillLayoutSubviews() {
     super.viewWillLayoutSubviews()
-    this.redView.frame = UIRectMake(44, 44, 88, 88)
+    this.textField.frame = UIRectMake(44, 44, 200, 88)
   }
 
 }

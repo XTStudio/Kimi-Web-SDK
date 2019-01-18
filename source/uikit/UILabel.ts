@@ -189,8 +189,9 @@ export class UILabel extends UIView {
             this.textElement.style.wordWrap = null;
             this.textElement.style.wordBreak = null;
             this.textElement.style.textOverflow = this.lineBreakMode === UILineBreakMode.truncatingTail ? "ellipsis" : null;
-            this.textElement.style.display = "inline-block";
-            this.textElement.style.setProperty("-webkit-line-clamp", null)
+            this.textElement.style.display = "-webkit-box";
+            this.textElement.style.setProperty("-webkit-line-clamp", "1")
+            this.textElement.style.setProperty("-webkit-box-orient", "vertical")
             this.textElement.style.whiteSpace = "nowrap";
             this.textElement.style.visibility = null
         }
