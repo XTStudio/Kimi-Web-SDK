@@ -4,6 +4,21 @@ export class UserDefaults {
 
     constructor(readonly suiteName: string | undefined = undefined) { }
 
+    dump(): { [key: string]: any } {
+        const prefix = `com.xt.${(this.suiteName || "standard")}.`
+        let keys: string[] = []
+        for (const key in localStorage) {
+            if (key.indexOf(prefix) === 0) {
+                keys.push(key)
+            }
+        }
+        let result: { [key: string]: any } = {}
+        keys.forEach(it => {
+            result[it] = localStorage.getItem(it)
+        })
+        return result
+    }
+
     valueForKey(forKey: string): any | undefined {
         const value = localStorage.getItem(this.buildKey(forKey))
         if (value !== undefined && typeof value === "string") {

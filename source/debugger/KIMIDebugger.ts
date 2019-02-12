@@ -1,7 +1,8 @@
 import { UIReloader } from "../uikit/UIReload";
-import { Router } from "../uikit/helpers/Router";
 
 export class KIMIDebugger {
+
+    static shared: KIMIDebugger | undefined
 
     private worker = new Worker(window.URL.createObjectURL(new Blob([`
     onmessage = function(e){
@@ -65,6 +66,7 @@ export class KIMIDebugger {
 
     constructor(readonly remoteAddress: string = window.location.hostname + ":8090") {
         this.addConsoleHandler()
+        KIMIDebugger.shared = this
     }
 
     addConsoleHandler() {
@@ -164,6 +166,13 @@ export class KIMIDebugger {
                 }
             })
         }
+    }
+
+    static uuidv4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     }
 
 }
