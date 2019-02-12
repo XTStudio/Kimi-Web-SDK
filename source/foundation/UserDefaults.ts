@@ -14,7 +14,8 @@ export class UserDefaults {
         }
         let result: { [key: string]: any } = {}
         keys.forEach(it => {
-            result[it] = localStorage.getItem(it)
+            const realKey = it.replace(prefix, '')
+            result[realKey] = this.valueForKey(realKey)
         })
         return result
     }
