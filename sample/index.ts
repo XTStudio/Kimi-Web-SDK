@@ -5,25 +5,35 @@ class Foo extends UIViewController {
 
   viewDidLoad() {
     super.viewDidLoad()
-    let grayView = new UIView
-    grayView.backgroundColor = UIColor.gray
-    grayView.frame = UIRectMake(200, 200, 200, 200)
-    this.view.addSubview(grayView)
-    grayView.layoutController.left(44).bottom(100).apply()
+    let aLabel = new UILabel
+    aLabel.text = "Hello, World! Hello, World! Hello, World! Hello, World! Hello, World! Hello, World! Hello, World! Hello, World! Hello, World!"
+    aLabel.numberOfLines = 0
+    aLabel.font = new UIFont(17)
+    this.view.addSubview(aLabel)
     let yellowView = new UIView
     yellowView.backgroundColor = UIColor.yellow
-    grayView.addSubview(yellowView)
-    yellowView.makeConstraints(it => it.left(0, grayView).top(0, grayView).width(88).height(88))
+    this.view.addSubview(yellowView)
     let redView = new UIView
     redView.backgroundColor = UIColor.red
-    redView.alpha = 0.75
     this.view.addSubview(redView)
-    redView.makeConstraints(it => it.left(0, grayView).top(-100, grayView).width("100%", grayView).height("25%", grayView))
-    redView.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
-      UIAnimator.bouncy(12.0, 40.0, () => {
-        redView.makeConstraints(it => it.left(0, grayView).top(-200, grayView).width("100%", grayView).height("100%", grayView))
-      })
-    }))
+    yellowView.makeConstraints(it => {
+      it.left(20)
+      it.top(20)
+      it.width(44)
+      it.height(44)
+    })
+    aLabel.makeConstraints(it => {
+      it.left(0, yellowView)
+      it.top(20)
+      it.width(-1).maxWidth(frame => frame.width - (20 + 44 + 20))
+      it.height(44)
+    })
+    redView.makeConstraints(it => {
+      it.left(0, aLabel)
+      it.top(20)
+      it.width(20)
+      it.height(44)
+    })
   }
 
 }

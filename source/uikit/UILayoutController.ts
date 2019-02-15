@@ -3,6 +3,7 @@ import { UIView } from "./UIView";
 import { UIRect } from "./UIRect";
 import { UIEdgeInsets } from "./UIEdgeInsets";
 import { UIAnimator } from './UIAnimator';
+import { UISizeZero } from './UISize';
 
 enum LayoutType {
     Left,
@@ -38,6 +39,8 @@ export class UILayoutController {
 
     private layoutItems: LayoutItem[] = []
     private linkedItems: UIView[] = []
+    private maxWidthItem: LayoutItem | undefined
+    private maxHeightItem: LayoutItem | undefined
 
     constructor(readonly owner: UIView) { }
 
@@ -159,7 +162,11 @@ export class UILayoutController {
                         break
                     case LayoutType.Width:
                         {
-                            const newValue = this.calculate(ownerFrame, ownerFrame.width, it.expression)
+                            let newValue = it.expression === -1 ? (target.intrinsicContentSize() || UISizeZero).width : this.calculate(ownerFrame, ownerFrame.width, it.expression)
+                            if (target.layoutController.maxWidthItem !== undefined) {
+                                const maxValue = this.calculate(ownerFrame, ownerFrame.width, target.layoutController.maxWidthItem.expression)
+                                newValue = Math.min(newValue, maxValue)
+                            }
                             if (targetFrame.width !== newValue) {
                                 changed = true
                             }
@@ -168,7 +175,11 @@ export class UILayoutController {
                         break
                     case LayoutType.Height:
                         {
-                            const newValue = this.calculate(ownerFrame, ownerFrame.height, it.expression)
+                            let newValue = it.expression === -1 ? (target.intrinsicContentSize() || UISizeZero).height : this.calculate(ownerFrame, ownerFrame.height, it.expression)
+                            if (target.layoutController.maxHeightItem !== undefined) {
+                                const maxValue = this.calculate(ownerFrame, ownerFrame.height, target.layoutController.maxHeightItem.expression)
+                                newValue = Math.min(newValue, maxValue)
+                            }
                             if (targetFrame.height !== newValue) {
                                 changed = true
                             }
@@ -261,8 +272,28 @@ export class UILayoutController {
         return this
     }
 
+    maxWidth(expression: LayoutExpression): UILayoutController {
+        this.maxWidthItem = {
+            target: this.owner,
+            type: LayoutType.Width,
+            expression,
+            options: {},
+        }
+        return this
+    }
+
     height(expression: LayoutExpression, toView: UIView | undefined = undefined): UILayoutController {
         this.addRelation(toView || this.owner.superview, LayoutType.Height, expression)
+        return this
+    }
+
+    maxHeight(expression: LayoutExpression): UILayoutController {
+        this.maxHeightItem = {
+            target: this.owner,
+            type: LayoutType.Height,
+            expression,
+            options: {},
+        }
         return this
     }
 
