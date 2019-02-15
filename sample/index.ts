@@ -5,10 +5,10 @@ class Foo extends UIViewController {
 
   viewDidLoad() {
     super.viewDidLoad()
-    let aLabel = new UILabel
-    aLabel.text = "Hello, World! Hello, World! Hello, World! Hello, World! Hello, World! Hello, World! Hello, World! Hello, World! Hello, World!"
-    aLabel.numberOfLines = 0
-    aLabel.font = new UIFont(17)
+    let aLabel = new UIImageView
+    // aLabel.text = "Hello, World! Hello, World! Hello, World! Hello, World! "
+    // aLabel.numberOfLines = 0
+    // aLabel.font = new UIFont(17)
     this.view.addSubview(aLabel)
     let yellowView = new UIView
     yellowView.backgroundColor = UIColor.yellow
@@ -23,17 +23,20 @@ class Foo extends UIViewController {
       it.height(44)
     })
     aLabel.makeConstraints(it => {
-      it.left(0, yellowView)
+      it.left(8, yellowView)
       it.top(20)
       it.width(-1).maxWidth(frame => frame.width - (20 + 44 + 20))
-      it.height(44)
+      it.height(-1)
     })
     redView.makeConstraints(it => {
-      it.left(0, aLabel)
-      it.top(20)
+      it.left(0, aLabel, UILayoutAlignment.Start)
+      it.top(20, aLabel)
       it.width(20)
       it.height(44)
     })
+    redView.addGestureRecognizer(new UITapGestureRecognizer().on("touch", () => {
+      aLabel.loadImageWithURLString("https://avatars0.githubusercontent.com/u/5013664?s=460&v=4")
+    }))
   }
 
 }

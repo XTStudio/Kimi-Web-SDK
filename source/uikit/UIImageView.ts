@@ -85,6 +85,9 @@ export class UIImageView extends UIView {
             }
         }
         this.createTintFilter()
+        if (this.requireLayoutApplingAfterContentChanged) {
+            this.layoutController.apply()
+        }
     }
 
     private currentURLString: string | undefined = undefined
@@ -171,9 +174,17 @@ export class UIImageView extends UIView {
         }
     }
 
-    intrinsicContentSize(): UISize {
+    intrinsicContentSize(width: number | undefined = undefined): UISize {
         if (this.image) {
-            return this.image.size
+            if (width !== undefined && this.image.size.width > width) {
+                return {
+                    width: width,
+                    height: (width / this.image.size.width) * this.image.size.height
+                }
+            }
+            else {
+                return this.image.size
+            }
         }
         return UISizeZero
     }

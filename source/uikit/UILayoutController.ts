@@ -162,10 +162,16 @@ export class UILayoutController {
                         break
                     case LayoutType.Width:
                         {
-                            let newValue = it.expression === -1 ? (target.intrinsicContentSize() || UISizeZero).width : this.calculate(ownerFrame, ownerFrame.width, it.expression)
+                            let maxValue: number | undefined = undefined
                             if (target.layoutController.maxWidthItem !== undefined) {
-                                const maxValue = this.calculate(ownerFrame, ownerFrame.width, target.layoutController.maxWidthItem.expression)
-                                newValue = Math.min(newValue, maxValue)
+                                maxValue = this.calculate(ownerFrame, ownerFrame.width, target.layoutController.maxWidthItem.expression)
+                            }
+                            let newValue = it.expression === -1 ? (target.intrinsicContentSize(maxValue) || UISizeZero).width : this.calculate(ownerFrame, ownerFrame.width, it.expression)
+                            if (maxValue !== undefined) {
+                                newValue = Math.max(0, Math.min(newValue, maxValue))
+                            }
+                            if (it.expression) {
+                                target.requireLayoutApplingAfterContentChanged = true
                             }
                             if (targetFrame.width !== newValue) {
                                 changed = true
@@ -175,10 +181,17 @@ export class UILayoutController {
                         break
                     case LayoutType.Height:
                         {
-                            let newValue = it.expression === -1 ? (target.intrinsicContentSize() || UISizeZero).height : this.calculate(ownerFrame, ownerFrame.height, it.expression)
+                            let maxWidthValue: number | undefined = undefined
+                            if (target.layoutController.maxWidthItem !== undefined) {
+                                maxWidthValue = this.calculate(ownerFrame, ownerFrame.width, target.layoutController.maxWidthItem.expression)
+                            }
+                            let newValue = it.expression === -1 ? (target.intrinsicContentSize(maxWidthValue) || UISizeZero).height : this.calculate(ownerFrame, ownerFrame.height, it.expression)
                             if (target.layoutController.maxHeightItem !== undefined) {
                                 const maxValue = this.calculate(ownerFrame, ownerFrame.height, target.layoutController.maxHeightItem.expression)
-                                newValue = Math.min(newValue, maxValue)
+                                newValue = Math.max(0, Math.min(newValue, maxValue))
+                            }
+                            if (it.expression) {
+                                target.requireLayoutApplingAfterContentChanged = true
                             }
                             if (targetFrame.height !== newValue) {
                                 changed = true

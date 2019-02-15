@@ -48,6 +48,9 @@ export class UILabel extends UIView {
         else {
             this.textElement.innerText = ""
         }
+        if (this.requireLayoutApplingAfterContentChanged) {
+            this.layoutController.apply()
+        }
     }
 
     private _attributedText: UIAttributedString | undefined = undefined
@@ -76,6 +79,9 @@ export class UILabel extends UIView {
         }
         else {
             this.textElement.innerText = ""
+        }
+        if (this.requireLayoutApplingAfterContentChanged) {
+            this.layoutController.apply()
         }
     }
 
@@ -107,6 +113,9 @@ export class UILabel extends UIView {
             this.textElement.style.fontFamily = null;
             this.textElement.style.fontWeight = null;
             this.textElement.style.fontStyle = null;
+        }
+        if (this.requireLayoutApplingAfterContentChanged) {
+            this.layoutController.apply()
         }
     }
 
@@ -205,6 +214,9 @@ export class UILabel extends UIView {
             this.resetLineClamp()
             this.textElement.style.whiteSpace = null;
         }
+        if (this.requireLayoutApplingAfterContentChanged) {
+            this.layoutController.apply()
+        }
     }
 
     private resetLineClamp() {
@@ -221,6 +233,7 @@ export class UILabel extends UIView {
                     realHeight = TextMeasurer.measureText(this.text, {
                         font: this.font || new UIFont(14),
                         inRect: { x: 0, y: 0, width: this.bounds.width, height: Infinity },
+                        numberOfLines: this.numberOfLines,
                     }).height
                 }
                 else if (this.attributedText) {
@@ -250,20 +263,25 @@ export class UILabel extends UIView {
         this.resetLineClamp()
     }
 
+    private cachedSizeLimitWidth: number | undefined = undefined
     private cachedSize: UISize | undefined = undefined
 
-    intrinsicContentSize(): UISize {
+    intrinsicContentSize(width: number | undefined = undefined): UISize {
+        if (this.cachedSizeLimitWidth !== width) {
+            this.cachedSize = undefined
+            this.cachedSizeLimitWidth = width
+        }
         if (this.cachedSize !== undefined) {
             return this.cachedSize
         }
         else if (this.attributedText) {
-            this.cachedSize = TextMeasurer.measureAttributedText(this.attributedText, { width: Infinity, height: Infinity })
+            this.cachedSize = TextMeasurer.measureAttributedText(this.attributedText, { width: width !== undefined ? width : Infinity, height: Infinity })
             return this.cachedSize
         }
         else if (this.text) {
             this.cachedSize = TextMeasurer.measureText(this.text, {
                 font: this.font || new UIFont(14),
-                inRect: { x: 0, y: 0, width: Infinity, height: Infinity },
+                inRect: { x: 0, y: 0, width: (width !== undefined ? width : Infinity), height: Infinity },
                 numberOfLines: this.numberOfLines
             })
             return this.cachedSize

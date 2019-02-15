@@ -19,6 +19,7 @@ export const sharedVelocityTracker = new VelocityTracker
 export class UIView extends EventEmitter {
 
     public domElement = document.createElement("div")
+    public requireLayoutApplingAfterContentChanged = false
 
     constructor() {
         super()
@@ -936,7 +937,7 @@ export class UIView extends EventEmitter {
         }
     }
 
-    intrinsicContentSize(): UISize | undefined {
+    intrinsicContentSize(width: number | undefined = undefined): UISize | undefined {
         return undefined
     }
 
