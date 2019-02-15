@@ -12,6 +12,7 @@ import { UIEdgeInsets, UIEdgeInsetsZero } from "./UIEdgeInsets";
 import { UIAnimator, UIAnimation } from "./UIAnimator";
 import { UISize } from "./UISize";
 import { Router } from "./helpers/Router";
+import { UILayoutController } from "./UILayoutController";
 
 export const sharedVelocityTracker = new VelocityTracker
 
@@ -78,6 +79,14 @@ export class UIView extends EventEmitter {
             this._layer = new CALayer()
         }
         return this._layer
+    }
+
+    public layoutController = new UILayoutController(this)
+
+    makeConstraints(maker: (layoutController: UILayoutController) => void) {
+        this.layoutController.clear()
+        maker(this.layoutController)
+        this.layoutController.apply()
     }
 
     private _frame: UIRect = UIRectZero
@@ -270,14 +279,22 @@ export class UIView extends EventEmitter {
             this.viewDelegate.didAddSubview(subview)
         }
     }
-    willRemoveSubview(subview: UIView): void { }
-    willMoveToSuperview(newSuperview: UIView | undefined): void { }
+
+    willRemoveSubview(subview: UIView): void {
+        subview.layoutController.clear()
+    }
+
+    willMoveToSuperview(newSuperview: UIView | undefined): void {
+    }
+
     didMoveToSuperview(): void {
         this.tintColorDidChange()
     }
+
     willMoveToWindow(window: UIWindow | undefined): void {
         this.subviews.forEach(it => it.willMoveToWindow(window))
     }
+
     didMoveToWindow(): void {
         this.subviews.forEach(it => it.didMoveToWindow())
     }
@@ -285,7 +302,12 @@ export class UIView extends EventEmitter {
     private _layoutTimer: any
 
     setNeedsLayout(layoutSubviews = false): void {
-        if (!layoutSubviews) { return }
+        if (!layoutSubviews) {
+            if (!UIAnimator.duringAnimationValueSet) {
+                this.layoutController.apply()
+            }
+            return
+        }
         this.layoutIfNeeded()
     }
 
@@ -296,7 +318,15 @@ export class UIView extends EventEmitter {
     layoutSubviews(): void {
         if (this.viewDelegate) {
             this.viewDelegate.viewWillLayoutSubviews()
+            if (!UIAnimator.duringAnimationValueSet) {
+                this.layoutController.apply()
+            }
             this.viewDelegate.viewDidLayoutSubviews()
+        }
+        else {
+            if (!UIAnimator.duringAnimationValueSet) {
+                this.layoutController.apply()
+            }
         }
     }
 

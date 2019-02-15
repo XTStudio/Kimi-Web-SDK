@@ -226,6 +226,9 @@ global.UIWebView = UIWebView
 import { UIReload } from "./uikit/UIReload";
 global.UIReload = UIReload
 
+import { UILayoutAlignment } from "./uikit/UILayoutController";
+global.UILayoutAlignment = UILayoutAlignment
+
 // Foundation
 
 import { Bundle } from "./foundation/Bundle";
